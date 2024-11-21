@@ -101,13 +101,11 @@ async function getCustomerData() {
 async function getProductData() {
   const [productCount, availableProducts] = await Promise.all([
     prisma.product.count(),
-    prisma.product.aggregate({
-      _count: { isAvailable: true },
-    }),
+    prisma.product.count({ where: { isAvailable: true } }),
   ]);
   return {
     productCount,
-    availableProducts: availableProducts._count.isAvailable,
+    availableProducts,
   };
 }
 
