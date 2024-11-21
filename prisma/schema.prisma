@@ -25,6 +25,8 @@ model Product {
   categoryId   Int
   reviews      Review[]
   cart         CartItem[]
+  style        Style @relation(fields: [styleId], references: [id])
+  styleId      Int
 }
 
 model User {
@@ -47,9 +49,7 @@ model Order {
   items        OrderItem[]
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int
-
 }
-
 
 model OrderItem {
   id        Int      @id @default(autoincrement())
@@ -62,6 +62,13 @@ model OrderItem {
 }
 
 model Category {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  description String?
+  products    Product[]
+}
+
+model Style {
   id          Int        @id @default(autoincrement())
   name        String     @unique
   description String?
