@@ -14,6 +14,11 @@ export default {
         secondaryBackground: "#000000",
         secondaryText: "#FFFFFF",
       },
+      fontFamily: {
+        satoshiLight: ["SatoshiLight", "Arial", "Helvetica", "sans-serif"],
+        satoshiMedium: ["SatoshiMedium", "Arial", "Helvetica", "sans-serif"],
+        satoshiRegular: ["SatoshiRegular", "Arial", "Helvetica", "sans-serif"],
+      },
     },
   },
   plugins: [],

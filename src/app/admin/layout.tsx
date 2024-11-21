@@ -20,7 +20,7 @@ export default function RootLayout({
         <NavLink href="/admin/customers">Customers</NavLink>
         <NavLink href="/admin/orders">Sales</NavLink>
       </Nav>
-      <div className="container my-6">{children}</div>
+      <div className="container my-6 mx-6">{children}</div>
     </>
   );
 }
