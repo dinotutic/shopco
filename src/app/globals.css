@@ -10,10 +10,26 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: "SatoshiBlack", "Arial", "Helvetica", "sans-serif";
+  font-family: "SatoshiRegular", "Arial", "Helvetica", "sans-serif";
 }
 
 @font-face {
   font-family: "SatoshiBlack";
-  src: url("./fonts/Satoshi-Black") format("otf");
+  src: url("/fonts/Satoshi-Black.otf");
+}
+@font-face {
+  font-family: "SatoshiBold";
+  src: url("/fonts/Satoshi-Bold.otf");
+}
+@font-face {
+  font-family: "SatoshiLight";
+  src: url("/fonts/Satoshi-Light.otf");
+}
+@font-face {
+  font-family: "SatoshiMedium";
+  src: url("/fonts/Satoshi-Medium.otf");
+}
+@font-face {
+  font-family: "SatoshiRegular";
+  src: url("/fonts/Satoshi-Regular.otf");
 }
