@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "../globals.css";
 import { Nav, NavLink } from "./_components/Nav";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Admin - ShopCo",
   description: "Admin page for ShopCo",
