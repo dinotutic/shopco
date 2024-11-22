@@ -1,10 +1,14 @@
 "use client";
-
+import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ComponentProps } from "react";
 
-export function Nav({ children }: { children: React.ReactNode }) {
+type NavProps = {
+  children: ReactNode;
+};
+
+export function Nav({ children }: NavProps) {
   return (
     <nav className="bg-secondaryBackground text-secondaryText flex justify-center items-center">
       {children}

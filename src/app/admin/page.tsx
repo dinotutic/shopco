@@ -44,7 +44,6 @@ export default async function AdminDashboard() {
   const salesData = await getSales();
   const customerData = await getCustomerData();
   const productData = await getProductData();
-  console.log(productData);
   return (
     <div className="flex flex-col gap-4">
       <DashboardCard
@@ -53,7 +52,7 @@ export default async function AdminDashboard() {
         body={formatCurrency(salesData.ammount)}
       />
       <DashboardCard
-        title="Cutomers"
+        title="Customers"
         subtitle={formatNumber(customerData.userCount)}
         body={`${formatCurrency(
           customerData.avgSpentPerUser
