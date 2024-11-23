@@ -1,6 +1,6 @@
 "use server";
 
-import { z } from "zod";
+// import { z } from "zod";
 import prisma from "./prisma";
 
 // z.object({
@@ -33,4 +33,15 @@ export async function getStyles() {
   const data = await prisma.style.findMany();
   const styles = data.map((style) => style.name);
   return styles;
+}
+
+export async function getProductCount() {
+  const [productCount, availableProducts] = await Promise.all([
+    prisma.product.count(),
+    prisma.product.count({ where: { isAvailable: true } }),
+  ]);
+  return {
+    productCount,
+    availableProducts,
+  };
 }

@@ -1,49 +1,13 @@
 import { formatCurrency, formatNumber } from "../lib/formatters";
 import DashboardCard from "./ui/Card";
-import prisma from "@/db/prisma";
-
-async function getSales() {
-  const data = await prisma.order.aggregate({
-    _count: true,
-    _sum: { totalInCents: true },
-  });
-  return {
-    ammount: data._sum.totalInCents || 0,
-    numberOfOrders: data._count,
-  };
-}
-
-async function getCustomerData() {
-  const [userCount, avgSpentPerUser] = await Promise.all([
-    prisma.user.count(),
-    prisma.order.aggregate({
-      _sum: { totalInCents: true },
-    }),
-  ]);
-  return {
-    userCount,
-    avgSpentPerUser:
-      userCount === 0
-        ? 0
-        : (avgSpentPerUser._sum.totalInCents || 0) / userCount,
-  };
-}
-
-async function getProductData() {
-  const [productCount, availableProducts] = await Promise.all([
-    prisma.product.count(),
-    prisma.product.count({ where: { isAvailable: true } }),
-  ]);
-  return {
-    productCount,
-    availableProducts,
-  };
-}
+import { getSaleStats } from "@/db/saleQueries";
+import { getProductCount } from "@/db/productQueries";
+import { getAllCustomerStats } from "@/db/userQueries";
 
 export default async function AdminDashboard() {
-  const salesData = await getSales();
-  const customerData = await getCustomerData();
-  const productData = await getProductData();
+  const salesData = await getSaleStats();
+  const customerData = await getAllCustomerStats();
+  const productData = await getProductCount();
   return (
     <div className="flex flex-col gap-4">
       <DashboardCard
