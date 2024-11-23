@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import { Nav, NavLink } from "./_components/Nav";
+import { ReactNode } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -9,11 +10,11 @@ export const metadata: Metadata = {
   description: "Admin page for ShopCo",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+type RootLayoutProps = {
+  children: ReactNode;
+};
+
+export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   return (
     <>
       <Nav>

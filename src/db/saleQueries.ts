@@ -9,3 +9,14 @@ export async function getAllSales() {
   });
   return sales;
 }
+
+export async function getSaleStats() {
+  const data = await prisma.order.aggregate({
+    _count: true,
+    _sum: { totalInCents: true },
+  });
+  return {
+    ammount: data._sum.totalInCents || 0,
+    numberOfOrders: data._count,
+  };
+}
