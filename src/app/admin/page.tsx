@@ -8,6 +8,7 @@ export default async function AdminDashboard() {
   const salesData = await getSaleStats();
   const customerData = await getAllCustomerStats();
   const productData = await getProductCount();
+
   return (
     <div className="flex flex-col gap-4">
       <DashboardCard

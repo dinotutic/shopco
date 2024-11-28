@@ -1,5 +1,3 @@
-import { getAllProducts } from "@/db/productQueries";
-
 type Product = {
   id: number;
   name: string;
@@ -8,10 +6,10 @@ type Product = {
   stock: number;
   categoryId: number;
   styleId: number;
+  images: string;
 };
 
-export default async function ProductList() {
-  const products: Product[] = await getAllProducts();
+export default function ProductList({ products }: { products: Product[] }) {
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white border">
