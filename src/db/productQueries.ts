@@ -1,5 +1,5 @@
 "use server";
-import { buffer } from "stream/consumers";
+
 import prisma from "./prisma";
 import { uploadFile } from "@/app/lib/s3";
 
@@ -19,19 +19,20 @@ export async function addProduct(formData: FormData) {
   const style = formData.get("style");
 
   // Upload images
-  const imageKeys = [];
+  const imageUrls = [];
   for (const image of images) {
     if (!(image instanceof File) || !image.type.startsWith("image/")) {
       throw new Error("All files must be images");
     }
     const arrayBuffer = await image.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const key = `products/${name}/${image.name}`;
-    // const imageUrl = await uploadFile(key, buffer, image.type);
-    // imageUrls.push(imageUrl);
-    imageKeys.push(key);
-    uploadFile(key, buffer, image.type);
+    const key = `products/images/${name}/${image.name}`;
+    const imageUrl = await uploadFile(key, buffer, image.type);
+    if (typeof imageUrl === "string") {
+      imageUrls.push(imageUrl);
+    }
   }
+  console.log(imageUrls);
   // Create roduct in DB
   await prisma.product.create({
     data: {
@@ -51,7 +52,7 @@ export async function addProduct(formData: FormData) {
         },
       },
       images: {
-        create: imageKeys.map((key) => ({ url: key })),
+        create: imageUrls.map((key) => ({ url: key })),
       },
     },
   });
