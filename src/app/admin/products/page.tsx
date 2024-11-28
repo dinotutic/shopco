@@ -1,7 +1,11 @@
 import Link from "next/link";
 import PageHeader from "../_components/PageHeader";
 import ProductList from "../_components/ProductList";
-export default function AdminProductsPage() {
+import { getAllProducts } from "@/db/productQueries";
+
+export default async function AdminProductsPage() {
+  const products = await getAllProducts();
+
   return (
     <>
       <div className="flex justify-between border items-center w-full ">
@@ -10,7 +14,7 @@ export default function AdminProductsPage() {
           <Link href="/admin/products/add-product">Add Product</Link>
         </button>
       </div>
-      <ProductList />
+      <ProductList products={products} />
     </>
   );
 }

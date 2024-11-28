@@ -1,16 +1,7 @@
 "use server";
-
-// import { z } from "zod";
+import { buffer } from "stream/consumers";
 import prisma from "./prisma";
-
-// z.object({
-//   name: z.string().min(1),
-//   description: z.string().min(1),
-//   priceInCents: z.coerce.number().int().min(1),
-//   stock: z.coerce.number().int().min(1),
-//   isAvailable: z.boolean(),
-//   image: z.string().min(1),
-// });
+import { uploadFile } from "@/app/lib/s3";
 
 export async function getAllProducts() {
   const products = await prisma.product.findMany();
@@ -18,9 +9,52 @@ export async function getAllProducts() {
 }
 
 export async function addProduct(formData: FormData) {
-  console.log("Logging form data", formData);
-  console.log("category: ", formData.get("category"));
-  console.log("style: ", formData.get("style"));
+  const name = formData.get("name");
+  const description = formData.get("description");
+  const priceInCents = formData.get("priceInCents");
+  const stock = formData.get("stock");
+  const isAvailable = formData.get("isAvailable");
+  const images = formData.getAll("images");
+  const category = formData.get("category");
+  const style = formData.get("style");
+
+  // Upload images
+  const imageKeys = [];
+  for (const image of images) {
+    if (!(image instanceof File) || !image.type.startsWith("image/")) {
+      throw new Error("All files must be images");
+    }
+    const arrayBuffer = await image.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const key = `products/${name}/${image.name}`;
+    // const imageUrl = await uploadFile(key, buffer, image.type);
+    // imageUrls.push(imageUrl);
+    imageKeys.push(key);
+    uploadFile(key, buffer, image.type);
+  }
+  // Create roduct in DB
+  await prisma.product.create({
+    data: {
+      name: name as string,
+      description: description as string,
+      priceInCents: parseInt(priceInCents as string),
+      stock: parseInt(stock as string),
+      isAvailable: isAvailable === "true",
+      category: {
+        connect: {
+          name: category as string,
+        },
+      },
+      style: {
+        connect: {
+          name: style as string,
+        },
+      },
+      images: {
+        create: imageKeys.map((key) => ({ url: key })),
+      },
+    },
+  });
 }
 
 export async function getCategories() {

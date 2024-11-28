@@ -74,6 +74,7 @@ export default function ProductForm({
           type="checkbox"
           id="isAvailable"
           name="isAvailable"
+          value="true"
           required
           defaultChecked
           className="mx-4"
@@ -81,13 +82,14 @@ export default function ProductForm({
       </div>
       <div className="flex flex-col">
         <label htmlFor="image" className="mb-1">
-          Image link
+          Image
         </label>
         <input
-          type="text"
-          id="image"
-          name="image"
+          type="file"
+          id="images"
+          name="images"
           required
+          multiple
           className="border rounded-md py-1"
         ></input>
       </div>

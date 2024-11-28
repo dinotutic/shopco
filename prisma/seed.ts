@@ -4,14 +4,6 @@ import { faker } from "@faker-js/faker";
 const prisma = new PrismaClient();
 
 async function main() {
-  // Delete all existing data
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.style.deleteMany();
-  await prisma.user.deleteMany();
-
   // Create categories
   const categoryNames = ["T-shirts", "Shorts", "Shirts", "Hoodies", "Jeans"];
 
@@ -61,7 +53,6 @@ async function main() {
         name: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
         priceInCents: parseInt(faker.commerce.price()) * 100,
-        image: faker.image.urlLoremFlickr(),
         stock: Math.floor(Math.random() * 100),
         category: {
           connect: {
@@ -72,6 +63,13 @@ async function main() {
           connect: {
             id: styles[Math.floor(Math.random() * styles.length)].id,
           },
+        },
+        images: {
+          create: [
+            { url: faker.image.urlLoremFlickr() },
+            { url: faker.image.urlLoremFlickr() },
+            { url: faker.image.urlLoremFlickr() },
+          ],
         },
       },
     });
