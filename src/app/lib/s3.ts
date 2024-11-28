@@ -38,8 +38,8 @@ export async function uploadFile(
   try {
     const response = await s3Client.send(command);
     console.log("S3 Response", response);
-    // const fileUrl = `https://${bucketName}.s3.${bucketRegion}.amazonaws.com/${key}`;
-    // return fileUrl;
+    const fileUrl = `https://${bucketName}.s3.${bucketRegion}.amazonaws.com/${key}`;
+    return fileUrl;
   } catch (error) {
     console.error("S3 Error", error);
   }
