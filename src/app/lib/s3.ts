@@ -1,9 +1,10 @@
 import {
   S3Client,
   PutObjectCommand,
-  GetObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
 } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+
 import { Buffer } from "buffer";
 const bucketName = process.env.BUCKET_NAME;
 const bucketRegion = process.env.BUCKET_REGION;
@@ -45,17 +46,28 @@ export async function uploadFile(
   }
 }
 
-export async function getPresignedUrl(key: string) {
-  const command = new GetObjectCommand({
+export async function deleteFile(location: string) {
+  const params = {
     Bucket: bucketName,
-    Key: key,
-  });
-
-  try {
-    const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-    console.log("Presigned URL", url);
-    return url;
-  } catch (error) {
-    console.error("Presigned URL Error", error);
+    Prefix: location,
+  };
+  const listCommand = new ListObjectsV2Command(params);
+  let list = await s3Client.send(listCommand);
+  console.log(list);
+  if (list.KeyCount) {
+    const deleteCommand = new DeleteObjectsCommand({
+      Bucket: bucketName,
+      Delete: {
+        Objects: list.Contents?.map((content) => ({ Key: content.Key })),
+        Quiet: false,
+      },
+    });
+    let deleted = await s3Client.send(deleteCommand);
+    if (deleted.Errors) {
+      deleted.Errors.map((error) =>
+        console.log(`${error.Key} could not be deleted - ${error.Code}`)
+      );
+    }
+    return `${deleted.Deleted?.length} files deleted.`;
   }
 }

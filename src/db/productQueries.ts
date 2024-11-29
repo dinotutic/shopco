@@ -1,11 +1,32 @@
 "use server";
 
 import prisma from "./prisma";
-import { uploadFile } from "@/app/lib/s3";
+import { deleteFile, uploadFile } from "@/app/lib/s3";
 
 export async function getAllProducts() {
-  const products = await prisma.product.findMany();
+  const products = await prisma.product.findMany({ include: { images: true } });
   return products;
+}
+
+export async function deleteProduct(id: number, name: string) {
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: { images: true },
+  });
+  if (!product) {
+    throw new Error("Product not found");
+  }
+  console.log(product);
+
+  // Delete related images from db
+
+  await prisma.image.deleteMany({
+    where: { productId: id },
+  });
+  await prisma.product.delete({ where: { id } });
+
+  // Delete images from s3
+  await deleteFile(`products/images/${name}`);
 }
 
 export async function addProduct(formData: FormData) {
@@ -18,7 +39,7 @@ export async function addProduct(formData: FormData) {
   const category = formData.get("category");
   const style = formData.get("style");
 
-  // Upload images
+  // Upload images to s3
   const imageUrls = [];
   for (const image of images) {
     if (!(image instanceof File) || !image.type.startsWith("image/")) {
@@ -32,7 +53,6 @@ export async function addProduct(formData: FormData) {
       imageUrls.push(imageUrl);
     }
   }
-  console.log(imageUrls);
   // Create roduct in DB
   await prisma.product.create({
     data: {
