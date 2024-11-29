@@ -55,7 +55,7 @@ export default function ProductList({ products }: { products: Product[] }) {
               <td className="py-2 px-4 border-b">{product.stock}</td>
               <td className="py-2 px-4 border-b">{product.categoryId}</td>
               <td className="py-2 px-4 border-b">{product.styleId}</td>
-              <td className="py-2 px-4 border">
+              <td className="py-2 px-4 border-b">
                 <ProductActions product={product} />
               </td>
             </tr>
