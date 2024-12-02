@@ -38,7 +38,7 @@ export async function addProduct(formData: FormData) {
   const images = formData.getAll("images");
   const category = formData.get("category");
   const style = formData.get("style");
-
+  console.log("addproduct cat: ", category);
   // Upload images to s3
   const imageUrls = [];
   for (const image of images) {
@@ -79,14 +79,12 @@ export async function addProduct(formData: FormData) {
 }
 
 export async function getCategories() {
-  const data = await prisma.category.findMany();
-  const categories = data.map((category) => category.name);
+  const categories = await prisma.category.findMany();
   return categories;
 }
 
 export async function getStyles() {
-  const data = await prisma.style.findMany();
-  const styles = data.map((style) => style.name);
+  const styles = await prisma.style.findMany();
   return styles;
 }
 
