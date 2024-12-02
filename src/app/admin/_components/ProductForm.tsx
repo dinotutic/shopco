@@ -2,7 +2,7 @@
 
 import { formatCurrency } from "@/app/lib/formatters";
 import { addProduct } from "@/db/productQueries";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Product = {
   id: number;
@@ -13,28 +13,40 @@ type Product = {
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
-  categoryId: number;
-  styleId: number;
+  category: string;
+  style: string;
   images: { url: string }[];
 };
+
+type Styles = {
+  id: number;
+  name: string;
+};
+
+type Categories = {
+  id: number;
+  name: string;
+};
+
 export default function ProductForm({
   categories,
   styles,
   product,
 }: {
-  categories: string[];
-  styles: string[];
+  categories: Categories[];
+  styles: Styles[];
   product?: Product;
 }) {
   const [priceInEuros, setPriceInEuros] = useState<number>(0);
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [priceInCents, setPriceInCents] = useState<number>(0);
-  const [stock, setStock] = useState<number>(0);
+  const [priceInCents, setPriceInCents] = useState<number | string>("");
+  const [stock, setStock] = useState<number | string>("");
   const [isAvailable, setIsAvailable] = useState<boolean>(true);
-  const [categoryId, setCategoryId] = useState<number>(0);
-  const [styleId, setStyleId] = useState<number>(0);
+  const [category, setCategory] = useState<string>("");
+  const [style, setStyle] = useState<string>("");
   const [images, setImages] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
@@ -76,10 +88,18 @@ export default function ProductForm({
       formData.append("images", image);
     });
 
-    if (product) {
-      // await updateProduct(product.id, formData);
-    } else {
-      await addProduct(formData);
+    await addProduct(formData);
+    setName("");
+    setDescription("");
+    setPriceInCents("");
+    setPriceInEuros(0);
+    setStock("");
+    setIsAvailable(true);
+    setCategory("");
+    setStyle("");
+    setImages([]);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
     }
   };
 
@@ -165,6 +185,7 @@ export default function ProductForm({
           type="file"
           id="images"
           name="images"
+          ref={fileInputRef}
           onChange={handleImageChange}
           required
           multiple
@@ -180,8 +201,8 @@ export default function ProductForm({
           id="category"
           name="category"
           required
-          value={categoryId}
-          onChange={(e) => setCategoryId(Number(e.target.value))}
+          value={category}
+          onChange={(e) => setCategory(String(e.target.value))}
           className="border rounded-md py-1"
         >
           <option value="" disabled>
@@ -189,8 +210,8 @@ export default function ProductForm({
           </option>
           {categories.map((category) => {
             return (
-              <option key={category} value={category}>
-                {category}
+              <option key={category.name} value={category.name}>
+                {category.name}
               </option>
             );
           })}
@@ -203,8 +224,8 @@ export default function ProductForm({
         <select
           id="style"
           name="style"
-          value={styleId}
-          onChange={(e) => setStyleId(Number(e.target.value))}
+          value={style}
+          onChange={(e) => setStyle(String(e.target.value))}
           required
           className="border rounded-md py-1"
         >
@@ -213,8 +234,8 @@ export default function ProductForm({
           </option>
           {styles.map((style) => {
             return (
-              <option key={style} value={style}>
-                {style}
+              <option key={style.name} value={style.name}>
+                {style.name}
               </option>
             );
           })}
