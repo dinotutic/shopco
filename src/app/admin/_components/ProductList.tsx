@@ -1,12 +1,12 @@
-import { deleteProduct } from "@/db/productQueries";
 import ProductActions from "./ProductActions";
+import { deleteProduct } from "@/db/productQueries";
 
 type Product = {
   id: number;
   name: string;
   description: string;
   priceInCents: number;
-  stock: number;
+  stock: { id: number; size: string; quantity: number; productId: number }[];
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -16,6 +16,7 @@ type Product = {
 };
 
 export default function ProductList({ products }: { products: Product[] }) {
+  const sizes = ["XS", "S", "M", "L", "XL"]; // Gotta do this nicer sometime in the future
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white border">
@@ -52,7 +53,21 @@ export default function ProductList({ products }: { products: Product[] }) {
               <td className="py-2 px-4 border-b">
                 {(product.priceInCents / 100).toFixed(2)}€
               </td>
-              <td className="py-2 px-4 border-b">{product.stock}</td>
+              <td className="py-2 px-4 border-b">
+                <div className="flex gap-4">
+                  {sizes.map((size) => {
+                    const stockEntry = product.stock.find(
+                      (entry) => entry.size === size
+                    );
+                    return (
+                      <div key={size} className="flex flex-col items-center">
+                        <span>{size}</span>
+                        <span>{stockEntry ? stockEntry.quantity : 0}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </td>
               <td className="py-2 px-4 border-b">{product.categoryId}</td>
               <td className="py-2 px-4 border-b">{product.styleId}</td>
               <td className="py-2 px-4 border-b">
