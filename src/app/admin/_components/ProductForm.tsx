@@ -9,7 +9,7 @@ type Product = {
   name: string;
   description: string;
   priceInCents: number;
-  stock: number;
+  stock: { size: string; quantity: number }[];
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -41,7 +41,12 @@ export default function ProductForm({
   const [name, setName] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [priceInCents, setPriceInCents] = useState<number | string>("");
-  const [stock, setStock] = useState<number | string>("");
+  const [stock, setStock] = useState<{ size: string; quantity: number }[]>([
+    { size: "S", quantity: 0 },
+    { size: "M", quantity: 0 },
+    { size: "L", quantity: 0 },
+    { size: "XL", quantity: 0 },
+  ]);
   const [isAvailable, setIsAvailable] = useState<boolean>(true);
   const [category, setCategory] = useState<string>("");
   const [style, setStyle] = useState<string>("");
@@ -82,24 +87,40 @@ export default function ProductForm({
 
   const handleSUbmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
 
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
     images.forEach((image) => {
       formData.append("images", image);
     });
 
-    await addProduct(formData);
-    setName("");
-    setDescription("");
-    setPriceInCents("");
-    setPriceInEuros(0);
-    setStock("");
-    setIsAvailable(true);
-    setCategory("");
-    setStyle("");
-    setImages([]);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+    // Serializing stock since formData can't handle arrays
+    formData.append("stock", JSON.stringify(stock));
+    try {
+      await addProduct(formData);
+
+      // // Reset form
+      setName("");
+      setDescription("");
+      setPriceInCents("");
+      setPriceInEuros(0);
+      setStock([
+        { size: "XS", quantity: 0 },
+        { size: "S", quantity: 0 },
+        { size: "M", quantity: 0 },
+        { size: "L", quantity: 0 },
+        { size: "XL", quantity: 0 },
+      ]);
+      setIsAvailable(true);
+      setCategory("");
+      setStyle("");
+      setImages([]);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      // Reset the form element itself
+    } catch (error) {
+      console.error("Error adding product:", error);
     }
   };
 
@@ -153,15 +174,24 @@ export default function ProductForm({
         <label htmlFor="stock" className="mb-1">
           Stock
         </label>
-        <input
-          type="number"
-          id="stock"
-          name="stock"
-          value={stock}
-          onChange={(e) => setStock(Number(e.target.value))}
-          required
-          className="border rounded-md py-1"
-        ></input>
+        {stock.map((item, index) => (
+          <div key={index} className="flex items-center mb-2">
+            <span className="w-7">{item.size}</span>
+            <input
+              type="number"
+              id={`stock-${item.size}`}
+              name={`stock-${item.size}`}
+              value={item.quantity}
+              onChange={(e) => {
+                const newStock = [...stock];
+                newStock[index].quantity = Number(e.target.value);
+                setStock(newStock);
+              }}
+              required
+              className="border rounded-md py-1 w-12"
+            ></input>
+          </div>
+        ))}
       </div>
       <div className="flex">
         <label htmlFor="isAvailable" className="mb-1">

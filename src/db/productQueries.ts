@@ -4,25 +4,29 @@ import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
 
 export async function getAllProducts() {
-  const products = await prisma.product.findMany({ include: { images: true } });
+  const products = await prisma.product.findMany({
+    include: { images: true, category: true, style: true, stock: true },
+  });
   return products;
 }
 
 export async function deleteProduct(id: number, name: string) {
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { images: true },
+    include: { images: true, stock: true },
   });
   if (!product) {
     throw new Error("Product not found");
   }
-  console.log(product);
+  console.log(`Deleting product ${product}`);
 
   // Delete related images from db
 
   await prisma.image.deleteMany({
     where: { productId: id },
   });
+
+  await prisma.stock.deleteMany({ where: { productId: id } });
   await prisma.product.delete({ where: { id } });
 
   // Delete images from s3
@@ -38,7 +42,7 @@ export async function addProduct(formData: FormData) {
   const images = formData.getAll("images");
   const category = formData.get("category");
   const style = formData.get("style");
-  console.log("addproduct cat: ", category);
+
   // Upload images to s3
   const imageUrls = [];
   for (const image of images) {
@@ -53,13 +57,17 @@ export async function addProduct(formData: FormData) {
       imageUrls.push(imageUrl);
     }
   }
+
+  //Parse stock array to be usable here
+  type StockData = { size: string; quantity: number }[];
+  const stockData: StockData = JSON.parse(stock as string);
+
   // Create roduct in DB
   await prisma.product.create({
     data: {
       name: name as string,
       description: description as string,
       priceInCents: parseInt(priceInCents as string),
-      stock: parseInt(stock as string),
       isAvailable: isAvailable === "true",
       category: {
         connect: {
@@ -72,10 +80,17 @@ export async function addProduct(formData: FormData) {
         },
       },
       images: {
-        create: imageUrls.map((key) => ({ url: key })),
+        create: imageUrls.map((url) => ({ url })),
+      },
+      stock: {
+        create: stockData.map((item) => ({
+          size: item.size,
+          quantity: item.quantity,
+        })),
       },
     },
   });
+  console.log(`Product added: ${name}`);
 }
 
 export async function getCategories() {

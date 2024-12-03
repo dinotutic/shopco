@@ -4,38 +4,37 @@ import { faker } from "@faker-js/faker";
 const prisma = new PrismaClient();
 
 async function main() {
-  const availableSizes = ["XS", "S", "M", "L", "XL"];
-
   // Create categories
-  const categoryNames = ["T-shirts", "Shorts", "Shirts", "Hoodies", "Jeans"];
-  const categories = [];
-  for (const category of categoryNames) {
-    console.log(`Creating category: ${category}`);
-    const createdCategory = await prisma.category.create({
-      data: {
-        name: category,
-      },
-    });
-    categories.push(createdCategory);
+  const categories = ["T-shirts", "Shorts", "Shirts", "Hoodies", "Jeans"];
+  const sizes = ["S", "M", "L", "XL"];
+
+for (const category of categories) {
+  await prisma.category.create({
+    data: {
+      name: category,
+    },
+  });
+}
+
   }
 
   // Create styles
   const styleNames = ["Casual", "Formal", "Party", "Gym"];
+
   const styles = [];
-  for (const style of styleNames) {
-    console.log(`Creating style: ${style}`);
-    const createdStyle = await prisma.style.create({
+  for (const name of styleNames) {
+    const style = await prisma.style.create({
       data: {
-        name: style,
+        name,
+        description: faker.lorem.sentence(),
       },
     });
-    styles.push(createdStyle);
+    styles.push(style);
   }
 
   // Create users
   const users = [];
   for (let i = 0; i < 25; i++) {
-    console.log(`Creating user ${i + 1}`);
     const user = await prisma.user.create({
       data: {
         email: faker.internet.email(),
@@ -49,20 +48,18 @@ async function main() {
   // Create products
   const products = [];
   for (let i = 0; i < 50; i++) {
-    const stockEntries = [];
-    for (const size of availableSizes) {
-      stockEntries.push({
-        size,
-        quantity: faker.number.int({ min: 0, max: 30 }),
-      });
-    }
-    console.log(`Creating product ${i + 1}`);
     const product = await prisma.product.create({
       data: {
         name: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
         priceInCents: parseInt(faker.commerce.price()) * 100,
-        isAvailable: faker.datatype.boolean(),
+        stock: {
+          create: sizes.map(size => ({
+            size,
+            quantity: faker.number.int({ min: 0, max: 30 }),
+          }))
+        },
+
         category: {
           connect: {
             id: categories[Math.floor(Math.random() * categories.length)].id,
@@ -80,9 +77,6 @@ async function main() {
             { url: faker.image.urlLoremFlickr() },
           ],
         },
-        stock: {
-          create: stockEntries,
-        },
       },
     });
     products.push(product);
@@ -95,16 +89,13 @@ async function main() {
       const orderItems = [];
       for (let j = 0; j < faker.number.int({ min: 1, max: 5 }); j++) {
         const product = products[Math.floor(Math.random() * products.length)];
-        const size =
-          availableSizes[Math.floor(Math.random() * availableSizes.length)];
         orderItems.push({
           productId: product.id,
           quantity: faker.number.int({ min: 1, max: 5 }),
           price: product.priceInCents,
-          size: size,
         });
       }
-      console.log(`Creating order ${i + 1} for user ${user.id}`);
+
       await prisma.order.create({
         data: {
           totalInCents: orderItems.reduce(

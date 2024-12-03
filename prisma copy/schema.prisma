@@ -31,11 +31,9 @@ model Product {
 
 model Stock {
   id          Int       @id @default(autoincrement())
-  size        String    
+  name        String    @unique
   quantity    Int
-  productId   Int
-  product      Product @relation(fields: [productId], references: [id])
-  @@unique([productId, size])
+  products    Product[]
 }
 
 model Image {
@@ -76,7 +74,6 @@ model OrderItem {
   productId Int
   quantity  Int      @default(1) // Number of this product in the order
   price     Float    // Price at the time of purchase
-  size      String
 }
 
 model Category {
@@ -88,6 +85,7 @@ model Category {
 model Style {
   id          Int        @id @default(autoincrement())
   name        String     @unique
+  description String?
   products    Product[]
 }
 
