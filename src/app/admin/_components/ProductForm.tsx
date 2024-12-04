@@ -89,16 +89,16 @@ export default function ProductForm({
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    images.forEach((image) => {
-      formData.append("images", image);
-    });
+    // images.forEach((image) => {
+    //   formData.append("images", image);
+    // });
 
     // Serializing stock since formData can't handle arrays
     formData.append("stock", JSON.stringify(stock));
     try {
       await addProduct(formData);
 
-      // // Reset form
+      // Reset form
       setName("");
       setDescription("");
       setPriceInCents("");
@@ -117,8 +117,6 @@ export default function ProductForm({
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
-
-      // Reset the form element itself
     } catch (error) {
       console.error("Error adding product:", error);
     }

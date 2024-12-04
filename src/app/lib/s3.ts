@@ -53,7 +53,6 @@ export async function deleteFile(location: string) {
   };
   const listCommand = new ListObjectsV2Command(params);
   let list = await s3Client.send(listCommand);
-  console.log(list);
   if (list.KeyCount) {
     const deleteCommand = new DeleteObjectsCommand({
       Bucket: bucketName,

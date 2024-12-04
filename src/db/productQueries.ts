@@ -18,7 +18,7 @@ export async function deleteProduct(id: number, name: string) {
   if (!product) {
     throw new Error("Product not found");
   }
-  console.log(`Deleting product ${product}`);
+  console.log(`Deleting product ${product.name}`);
 
   // Delete related images from db
 
@@ -90,6 +90,7 @@ export async function addProduct(formData: FormData) {
       },
     },
   });
+
   console.log(`Product added: ${name}`);
 }
 
