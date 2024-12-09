@@ -3,6 +3,7 @@
 import { formatCurrency } from "@/app/lib/formatters";
 import { addProduct } from "@/db/productQueries";
 import { useRef, useState } from "react";
+import { isatty } from "tty";
 
 type Product = {
   id: number;
@@ -42,6 +43,7 @@ export default function ProductForm({
   const [description, setDescription] = useState<string>("");
   const [priceInCents, setPriceInCents] = useState<number | string>("");
   const [stock, setStock] = useState<{ size: string; quantity: number }[]>([
+    { size: "XS", quantity: 0 },
     { size: "S", quantity: 0 },
     { size: "M", quantity: 0 },
     { size: "L", quantity: 0 },
@@ -89,10 +91,8 @@ export default function ProductForm({
     e.preventDefault();
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    // images.forEach((image) => {
-    //   formData.append("images", image);
-    // });
 
+    console.log("product form isavailable", isAvailable);
     // Serializing stock since formData can't handle arrays
     formData.append("stock", JSON.stringify(stock));
     try {

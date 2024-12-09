@@ -1,5 +1,4 @@
 import ProductActions from "./ProductActions";
-import { deleteProduct } from "@/db/productQueries";
 
 type Product = {
   id: number;
@@ -16,10 +15,11 @@ type Product = {
 };
 
 export default function ProductList({ products }: { products: Product[] }) {
+  console.log(products.map((product) => product.isAvailable));
   const sizes = ["XS", "S", "M", "L", "XL"]; // Gotta do this nicer sometime in the future
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border">
+      <table className="min-w-full bg-white border text-center">
         <thead>
           <tr>
             <th className="py-2 px-4 border-b">ID</th>
