@@ -10,6 +10,7 @@ export async function getAllProducts() {
   return products;
 }
 
+// I should probably only delete image from s3 if DB delete was successful and vice versa. Will look into it sometime in the future
 export async function deleteProduct(id: number, name: string) {
   const product = await prisma.product.findUnique({
     where: { id },
@@ -38,7 +39,7 @@ export async function addProduct(formData: FormData) {
   const description = formData.get("description");
   const priceInCents = formData.get("priceInCents");
   const stock = formData.get("stock");
-  const isAvailable = formData.get("isAvailable");
+  const isAvailable = formData.get("isAvailable") === "on";
   const images = formData.getAll("images");
   const category = formData.get("category");
   const style = formData.get("style");
@@ -68,7 +69,7 @@ export async function addProduct(formData: FormData) {
       name: name as string,
       description: description as string,
       priceInCents: parseInt(priceInCents as string),
-      isAvailable: isAvailable === "true",
+      isAvailable: isAvailable,
       category: {
         connect: {
           name: category as string,
@@ -91,7 +92,7 @@ export async function addProduct(formData: FormData) {
     },
   });
 
-  console.log(`Product added: ${name}`);
+  console.log(`Product added: ${name} ${isAvailable}`);
 }
 
 export async function getCategories() {
@@ -113,4 +114,62 @@ export async function getProductCount() {
     productCount,
     availableProducts,
   };
+}
+
+export async function getProductById(id: number) {
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: { images: true, category: true, style: true, stock: true },
+  });
+  return product;
+}
+
+export async function deleteSingleImage(key: string) {
+  await deleteFile(key);
+}
+
+export async function editProduct(
+  id: number,
+  data: {
+    name?: string;
+    description?: string;
+    priceInCents?: number;
+    categoryId?: number;
+    styleId?: number;
+    isAvailable?: boolean;
+    images?: File[];
+  },
+  newImages: File[] = []
+) {
+  // Upload new images and get their URL
+  const uploadedImages = await Promise.all(
+    newImages.map(async (image) => {
+      if (!(image instanceof File) || !image.type.startsWith("image/")) {
+        throw new Error("All files must be images");
+      }
+      const arrayBuffer = await image.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const key = `products/images/${data.name}/${image.name}`;
+      const imageUrl = await uploadFile(key, buffer, image.type);
+      return { url: imageUrl };
+    })
+  );
+
+  // Add new images to the image urls
+  const updatedImages = [...(data.images || []), ...uploadedImages];
+
+  // Update product in DB+
+  //unfinished
+  const updatedProduct = await prisma.product.update({
+    where: { id },
+    data: {
+      ...data,
+      images: {
+        deleteMany: {}, // Delete all existing images
+        create: updatedImages, // Add new images
+      },
+    },
+    include: { images: true, category: true, style: true, stock: true },
+  });
+  return updatedProduct;
 }
