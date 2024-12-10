@@ -92,7 +92,6 @@ export default function ProductForm({
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
 
-    console.log("product form isavailable", isAvailable);
     // Serializing stock since formData can't handle arrays
     formData.append("stock", JSON.stringify(stock));
     try {
