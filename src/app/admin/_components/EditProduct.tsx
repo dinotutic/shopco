@@ -1,7 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { deleteSingleImage, editProduct } from "@/db/productQueries";
+import {
+  deleteSingleImage,
+  deleteSingleImageFromProduct,
+  editProduct,
+} from "@/db/productQueries";
+import { simpleFaker } from "@faker-js/faker";
 
 type EditProductProps = {
   product: Product;
@@ -18,7 +23,7 @@ type Product = {
   updatedAt: Date;
   categoryId: number;
   styleId: number;
-  images: { url: string }[];
+  images: { url: string; isNew?: boolean }[];
 };
 
 export default function EditProduct({ product }: EditProductProps) {
@@ -32,14 +37,34 @@ export default function EditProduct({ product }: EditProductProps) {
   const [stock, setStock] = useState(product.stock);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
+  const [images, setImages] = useState(product.images);
 
   const handleMarkImagesToDelete = (
     e: React.MouseEvent<HTMLButtonElement>,
-    link: string
+    link: string,
+    isNew?: boolean,
+    index?: number
   ) => {
     e.preventDefault();
     if (!imagesToDelete.includes(link)) {
       setImagesToDelete([...imagesToDelete, link]);
+    } else {
+      const updatedImagesToDelete = imagesToDelete.filter(
+        (imageUrl) => imageUrl !== link
+      );
+      setImagesToDelete(updatedImagesToDelete);
+    }
+    // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
+    if (isNew) {
+      const startIndexOfNewImages = images.length - newImages.length;
+      const newImagesIndex =
+        index !== undefined ? index - startIndexOfNewImages : -1;
+      if (newImagesIndex !== -1) {
+        const updatedNewImages = newImages.filter(
+          (_, i) => i !== newImagesIndex
+        );
+        setNewImages(updatedNewImages);
+      }
     }
   };
 
@@ -47,13 +72,19 @@ export default function EditProduct({ product }: EditProductProps) {
     const imageFileName = link.split(`/${product.name}/`)[1];
     console.log(`Deleting products/images/${product.name}/${imageFileName}`);
     await deleteSingleImage(`products/images/${product.name}/${imageFileName}`);
-
-    const currentImages = product.images;
+    await deleteSingleImageFromProduct(product.id, link);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setNewImages([...newImages, ...Array.from(e.target.files)]);
+      const files = Array.from(e.target.files);
+      setNewImages([...newImages, ...files]);
+      const previews = files.map((file) => ({
+        file,
+        url: URL.createObjectURL(file),
+        isNew: true,
+      }));
+      setImages([...images, ...previews]);
     }
   };
 
@@ -69,9 +100,10 @@ export default function EditProduct({ product }: EditProductProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Delete images in S3
-    // await Promise.all(
-    //   imagesToDelete.map((imageUrl) => handleDeleteImage(imageUrl))
-    // );
+    console.log(imagesToDelete);
+    await Promise.all(
+      imagesToDelete.map((imageUrl) => handleDeleteImage(imageUrl))
+    );
 
     // New array of images for DB
     const currentImages = product.images.map((image) => image.url);
@@ -79,16 +111,38 @@ export default function EditProduct({ product }: EditProductProps) {
       (image) => !imagesToDelete.includes(image)
     );
     console.log(
+      `---------------------------------------------------------------\n`,
+      `Name: ${name}\n`,
+      `Description: ${description}\n`,
+      `Price (in cents): ${priceInCents}\n`,
+      `Stock: ${JSON.stringify(stock)}\n`,
+      `Available for Sale: ${availableForSale}\n`,
+      `Category ID: ${categoryId}\n`,
+      `Style ID: ${styleId}\n`,
+      `Filtered Images: ${JSON.stringify(filteredImages)}\n`,
+      `\n`,
+      `New images: ${newImages}\n`,
+      `\n`,
+      `Images to Delete: ${imagesToDelete}\n`,
+      `\n`,
+      `Previews/images: ${JSON.stringify(images)}\n`
+    );
+    const data = {
       name,
       description,
       priceInCents,
-      stock,
-      availableForSale,
       categoryId,
       styleId,
-      filteredImages,
-      newImages
-    );
+      isAvailable: availableForSale,
+      images: filteredImages.map((url) => ({ url })),
+    };
+    try {
+      // Call the editProduct function to update the product
+      const updatedProduct = await editProduct(product.id, data, newImages);
+      console.log("Product updated successfully:", updatedProduct);
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
   };
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +252,7 @@ export default function EditProduct({ product }: EditProductProps) {
             Images
           </label>
           <div className="flex flex-wrap gap-4">
-            {product.images.map((image, index) => (
+            {images.map((image, index) => (
               <div className="relative" key={`div ${index}`}>
                 <img
                   key={index}
@@ -210,7 +264,9 @@ export default function EditProduct({ product }: EditProductProps) {
                 />
                 {isEditing && (
                   <button
-                    onClick={(e) => handleMarkImagesToDelete(e, image.url)}
+                    onClick={(e) =>
+                      handleMarkImagesToDelete(e, image.url, image.isNew, index)
+                    }
                     key={`button ${index}`}
                     className="absolute top-0 right-0 bg-red-500 text-white px-2 rounded-full text-md"
                   >
@@ -225,7 +281,7 @@ export default function EditProduct({ product }: EditProductProps) {
               type="file"
               multiple
               className="mt-2"
-              onChange={handleImageChange}
+              onChange={handleImageAdd}
             />
           )}
         </div>

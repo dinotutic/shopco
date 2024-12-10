@@ -15,7 +15,6 @@ type Product = {
 };
 
 export default function ProductList({ products }: { products: Product[] }) {
-  console.log(products.map((product) => product.isAvailable));
   const sizes = ["XS", "S", "M", "L", "XL"]; // Gotta do this nicer sometime in the future
   return (
     <div className="overflow-x-auto">

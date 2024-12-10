@@ -92,7 +92,7 @@ export async function addProduct(formData: FormData) {
     },
   });
 
-  console.log(`Product added: ${name} ${isAvailable}`);
+  console.log(`Product added: ${name}`);
 }
 
 export async function getCategories() {
@@ -155,21 +155,29 @@ export async function editProduct(
     })
   );
 
-  // Add new images to the image urls
-  const updatedImages = [...(data.images || []), ...uploadedImages];
+  // Update product in DB
 
-  // Update product in DB+
-  //unfinished
   const updatedProduct = await prisma.product.update({
     where: { id },
     data: {
-      ...data,
+      name: data.name,
+      description: data.description,
+      priceInCents: data.priceInCents,
+      categoryId: data.categoryId,
+      styleId: data.styleId,
+      isAvailable: data.isAvailable,
       images: {
-        deleteMany: {}, // Delete all existing images
-        create: updatedImages, // Add new images
+        create: uploadedImages.map((image) => ({ url: image.url })),
       },
     },
-    include: { images: true, category: true, style: true, stock: true },
   });
   return updatedProduct;
+}
+
+export async function deleteSingleImageFromProduct(
+  productId: number,
+  key: string
+) {
+  await prisma.image.deleteMany({ where: { productId, url: key } });
+  await deleteFile(key);
 }
