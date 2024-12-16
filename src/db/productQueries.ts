@@ -1,5 +1,6 @@
 "use server";
-
+// So either here or in EditProduct there could come to issues if i were to upload files with the same name(i think)
+// it would be a good idea to fix this sometime in the future, but to be honest i dont think that time will ever come
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
 
@@ -134,8 +135,8 @@ export async function editProduct(
     name?: string;
     description?: string;
     priceInCents?: number;
-    categoryId?: number;
-    styleId?: number;
+    category?: { id: number; name: string };
+    style?: { id: number; name: string };
     isAvailable?: boolean;
     images?: File[];
   },
@@ -151,9 +152,12 @@ export async function editProduct(
       const buffer = Buffer.from(arrayBuffer);
       const key = `products/images/${data.name}/${image.name}`;
       const imageUrl = await uploadFile(key, buffer, image.type);
-      return { url: imageUrl };
+      if (typeof imageUrl === "string") {
+        return { url: imageUrl };
+      }
+      return null;
     })
-  );
+  ).then((images) => images.filter((image) => image !== null));
 
   // Update product in DB
 
@@ -163,8 +167,16 @@ export async function editProduct(
       name: data.name,
       description: data.description,
       priceInCents: data.priceInCents,
-      categoryId: data.categoryId,
-      styleId: data.styleId,
+      category: {
+        connect: {
+          id: data.category?.id,
+        },
+      },
+      style: {
+        connect: {
+          id: data.style?.id,
+        },
+      },
       isAvailable: data.isAvailable,
       images: {
         create: uploadedImages.map((image) => ({ url: image.url })),
