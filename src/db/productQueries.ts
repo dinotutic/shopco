@@ -185,7 +185,6 @@ export async function editProduct(
   });
 
   // Update stock quantities
-  console.log(data.stock);
   await Promise.all(
     data.stock.map(async (item) =>
       prisma.stock.updateMany({
@@ -194,15 +193,6 @@ export async function editProduct(
       })
     )
   );
-  // const stockItems = await prisma.stock.findMany({ where: { productId: id } });
-  // await Promise.all(
-  //   stockItems.map((item) =>
-  //     prisma.stock.updateMany({
-  //       where: { productId: item.productId, size: item.size },
-  //       data: { quantity: .quantity },
-  //     })
-  //   )
-  // );
 
   return updatedProduct;
 }

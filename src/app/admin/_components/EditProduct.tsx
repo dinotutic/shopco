@@ -51,6 +51,10 @@ export default function EditProduct({
   const [category, setCategory] = useState(product.category);
   const [availableForSale, setAvailableForSale] = useState(product.isAvailable);
   const [stock, setStock] = useState(product.stock);
+  const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
+  const sortedStock = [...stock].sort((a, b) => {
+    return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
+  });
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [images, setImages] = useState(product.images);
@@ -125,24 +129,7 @@ export default function EditProduct({
     const filteredImages = currentImages.filter(
       (image) => !imagesToDelete.includes(image)
     );
-    console.log(
-      `---------------------------------------------------------------\n`,
-      `Name: ${name}\n`,
-      `Description: ${description}\n`,
-      `Price (in cents): ${priceInCents}\n`,
-      `Stock: ${JSON.stringify(stock)}\n`,
-      `Available for Sale: ${availableForSale}\n`,
 
-      `Filtered Images: ${JSON.stringify(filteredImages)}\n`,
-      `\n`,
-      `New images: ${newImages}\n`,
-      `\n`,
-      `Images to Delete: ${imagesToDelete}\n`,
-      `\n`,
-      `Previews/images: ${JSON.stringify(images)}\n`
-    );
-    console.log("---------------------------------");
-    console.log(stock);
     const data = {
       name,
       description,
@@ -212,8 +199,8 @@ export default function EditProduct({
           <label className="block text-sm font-medium text-gray-700">
             Stock
           </label>
-          {stock.map((item, index) => (
-            <div key={item.size} className="flex items-center  mb-2 ">
+          {sortedStock.map((item, index) => (
+            <div key={item.size} className="flex items-center  mb-2">
               <span className="w-7">{item.size}</span>
               <input
                 type="number"
@@ -221,7 +208,7 @@ export default function EditProduct({
                 onChange={(e) =>
                   handleStockChange(index, Number(e.target.value))
                 }
-                className="mt-1 block border border-gray-300 rounded-md shadow-sm p-2 w-12"
+                className="mt-1 block border border-gray-300 rounded-md shadow-sm py-2 px-2 w-14"
                 disabled={!isEditing}
               />
             </div>
