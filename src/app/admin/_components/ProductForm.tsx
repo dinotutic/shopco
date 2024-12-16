@@ -3,7 +3,6 @@
 import { formatCurrency } from "@/app/lib/formatters";
 import { addProduct } from "@/db/productQueries";
 import { useRef, useState } from "react";
-import { isatty } from "tty";
 
 type Product = {
   id: number;
@@ -14,8 +13,8 @@ type Product = {
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
-  category: string;
-  style: string;
+  category: { id: number; name: string };
+  style: { id: number; name: string };
   images: { url: string }[];
 };
 

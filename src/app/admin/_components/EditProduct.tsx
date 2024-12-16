@@ -1,44 +1,59 @@
 "use client";
-
+// Changing product names will cause issues with images, as the images are stored in S3 with the product name as part of the key
+// To avoid this, I should save images in folders named by product ID instead of product name
+// Will do this in the future. Dont wanna do 5 things at once
 import { useState } from "react";
 import {
   deleteSingleImage,
   deleteSingleImageFromProduct,
   editProduct,
 } from "@/db/productQueries";
-import { simpleFaker } from "@faker-js/faker";
-
-type EditProductProps = {
-  product: Product;
-};
 
 type Product = {
   id: number;
   name: string;
   description: string;
   priceInCents: number;
-  stock: { id: number; size: string; quantity: number; productId: number }[];
+  stock: { size: string; quantity: number }[];
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
-  categoryId: number;
-  styleId: number;
+  category: { id: number; name: string };
+  style: { id: number; name: string };
   images: { url: string; isNew?: boolean }[];
 };
 
-export default function EditProduct({ product }: EditProductProps) {
+type Styles = {
+  id: number;
+  name: string;
+};
+
+type Categories = {
+  id: number;
+  name: string;
+};
+
+export default function EditProduct({
+  product,
+  styles,
+  categories,
+}: {
+  categories: Categories[];
+  styles: Styles[];
+  product?: Product;
+}) {
+  if (!product) throw new Error("Product not found"); // This should never happen
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [name, setName] = useState(product.name);
   const [description, setDescription] = useState(product.description);
   const [priceInCents, setPriceInCents] = useState(product.priceInCents);
-  const [categoryId, setCategoryId] = useState(product.categoryId);
-  const [styleId, setStyleId] = useState(product.styleId);
+  const [style, setStyle] = useState(product.style);
+  const [category, setCategory] = useState(product.category);
   const [availableForSale, setAvailableForSale] = useState(product.isAvailable);
   const [stock, setStock] = useState(product.stock);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [images, setImages] = useState(product.images);
-
   const handleMarkImagesToDelete = (
     e: React.MouseEvent<HTMLButtonElement>,
     link: string,
@@ -117,8 +132,7 @@ export default function EditProduct({ product }: EditProductProps) {
       `Price (in cents): ${priceInCents}\n`,
       `Stock: ${JSON.stringify(stock)}\n`,
       `Available for Sale: ${availableForSale}\n`,
-      `Category ID: ${categoryId}\n`,
-      `Style ID: ${styleId}\n`,
+
       `Filtered Images: ${JSON.stringify(filteredImages)}\n`,
       `\n`,
       `New images: ${newImages}\n`,
@@ -131,10 +145,10 @@ export default function EditProduct({ product }: EditProductProps) {
       name,
       description,
       priceInCents,
-      categoryId,
-      styleId,
+      category: { id: category.id, name: category.name },
+      style: { id: style.id, name: style.name },
       isAvailable: availableForSale,
-      images: filteredImages.map((url) => ({ url })),
+      images: newImages,
     };
     try {
       // Call the editProduct function to update the product
@@ -196,7 +210,7 @@ export default function EditProduct({ product }: EditProductProps) {
             Stock
           </label>
           {stock.map((item, index) => (
-            <div key={item.id} className="flex items-center  mb-2 ">
+            <div key={item.size} className="flex items-center  mb-2 ">
               <span className="w-7">{item.size}</span>
               <input
                 type="number"
@@ -224,28 +238,70 @@ export default function EditProduct({ product }: EditProductProps) {
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
-            Category ID
+            Category
           </label>
-          <input
-            type="number"
-            value={categoryId}
+          <select
+            id="category"
+            name="category"
+            value={category.name}
+            onChange={(e) => {
+              const selectedCategory = categories.find(
+                (cat) => cat.name === e.target.value
+              );
+              if (selectedCategory) {
+                setCategory({
+                  id: selectedCategory.id,
+                  name: selectedCategory.name,
+                });
+              }
+            }}
+            required
+            className="border rounded-md py-1"
             disabled={!isEditing}
-            onChange={(e) => setCategoryId(Number(e.target.value))}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          />
+          >
+            <option value="" disabled>
+              Select a category
+            </option>
+            {categories.map((category) => {
+              return (
+                <option key={category.id} value={category.name}>
+                  {category.name}
+                </option>
+              );
+            })}
+          </select>
         </div>
-        {/*DO A DROPDOWN FOR STYLES AND CATEGORIES*/}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
-            Style ID
+            Style
           </label>
-          <input
-            type="number"
-            value={styleId}
+          <select
+            id="style"
+            name="style"
+            value={style.name}
+            onChange={(e) => {
+              const selectedStyle = styles.find(
+                (st) => st.name === e.target.value
+              );
+              if (selectedStyle) {
+                setStyle({ id: selectedStyle.id, name: selectedStyle.name });
+              }
+            }}
+            required
+            className="border rounded-md py-1"
             disabled={!isEditing}
-            onChange={(e) => setStyleId(Number(e.target.value))}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          />
+          >
+            <option value="" disabled>
+              Select a style
+            </option>
+            {styles.map((style) => {
+              return (
+                <option key={style.id} value={style.name}>
+                  {style.name}
+                </option>
+              );
+            })}
+          </select>
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">

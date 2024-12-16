@@ -1,4 +1,4 @@
-import { getProductById } from "@/db/productQueries";
+import { getCategories, getProductById, getStyles } from "@/db/productQueries";
 import PageHeader from "../../_components/PageHeader";
 import EditProduct from "../../_components/EditProduct";
 
@@ -9,6 +9,8 @@ type ProductDetailProps = {
 export default async function ProductDetail({ params }: ProductDetailProps) {
   const { productId } = await params;
   const product = await getProductById(Number(productId));
+  const categories = await getCategories();
+  const styles = await getStyles();
 
   if (!product) {
     return <div>Product not found</div>;
@@ -17,7 +19,7 @@ export default async function ProductDetail({ params }: ProductDetailProps) {
   return (
     <div>
       <PageHeader>Product Detail</PageHeader>
-      <EditProduct product={product} />
+      <EditProduct product={product} categories={categories} styles={styles} />
     </div>
   );
 }
