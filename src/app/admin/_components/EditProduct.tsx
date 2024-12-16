@@ -141,6 +141,8 @@ export default function EditProduct({
       `\n`,
       `Previews/images: ${JSON.stringify(images)}\n`
     );
+    console.log("---------------------------------");
+    console.log(stock);
     const data = {
       name,
       description,
@@ -149,6 +151,7 @@ export default function EditProduct({
       style: { id: style.id, name: style.name },
       isAvailable: availableForSale,
       images: newImages,
+      stock,
     };
     try {
       // Call the editProduct function to update the product

@@ -139,6 +139,7 @@ export async function editProduct(
     style?: { id: number; name: string };
     isAvailable?: boolean;
     images?: File[];
+    stock: { size: string; quantity: number }[];
   },
   newImages: File[] = []
 ) {
@@ -160,7 +161,6 @@ export async function editProduct(
   ).then((images) => images.filter((image) => image !== null));
 
   // Update product in DB
-
   const updatedProduct = await prisma.product.update({
     where: { id },
     data: {
@@ -183,6 +183,27 @@ export async function editProduct(
       },
     },
   });
+
+  // Update stock quantities
+  console.log(data.stock);
+  await Promise.all(
+    data.stock.map(async (item) =>
+      prisma.stock.updateMany({
+        where: { productId: id, size: item.size },
+        data: { quantity: item.quantity },
+      })
+    )
+  );
+  // const stockItems = await prisma.stock.findMany({ where: { productId: id } });
+  // await Promise.all(
+  //   stockItems.map((item) =>
+  //     prisma.stock.updateMany({
+  //       where: { productId: item.productId, size: item.size },
+  //       data: { quantity: .quantity },
+  //     })
+  //   )
+  // );
+
   return updatedProduct;
 }
 
