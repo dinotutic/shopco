@@ -9,12 +9,15 @@ type Product = {
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
+  style: { id: number; name: string };
+  category: { id: number; name: string };
+  images: { url: string }[];
   categoryId: number;
   styleId: number;
-  images: { url: string }[];
 };
 
 export default function ProductList({ products }: { products: Product[] }) {
+  console.log(products);
   const sizes = ["XS", "S", "M", "L", "XL"]; // Gotta do this nicer sometime in the future
   return (
     <div className="overflow-x-auto">
@@ -67,8 +70,8 @@ export default function ProductList({ products }: { products: Product[] }) {
                   })}
                 </div>
               </td>
-              <td className="py-2 px-4 border-b">{product.categoryId}</td>
-              <td className="py-2 px-4 border-b">{product.styleId}</td>
+              <td className="py-2 px-4 border-b">{product.category.name}</td>
+              <td className="py-2 px-4 border-b">{product.style.name}</td>
               <td className="py-2 px-4 border-b">
                 <ProductActions product={product} />
               </td>
