@@ -1,7 +1,5 @@
 "use client";
-// Changing product names will cause issues with images, as the images are stored in S3 with the product name as part of the key
-// To avoid this, I should save images in folders named by product ID instead of product name
-// Will do this in the future. Dont wanna do 5 things at once
+
 import { useState } from "react";
 import {
   deleteSingleImage,
@@ -80,6 +78,7 @@ export default function EditProduct({
       setImagesToDelete(updatedImagesToDelete);
     }
     // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
+    // Edit: I have no idea what I was thinking at the time, but it seems to works and I kinda get it so I wont touch it
     if (isNew) {
       const startIndexOfNewImages = images.length - newImages.length;
       const newImagesIndex =
@@ -94,9 +93,9 @@ export default function EditProduct({
   };
 
   const handleDeleteImage = async (link: string) => {
-    const imageFileName = link.split(`/${product.name}/`)[1];
-    console.log(`Deleting products/images/${product.name}/${imageFileName}`);
-    await deleteSingleImage(`products/images/${product.name}/${imageFileName}`);
+    const imageFileName = link.split(`/${product.id}/`)[1];
+    console.log(`Deleting products/images/${product.id}/${imageFileName}`);
+    await deleteSingleImage(`products/images/${product.id}/${imageFileName}`);
     await deleteSingleImageFromProduct(product.id, link);
   };
 
@@ -113,9 +112,10 @@ export default function EditProduct({
     }
   };
 
-  const handleStockChange = (index: number, quantity: number) => {
-    const newStock = [...stock];
-    newStock[index].quantity = quantity;
+  const handleStockChange = (size: string, quantity: number) => {
+    const newStock = stock.map((item) =>
+      item.size === size ? { ...item, quantity } : item
+    );
     setStock(newStock);
   };
 
@@ -148,6 +148,7 @@ export default function EditProduct({
       images: newImages,
       stock,
     };
+
     try {
       // Call the editProduct function to update the product
       const updatedProduct = await editProduct(product.id, data, newImages);
@@ -155,6 +156,7 @@ export default function EditProduct({
     } catch (error) {
       console.error("Error updating product:", error);
     }
+    window.location.reload();
   };
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -207,14 +209,14 @@ export default function EditProduct({
           <label className="block text-sm font-medium text-gray-700">
             Stock
           </label>
-          {sortedStock.map((item, index) => (
+          {sortedStock.map((item) => (
             <div key={item.size} className="flex items-center  mb-2">
               <span className="w-7">{item.size}</span>
               <input
                 type="number"
                 value={item.quantity}
                 onChange={(e) =>
-                  handleStockChange(index, Number(e.target.value))
+                  handleStockChange(item.size, Number(e.target.value))
                 }
                 className="mt-1 block border border-gray-300 rounded-md shadow-sm py-2 px-2 w-14"
                 disabled={!isEditing}
@@ -357,6 +359,3 @@ export default function EditProduct({
     </div>
   );
 }
-
-// I BELIEVE I FIXED UPLOADING IDS INSTEAD OF NAMES
-// GOTTA CHECK OTHER uploadFile CALLS TO MAKE SURE IT WORKS EVERYWHERE
