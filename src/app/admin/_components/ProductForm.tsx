@@ -199,7 +199,6 @@ export default function ProductForm({
           name="isAvailable"
           checked={isAvailable}
           onChange={(e) => setIsAvailable(e.target.checked)}
-          required
           className="mx-4"
         ></input>
       </div>
