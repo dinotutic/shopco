@@ -8,6 +8,7 @@ import {
   deleteSingleImageFromProduct,
   editProduct,
 } from "@/db/productQueries";
+import { formatCurrency } from "@/app/lib/formatters";
 
 type Product = {
   id: number;
@@ -43,6 +44,9 @@ export default function EditProduct({
   product?: Product;
 }) {
   if (!product) throw new Error("Product not found"); // This should never happen
+  const [priceInEuros, setPriceInEuros] = useState<number>(
+    product.priceInCents
+  );
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [name, setName] = useState(product.name);
   const [description, setDescription] = useState(product.description);
@@ -51,6 +55,7 @@ export default function EditProduct({
   const [category, setCategory] = useState(product.category);
   const [availableForSale, setAvailableForSale] = useState(product.isAvailable);
   const [stock, setStock] = useState(product.stock);
+  // Simply for sorting stock
   const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
   const sortedStock = [...stock].sort((a, b) => {
     return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
@@ -58,6 +63,7 @@ export default function EditProduct({
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [images, setImages] = useState(product.images);
+
   const handleMarkImagesToDelete = (
     e: React.MouseEvent<HTMLButtonElement>,
     link: string,
@@ -112,14 +118,16 @@ export default function EditProduct({
     newStock[index].quantity = quantity;
     setStock(newStock);
   };
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    setPriceInEuros(value);
+    setPriceInCents(value);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Delete images in S3
-    console.log(imagesToDelete);
     await Promise.all(
       imagesToDelete.map((imageUrl) => handleDeleteImage(imageUrl))
     );
@@ -149,9 +157,6 @@ export default function EditProduct({
     }
   };
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsEditing(true);
@@ -191,9 +196,12 @@ export default function EditProduct({
             type="number"
             value={priceInCents}
             disabled={!isEditing}
-            onChange={(e) => setPriceInCents(Number(e.target.value))}
+            onChange={handlePriceChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
           />
+        </div>
+        <div>
+          <p>{formatCurrency(priceInEuros || 0)}</p>
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
@@ -245,7 +253,6 @@ export default function EditProduct({
                 });
               }
             }}
-            required
             className="border rounded-md py-1"
             disabled={!isEditing}
           >
@@ -277,7 +284,6 @@ export default function EditProduct({
                 setStyle({ id: selectedStyle.id, name: selectedStyle.name });
               }
             }}
-            required
             className="border rounded-md py-1"
             disabled={!isEditing}
           >
@@ -351,3 +357,6 @@ export default function EditProduct({
     </div>
   );
 }
+
+// I BELIEVE I FIXED UPLOADING IDS INSTEAD OF NAMES
+// GOTTA CHECK OTHER uploadFile CALLS TO MAKE SURE IT WORKS EVERYWHERE
