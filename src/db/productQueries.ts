@@ -138,10 +138,6 @@ export async function getProductById(id: number) {
   return product;
 }
 
-export async function deleteSingleImage(key: string) {
-  await deleteFile(key);
-}
-
 export async function editProduct(
   id: number,
   data: {
@@ -217,3 +213,12 @@ export async function deleteSingleImageFromProduct(
   await prisma.image.deleteMany({ where: { productId, url: key } });
   await deleteFile(key);
 }
+
+export async function deleteSingleImage(key: string) {
+  await deleteFile(key);
+}
+
+// export async function deleteSingleImage(productId: number, key: string) {
+//   await deleteFile(key);
+//   await prisma.image.deleteMany({ where: { productId, url: key } });
+// }
