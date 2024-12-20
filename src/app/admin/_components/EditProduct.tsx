@@ -13,23 +13,35 @@ type Product = {
   name: string;
   description: string;
   priceInCents: number;
-  stock: { size: string; quantity: number }[];
+  stock: Stock[];
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
-  category: { id: number; name: string };
-  style: { id: number; name: string };
-  images: { url: string; isNew?: boolean }[];
+  category: Category;
+  style: Style;
+  images: Image[];
+  // images: { url: string; isNew?: boolean }[];
 };
 
-type Styles = {
+type Image = {
+  url: string;
+  isNew?: boolean;
+};
+type Style = {
   id: number;
   name: string;
 };
 
-type Categories = {
+type Category = {
   id: number;
   name: string;
+};
+
+type Stock = {
+  id: number;
+  productId: number;
+  size: string;
+  quantity: number;
 };
 
 export default function EditProduct({
@@ -37,31 +49,37 @@ export default function EditProduct({
   styles,
   categories,
 }: {
-  categories: Categories[];
-  styles: Styles[];
+  categories: Category[];
+  styles: Style[];
   product?: Product;
 }) {
-  if (!product) throw new Error("Product not found"); // This should never happen
+  if (!product) throw new Error("Product not found"); // This should never happen, had to add it because typesciprt was not happy
   const [priceInEuros, setPriceInEuros] = useState<number>(
     product.priceInCents
   );
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [name, setName] = useState(product.name);
-  const [description, setDescription] = useState(product.description);
-  const [priceInCents, setPriceInCents] = useState(product.priceInCents);
-  const [style, setStyle] = useState(product.style);
-  const [category, setCategory] = useState(product.category);
-  const [availableForSale, setAvailableForSale] = useState(product.isAvailable);
-  const [stock, setStock] = useState(product.stock);
-  // Simply for sorting stock
+  const [name, setName] = useState<string>(product.name);
+  const [description, setDescription] = useState<string>(product.description);
+  const [priceInCents, setPriceInCents] = useState<number>(
+    product.priceInCents
+  );
+  const [style, setStyle] = useState<Style>(product.style);
+  const [category, setCategory] = useState<Category>(product.category);
+  const [availableForSale, setAvailableForSale] = useState<boolean>(
+    product.isAvailable
+  );
+  const [stock, setStock] = useState<Stock[]>(product.stock);
+
+  // Sorting sizes
   const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
   const sortedStock = [...stock].sort((a, b) => {
     return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
   });
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
-  const [images, setImages] = useState(product.images);
+  const [images, setImages] = useState<Image[]>(product.images);
 
+  // Marks images for deletion on submit
   const handleMarkImagesToDelete = (
     e: React.MouseEvent<HTMLButtonElement>,
     link: string,
@@ -79,6 +97,8 @@ export default function EditProduct({
     }
     // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
     // Edit: I have no idea what I was thinking at the time, but it seems to works and I kinda get it so I wont touch it
+    // Edit2: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
+    // remove the correct image from the newImages array
     if (isNew) {
       const startIndexOfNewImages = images.length - newImages.length;
       const newImagesIndex =
@@ -91,12 +111,16 @@ export default function EditProduct({
       }
     }
   };
-
+  // I have to rethink this.
+  // Do I need to delete images from DB at all, if they are being overwritten?
   const handleDeleteImage = async (link: string) => {
+    // await deleteSingleImage(product.id, link);
     const imageFileName = link.split(`/${product.id}/`)[1];
-    console.log(`Deleting products/images/${product.id}/${imageFileName}`);
     await deleteSingleImage(`products/images/${product.id}/${imageFileName}`);
+
     await deleteSingleImageFromProduct(product.id, link);
+
+    console.log(`Deleting products/images/${product.id}/${imageFileName}`);
   };
 
   const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -127,7 +151,7 @@ export default function EditProduct({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Delete images in S3
+    // Delete images in S3 and DB
     await Promise.all(
       imagesToDelete.map((imageUrl) => handleDeleteImage(imageUrl))
     );
