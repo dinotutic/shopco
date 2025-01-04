@@ -1,11 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  deleteSingleImage,
-  deleteSingleImageFromProduct,
-  editProduct,
-} from "@/db/productQueries";
+import { deleteSingleImage, editProduct } from "@/db/productQueries";
 import { formatCurrency } from "@/app/lib/formatters";
 
 type Product = {
@@ -115,12 +111,16 @@ export default function EditProduct({
   // Do I need to delete images from DB at all, if they are being overwritten?
   const handleDeleteImage = async (link: string) => {
     // await deleteSingleImage(product.id, link);
-    const imageFileName = link.split(`/${product.id}/`)[1];
-    await deleteSingleImage(`products/images/${product.id}/${imageFileName}`);
+    // link = https://shopco-project.s3.eu-north-1.amazonaws.com/products/images/97/green thing.png
+    // const imageFileName = link.split(`/${product.id}/`)[1];
 
-    await deleteSingleImageFromProduct(product.id, link);
+    // await deleteSingleImage(`products/images/${product.id}/${imageFileName}`);
+    // console.log("EditProduct.tsx");
+    // console.log(link);
 
-    console.log(`Deleting products/images/${product.id}/${imageFileName}`);
+    // await deleteSingleImageFromProduct(product.id, link);
+    await deleteSingleImage(product.id, link);
+    console.log(`Deleting ${product.id} / ${link}`);
   };
 
   const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,7 +180,7 @@ export default function EditProduct({
     } catch (error) {
       console.error("Error updating product:", error);
     }
-    window.location.reload();
+    // window.location.reload();
   };
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
