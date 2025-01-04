@@ -147,7 +147,7 @@ export async function editProduct(
     category?: { id: number; name: string };
     style?: { id: number; name: string };
     isAvailable?: boolean;
-    images?: File[];
+    images?: File[] | string[];
     stock: { size: string; quantity: number }[];
   },
   newImages: File[] = []
@@ -206,19 +206,21 @@ export async function editProduct(
   return updatedProduct;
 }
 
-export async function deleteSingleImageFromProduct(
-  productId: number,
-  key: string
-) {
-  await prisma.image.deleteMany({ where: { productId, url: key } });
-  await deleteFile(key);
-}
-
-export async function deleteSingleImage(key: string) {
-  await deleteFile(key);
-}
-
-// export async function deleteSingleImage(productId: number, key: string) {
-//   await deleteFile(key);
+// export async function deleteSingleImageFromProduct(
+//   productId: number,
+//   key: string
+// ) {
 //   await prisma.image.deleteMany({ where: { productId, url: key } });
+//   // dont think this ever worked
+//   // await deleteFile(key);
 // }
+
+// export async function deleteSingleImage(location: string) {
+//   await deleteFile(location);
+// }
+
+export async function deleteSingleImageTwo(productId: number, key: string) {
+  const location = key.split("amazonaws.com/")[1];
+  await deleteFile(location);
+  await prisma.image.deleteMany({ where: { productId, url: key } });
+}
