@@ -7,7 +7,7 @@ type ProductDetailProps = {
 };
 
 export default async function ProductDetail({ params }: ProductDetailProps) {
-  const { productId } = await params;
+  const { productId } = params;
   const product = await getProductById(Number(productId));
   const categories = await getCategories();
   const styles = await getStyles();

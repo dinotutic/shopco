@@ -107,20 +107,14 @@ export default function EditProduct({
       }
     }
   };
-  // I have to rethink this.
-  // Do I need to delete images from DB at all, if they are being overwritten?
+
   const handleDeleteImage = async (link: string) => {
-    // await deleteSingleImage(product.id, link);
-    // link = https://shopco-project.s3.eu-north-1.amazonaws.com/products/images/97/green thing.png
-    // const imageFileName = link.split(`/${product.id}/`)[1];
-
-    // await deleteSingleImage(`products/images/${product.id}/${imageFileName}`);
-    // console.log("EditProduct.tsx");
-    // console.log(link);
-
-    // await deleteSingleImageFromProduct(product.id, link);
-    await deleteSingleImage(product.id, link);
-    console.log(`Deleting ${product.id} / ${link}`);
+    try {
+      await deleteSingleImage(product.id, link);
+      console.log(`Deleting ${product.id} / ${link}`);
+    } catch (error) {
+      console.error("Error deleting image:", error);
+    }
   };
 
   const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -180,7 +174,7 @@ export default function EditProduct({
     } catch (error) {
       console.error("Error updating product:", error);
     }
-    // window.location.reload();
+    window.location.reload();
   };
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {

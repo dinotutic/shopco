@@ -206,20 +206,8 @@ export async function editProduct(
   return updatedProduct;
 }
 
-// export async function deleteSingleImageFromProduct(
-//   productId: number,
-//   key: string
-// ) {
-//   await prisma.image.deleteMany({ where: { productId, url: key } });
-//   // dont think this ever worked
-//   // await deleteFile(key);
-// }
-
-// export async function deleteSingleImage(location: string) {
-//   await deleteFile(location);
-// }
-
-export async function deleteSingleImageTwo(productId: number, key: string) {
+export async function deleteSingleImage(productId: number, key: string) {
+  // expected key = https://shopco-project.s3.eu-north-1.amazonaws.com/products/images/97/green thing.png
   const location = key.split("amazonaws.com/")[1];
   await deleteFile(location);
   await prisma.image.deleteMany({ where: { productId, url: key } });
