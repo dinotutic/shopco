@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import ProductActions from "./ProductActions";
 
 type Product = {
@@ -17,9 +20,51 @@ type Product = {
 };
 
 export default function ProductList({ products }: { products: Product[] }) {
-  const sizes = ["XS", "S", "M", "L", "XL"]; // Gotta do this nicer sometime in the future
+  const sizes = ["XS", "S", "M", "L", "XL"];
+  const [filter, setFilter] = useState<string>("");
+  const [sort, setSort] = useState<string>("");
+
+  const filteredProducts = products.filter((product) => {
+    return (
+      product.name.toLowerCase().includes(filter.toLowerCase()) ||
+      product.description.toLowerCase().includes(filter.toLowerCase())
+    );
+  });
+  const sortedProducts = filteredProducts.sort((a, b) => {
+    if (sort === "priceAsc") {
+      return a.priceInCents - b.priceInCents;
+    } else if (sort === "priceDesc") {
+      return b.priceInCents - a.priceInCents;
+    } else if (sort === "nameAsc") {
+      return a.name.localeCompare(b.name);
+    } else if (sort === "nameDesc") {
+      return b.name.localeCompare(a.name);
+    } else {
+      return 0;
+    }
+  });
   return (
     <div className="overflow-x-auto">
+      <div className="flex justify-between mb-4">
+        <input
+          type="text"
+          placeholder="Filter by name or description"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="border p-2 rounded"
+        />
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value)}
+          className="border p-2 rounded"
+        >
+          <option value="">Sort by</option>
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="priceDesc">Price: High to Low</option>
+          <option value="nameAsc">Name: A to Z</option>
+          <option value="nameDesc">Name: Z to A</option>
+        </select>
+      </div>
       <table className="min-w-full bg-white border text-center">
         <thead>
           <tr>
@@ -35,7 +80,7 @@ export default function ProductList({ products }: { products: Product[] }) {
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {sortedProducts.map((product) => (
             <tr key={product.id}>
               <td className="py-2 px-4 border-b">{product.id}</td>
               {product.images && product.images.length > 0 ? (
