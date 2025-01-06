@@ -357,6 +357,14 @@ export default function EditProduct({
             />
           )}
         </div>
+        <div className="my-4">
+          <p className="text-gray-500">
+            Created at: {product.createdAt.toLocaleString("de-de")}
+          </p>
+          <p className="text-gray-500">
+            Updated at: {product.updatedAt.toLocaleString("de-de")}
+          </p>
+        </div>
         {isEditing ? (
           <button
             type="submit"
