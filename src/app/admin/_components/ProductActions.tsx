@@ -14,15 +14,15 @@ export default function ProductActions({ product }: { product: Product }) {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex">
       <Link
         href={`/admin/products/${product.id}`}
-        className="border rounded-2xl p-4 bg-gray-500 text-secondaryText"
+        className="border rounded-2xl p-4 bg-gray-500 text-secondaryText  hover:bg-secondaryBackground"
       >
         View
       </Link>
       <button
-        className="border rounded-2xl p-4 bg-gray-500 text-secondaryText"
+        className="border rounded-2xl p-4 bg-gray-500 text-secondaryText  hover:bg-secondaryBackground"
         onClick={handleDelete}
       >
         Delete

@@ -1,17 +1,32 @@
 "use server";
-// So either here or in EditProduct there could come to issues if i were to upload files with the same name(i think)
-// it would be a good idea to fix this sometime in the future, but to be honest i dont think that time will ever come
+
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
 
-export async function getAllProducts() {
+export async function getAllProducts(page: number = 1) {
+  const itemsPerPage = 50;
+
   const products = await prisma.product.findMany({
+    take: itemsPerPage,
+    skip: (page - 1) * itemsPerPage,
     include: { images: true, category: true, style: true, stock: true },
     orderBy: {
       id: "desc", // Sort by ID in descending order
     },
   });
   return products;
+}
+
+export async function getProductCount() {
+  const [productCount, availableProducts] = await Promise.all([
+    prisma.product.count(),
+    prisma.product.count({ where: { isAvailable: true } }),
+  ]);
+  return {
+    productCount,
+    availableProducts,
+    totalPages: Math.ceil(productCount / 50), // 50 items per page
+  };
 }
 
 // I should probably only delete image from s3 if DB delete was successful and vice versa. Will look into it sometime in the future
@@ -70,9 +85,7 @@ export async function addProduct(formData: FormData) {
           name: style as string,
         },
       },
-      // images: {
-      //   create: imageUrls.map((url) => ({ url })),
-      // },
+
       stock: {
         create: stockData.map((item) => ({
           size: item.size,
@@ -117,17 +130,6 @@ export async function getCategories() {
 export async function getStyles() {
   const styles = await prisma.style.findMany();
   return styles;
-}
-
-export async function getProductCount() {
-  const [productCount, availableProducts] = await Promise.all([
-    prisma.product.count(),
-    prisma.product.count({ where: { isAvailable: true } }),
-  ]);
-  return {
-    productCount,
-    availableProducts,
-  };
 }
 
 export async function getProductById(id: number) {
