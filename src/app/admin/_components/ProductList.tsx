@@ -30,6 +30,7 @@ export default function ProductList({ products }: { products: Product[] }) {
       product.description.toLowerCase().includes(filter.toLowerCase())
     );
   });
+
   const sortedProducts = filteredProducts.sort((a, b) => {
     if (sort === "priceAsc") {
       return a.priceInCents - b.priceInCents;
@@ -43,6 +44,7 @@ export default function ProductList({ products }: { products: Product[] }) {
       return 0;
     }
   });
+
   return (
     <div className="overflow-x-auto">
       <div className="flex justify-between mb-4">

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import PageHeader from "../_components/PageHeader";
 import ProductList from "../_components/ProductList";
-import { getAllProducts } from "@/db/productQueries";
+import { getAllProducts, getProductCount } from "@/db/productQueries";
 
 export default async function AdminProductsPage() {
   const products = await getAllProducts();
