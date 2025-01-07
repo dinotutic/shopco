@@ -27,13 +27,16 @@ model Product {
   cart         CartItem[]
   style        Style @relation(fields: [styleId], references: [id])
   styleId      Int
+  gender       String @default("male")
 }
 
 model Stock {
   id          Int       @id @default(autoincrement())
-  name        String    @unique
+  size        String    
   quantity    Int
-  products    Product[]
+  productId   Int
+  product      Product @relation(fields: [productId], references: [id])
+  @@unique([productId, size])
 }
 
 model Image {
@@ -74,6 +77,7 @@ model OrderItem {
   productId Int
   quantity  Int      @default(1) // Number of this product in the order
   price     Float    // Price at the time of purchase
+  size      String
 }
 
 model Category {
@@ -85,7 +89,6 @@ model Category {
 model Style {
   id          Int        @id @default(autoincrement())
   name        String     @unique
-  description String?
   products    Product[]
 }
 
