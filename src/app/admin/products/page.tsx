@@ -7,7 +7,7 @@ export default async function AdminProductsPage() {
   const products = await getAllProducts();
   const categories = await getCategories();
   const styles = await getStyles();
-
+  console.log(products);
   return (
     <>
       <div className="flex justify-between items-center w-full mb-4">

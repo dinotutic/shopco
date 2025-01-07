@@ -45,6 +45,29 @@ async function main() {
     });
     users.push(user);
   }
+  // Add Colors
+
+  const colors = await prisma.color.createMany({
+    data: [
+      { name: "Black" },
+      { name: "White" },
+      { name: "Red" },
+      { name: "Blue" },
+      { name: "Green" },
+      { name: "Yellow" },
+      { name: "Orange" },
+      { name: "Purple" },
+      { name: "Pink" },
+      { name: "Brown" },
+      { name: "Colorful" },
+    ],
+  });
+
+  const colorIds = await prisma.color.findMany({
+    select: {
+      id: true,
+    },
+  });
 
   // Create products
   const products = [];
@@ -83,6 +106,19 @@ async function main() {
         stock: {
           create: stockEntries,
         },
+        gender: faker.helpers.arrayElement(["male", "female", "unisex"]),
+        sale: faker.helpers.arrayElement([0, 20, 30]),
+        details: faker.lorem.paragraph(),
+        colors: {
+          connect: Array.from(
+            { length: faker.number.int({ min: 1, max: 3 }) },
+            () => ({
+              id: colorIds[Math.floor(Math.random() * colorIds.length)].id,
+            })
+          ),
+        },
+        newArrival: faker.datatype.boolean(),
+        topSelling: faker.datatype.boolean(),
       },
     });
     products.push(product);
@@ -95,13 +131,19 @@ async function main() {
       const orderItems = [];
       for (let j = 0; j < faker.number.int({ min: 1, max: 5 }); j++) {
         const product = products[Math.floor(Math.random() * products.length)];
+        const color = colorIds[Math.floor(Math.random() * colorIds.length)];
         const size =
           availableSizes[Math.floor(Math.random() * availableSizes.length)];
         orderItems.push({
-          productId: product.id,
           quantity: faker.number.int({ min: 1, max: 5 }),
           price: product.priceInCents,
           size: size,
+          color: {
+            connect: { id: color.id },
+          },
+          product: {
+            connect: { id: product.id },
+          },
         });
       }
       console.log(`Creating order ${i + 1} for user ${user.id}`);
@@ -133,3 +175,34 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+// Things to add
+// Male/Female
+// Sale / If yes how much % off
+// Product details
+// available colors
+// new arrival boolean
+// top selling boolean
+// reviews - already done i think
+
+//        "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+// "prisma": {
+//   "seed": "node --loader ts-node/esm prisma/seed.ts"
+// },
+
+// https://github.com/prisma/prisma/discussions/20369
+// Ran:
+
+// npm install tsx --save-dev
+// Added
+
+// "prisma": {
+// 		"seed": "tsx prisma/seed.ts"
+// 	},
+// to package.json
+
+// and
+
+// ran the migration steps.
+
+// npx prisma migrate dev --name init
