@@ -17,6 +17,11 @@ type Product = {
   images: { url: string }[];
   categoryId: number;
   styleId: number;
+  gender: string;
+  sale: number;
+  details: string;
+  newArrival: boolean;
+  topSelling: boolean;
 };
 
 export default function ProductList({
@@ -36,6 +41,8 @@ export default function ProductList({
   const [availabilityFilter, setAvailabilityFilter] = useState<boolean | null>(
     null
   );
+  const [sexFilter, setSexFilter] = useState<string | null>(null);
+
   const filteredProducts = products.filter((product) => {
     const matchesNameFilter = product.name
       .toLowerCase()
@@ -46,14 +53,27 @@ export default function ProductList({
       categoryFilter === null || product.category.name === categoryFilter;
     const matchesStyle =
       styleFilter === null || product.style.name === styleFilter;
+    const matchesSex = sexFilter === null || product.gender === sexFilter;
 
     return (
       matchesNameFilter &&
       matchesAvailability &&
       matchesCategory &&
-      matchesStyle
+      matchesStyle &&
+      matchesSex
     );
   });
+
+  // To format JSX
+  const formattingSex = (product: Product) => {
+    if (product.gender === "male") {
+      return "M";
+    } else if (product.gender === "female") {
+      return "F";
+    } else if (product.gender === "unisex") {
+      return "U";
+    }
+  };
 
   const sortedProducts = filteredProducts.sort((a, b) => {
     if (sort === "priceAsc") {
@@ -99,7 +119,7 @@ export default function ProductList({
             }
             className="border p-2 rounded-xl"
           >
-            <option value="">All categories</option>
+            <option value="">Categories</option>
             {categories.map((category) => (
               <option key={category.name} value={category.name}>
                 {category.name}
@@ -113,7 +133,7 @@ export default function ProductList({
             }
             className="border p-2 rounded-xl"
           >
-            <option value="">All styles</option>
+            <option value="">Styles</option>
             {styles.map((style) => (
               <option key={style.name} value={style.name}>
                 {style.name}
@@ -131,9 +151,21 @@ export default function ProductList({
             }
             className="border p-2 rounded-xl"
           >
-            <option value="">Available Y/N</option>
+            <option value="">Availability</option>
             <option value="true">Available</option>
             <option value="false">Not Available</option>
+          </select>
+          <select
+            value={sexFilter ?? ""}
+            onChange={(e) =>
+              setSexFilter(e.target.value === "" ? null : e.target.value)
+            }
+            className="border p-2 rounded-xl"
+          >
+            <option value="">Sex</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="unisex">Unisex</option>
           </select>
         </div>
       </div>
@@ -144,6 +176,7 @@ export default function ProductList({
             <th className="py-2 px-4 border-b">Images</th>
             <th className="py-2 px-4 border-b">Name</th>
             <th className="py-2 px-4 border-b">Available</th>
+            <th className="py-2 px-4 border-b">Sex</th>
             <th className="py-2 px-4 border-b">Price</th>
             <th className="py-2 px-4 border-b">Stock</th>
             <th className="py-2 px-4 border-b">Category</th>
@@ -170,11 +203,13 @@ export default function ProductList({
               <td className="py-2 px-4 border-b">
                 {product.isAvailable ? "Y" : "N"}
               </td>
+              {/* GENDER */}
+              <td>{formattingSex(product)}</td>
               <td className="py-2 px-4 border-b">
                 {(product.priceInCents / 100).toFixed(2)}€
               </td>
               <td className="py-2 px-4 border-b">
-                <div className="flex gap-4">
+                <div className="flex gap-4 justify-center">
                   {sizes.map((size) => {
                     const stockEntry = product.stock.find(
                       (entry) => entry.size === size

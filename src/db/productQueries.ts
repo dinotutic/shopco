@@ -59,74 +59,91 @@ export async function deleteProduct(id: number, name: string) {
   await deleteFile(`products/images/${id}`);
 }
 
-// export async function addProduct(formData: FormData) {
-//   const name = formData.get("name");
-//   const description = formData.get("description");
-//   const priceInCents = formData.get("priceInCents");
-//   const stock = formData.get("stock");
-//   const isAvailable = formData.get("isAvailable") === "on";
-//   const images = formData.getAll("images");
-//   const category = formData.get("category");
-//   const style = formData.get("style");
+export async function addProduct(formData: FormData) {
+  // GOTTA HANDLE THIS LATER
+  const name = formData.get("name");
+  const description = formData.get("description");
+  const details = formData.get("details");
+  const priceInCents = formData.get("priceInCents");
+  const stock = formData.get("stock");
+  const isAvailable = formData.get("isAvailable") === "on";
+  const images = formData.getAll("images");
+  const category = formData.get("category");
+  const style = formData.get("style");
+  const sale = formData.get("sale");
+  const newArrival = formData.get("newArrival") === "on";
+  const topSelling = formData.get("topSelling") === "on";
+  const colors = formData.getAll("colors");
+  const sex = formData.get("sex");
 
-//   //Parse stock array to be usable here
-//   type StockData = { size: string; quantity: number }[];
-//   const stockData: StockData = JSON.parse(stock as string);
+  //Parse stock array to be usable here
+  type StockData = { size: string; quantity: number }[];
+  const stockData: StockData = JSON.parse(stock as string);
 
-//   // Create roduct in DB without the images.
-//   // Image links will be added after the images are uploaded to s3
-//   const newProduct = await prisma.product.create({
-//     data: {
-//       name: name as string,
-//       description: description as string,
-//       priceInCents: parseInt(priceInCents as string),
-//       isAvailable: isAvailable,
-//       category: {
-//         connect: {
-//           name: category as string,
-//         },
-//       },
-//       style: {
-//         connect: {
-//           name: style as string,
-//         },
-//       },
+  // Create roduct in DB without the images.
+  // Image links will be added after the images are uploaded to s3
+  const newProduct = await prisma.product.create({
+    data: {
+      name: name as string,
+      description: description as string,
+      priceInCents: parseInt(priceInCents as string),
+      isAvailable: isAvailable,
+      sale: parseInt(sale as string),
+      details: details as string,
+      newArrival: newArrival,
+      topSelling: topSelling,
+      gender: sex as string,
+      colors: {
+        create: colors.map((color) => ({
+          name: color as string,
+        })),
+      },
+      category: {
+        connect: {
+          name: category as string,
+        },
+      },
+      style: {
+        connect: {
+          name: style as string,
+        },
+      },
 
-//       stock: {
-//         create: stockData.map((item) => ({
-//           size: item.size,
-//           quantity: item.quantity,
-//         })),
-//       },
-//     },
-//   });
-//   const newProductId = newProduct.id;
+      stock: {
+        create: stockData.map((item) => ({
+          size: item.size,
+          quantity: item.quantity,
+        })),
+      },
+    },
+  });
+  const newProductId = newProduct.id;
 
-//   // Upload images to s3
-//   const imageUrls = [];
-//   for (const image of images) {
-//     if (!(image instanceof File) || !image.type.startsWith("image/")) {
-//       throw new Error("All files must be images");
-//     }
-//     const arrayBuffer = await image.arrayBuffer();
-//     const buffer = Buffer.from(arrayBuffer);
-//     const key = `products/images/${newProductId}/${image.name}`;
-//     const imageUrl = await uploadFile(key, buffer, image.type);
-//     if (typeof imageUrl === "string") {
-//       imageUrls.push(imageUrl);
-//     }
-//   }
-//   console.log("IMAGE URLS", imageUrls);
-//   await prisma.product.update({
-//     where: { id: newProductId },
-//     data: {
-//       images: {
-//         create: imageUrls.map((image) => ({ url: image })),
-//       },
-//     },
-//   });
-//   console.log(`Product added: ${name}`);
-// }
+  // Upload images to s3
+  const imageUrls = [];
+  for (const image of images) {
+    if (!(image instanceof File) || !image.type.startsWith("image/")) {
+      throw new Error("All files must be images");
+    }
+    const arrayBuffer = await image.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    const key = `products/images/${newProductId}/${image.name}`;
+    const imageUrl = await uploadFile(key, buffer, image.type);
+    if (typeof imageUrl === "string") {
+      imageUrls.push(imageUrl);
+    }
+  }
+  console.log("IMAGE URLS", imageUrls);
+  await prisma.product.update({
+    where: { id: newProductId },
+    data: {
+      images: {
+        create: imageUrls.map((image) => ({ url: image })),
+      },
+    },
+  });
+  console.log(`Product added: ${name}`);
+}
 
 export async function getCategories() {
   const categories = await prisma.category.findMany();
@@ -137,11 +154,21 @@ export async function getStyles() {
   const styles = await prisma.style.findMany();
   return styles;
 }
+export async function getColors() {
+  const colors = await prisma.color.findMany();
+  return colors;
+}
 
 export async function getProductById(id: number) {
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { images: true, category: true, style: true, stock: true },
+    include: {
+      images: true,
+      category: true,
+      style: true,
+      stock: true,
+      colors: true,
+    },
   });
   return product;
 }
@@ -157,6 +184,12 @@ export async function editProduct(
     isAvailable?: boolean;
     images?: File[] | string[];
     stock: { size: string; quantity: number }[];
+    sex: string;
+    sale: number;
+    details: string;
+    newArrival: boolean;
+    topSelling: boolean;
+    colors: { name: string; id: number }[];
   },
   newImages: File[] = []
 ) {
@@ -198,6 +231,14 @@ export async function editProduct(
       images: {
         create: uploadedImages.map((image) => ({ url: image.url })),
       },
+      details: data.details,
+      sale: data.sale,
+      newArrival: data.newArrival,
+      topSelling: data.topSelling,
+      gender: data.sex,
+      colors: {
+        set: data.colors.map((color) => ({ id: color.id })),
+      },
     },
   });
 
@@ -220,26 +261,3 @@ export async function deleteSingleImage(productId: number, key: string) {
   await deleteFile(location);
   await prisma.image.deleteMany({ where: { productId, url: key } });
 }
-
-// const updatedProduct = await prisma.product.update({
-//   where: { id },
-//   data: {
-//     name: data.name,
-//     description: data.description,
-//     priceInCents: data.priceInCents,
-//     category: {
-//       connect: {
-//         id: data.category?.id,
-//       },
-//     },
-//     style: {
-//       connect: {
-//         id: data.style?.id,
-//       },
-//     },
-//     isAvailable: data.isAvailable,
-//     images: {
-//       create: uploadedImages.map((image) => ({ url: image.url })),
-//     },
-//   },
-// });

@@ -16,7 +16,12 @@ type Product = {
   category: Category;
   style: Style;
   images: Image[];
-  // images: { url: string; isNew?: boolean }[];
+  colors: Color[];
+  gender: string;
+  sale: number;
+  details: string;
+  newArrival: boolean;
+  topSelling: boolean;
 };
 
 type Image = {
@@ -40,14 +45,21 @@ type Stock = {
   quantity: number;
 };
 
+type Color = {
+  id: number;
+  name: string;
+};
+
 export default function EditProduct({
   product,
   styles,
   categories,
+  colors,
 }: {
   categories: Category[];
   styles: Style[];
   product?: Product;
+  colors: Color[];
 }) {
   if (!product) throw new Error("Product not found"); // This should never happen, had to add it because typesciprt was not happy
   const [priceInEuros, setPriceInEuros] = useState<number>(
@@ -65,6 +77,18 @@ export default function EditProduct({
     product.isAvailable
   );
   const [stock, setStock] = useState<Stock[]>(product.stock);
+  //
+  const [sex, setSex] = useState<string>(product.gender);
+  const [sale, setSale] = useState<number>(product.sale);
+  const [details, setDetails] = useState<string>(product.details);
+  const [availableColors, setAvailableColors] = useState<Color[]>(
+    product.colors
+  );
+  const [newArrival, setNewArrival] = useState<boolean>(product.newArrival);
+  const [topSelling, setTopSelling] = useState<boolean>(product.topSelling);
+
+  // Hardcoded sex for now
+  const sexList = ["male", "female", "unisex"];
 
   // Sorting sizes
   const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
@@ -117,6 +141,19 @@ export default function EditProduct({
     }
   };
 
+  // I feel like I should have just added boolean isAvailable to color model in prisma and avoid computation here. Will revisit this sometime in the future
+  const isColorSelected = (color: Color) => {
+    return availableColors.some((c) => c.id === color.id);
+  };
+
+  const handleColorClick = (color: Color) => {
+    setAvailableColors((prev) =>
+      prev.some((c) => c.id === color.id)
+        ? prev.filter((c) => c.id !== color.id)
+        : [...prev, color]
+    );
+  };
+
   const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -150,12 +187,6 @@ export default function EditProduct({
       imagesToDelete.map((imageUrl) => handleDeleteImage(imageUrl))
     );
 
-    // New array of images for DB
-    const currentImages = product.images.map((image) => image.url);
-    const filteredImages = currentImages.filter(
-      (image) => !imagesToDelete.includes(image)
-    );
-
     const data = {
       name,
       description,
@@ -165,10 +196,15 @@ export default function EditProduct({
       isAvailable: availableForSale,
       images: newImages,
       stock,
+      sex,
+      sale,
+      details,
+      newArrival,
+      topSelling,
+      colors: availableColors,
     };
 
     try {
-      // Call the editProduct function to update the product
       const updatedProduct = await editProduct(product.id, data, newImages);
       console.log("Product updated successfully:", updatedProduct);
     } catch (error) {
@@ -210,25 +246,21 @@ export default function EditProduct({
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
-            Price (in cents)
+            Details
           </label>
-          <input
-            type="number"
-            value={priceInCents}
+          <textarea
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
             disabled={!isEditing}
-            onChange={handlePriceChange}
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
           />
         </div>
-        <div>
-          <p>{formatCurrency(priceInEuros || 0)}</p>
-        </div>
-        <div className="mb-4">
+        <div className="mb-4 flex gap-6">
           <label className="block text-sm font-medium text-gray-700">
             Stock
           </label>
           {sortedStock.map((item) => (
-            <div key={item.size} className="flex items-center  mb-2">
+            <div key={item.size} className="flex items-center mb-2">
               <span className="w-7">{item.size}</span>
               <input
                 type="number"
@@ -244,6 +276,45 @@ export default function EditProduct({
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
+            Price (in cents)
+          </label>
+          <input
+            type="number"
+            value={priceInCents}
+            disabled={!isEditing}
+            onChange={handlePriceChange}
+            className="mt-1 block w-[20%] border border-gray-300 rounded-md shadow-sm p-2"
+          />
+        </div>
+        <div className="mb-4">
+          <p>{formatCurrency(priceInEuros || 0)}</p>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Sex</label>
+          <select
+            id="sex"
+            name="sex"
+            value={sex}
+            onChange={(e) => {
+              setSex(e.target.value);
+            }}
+            className="border rounded-md py-1"
+            disabled={!isEditing}
+          >
+            <option value="" disabled>
+              Select sex
+            </option>
+            {sexList.map((sex) => {
+              return (
+                <option key={sex} value={sex}>
+                  {sex}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
             Available for Sale
           </label>
           <input
@@ -252,6 +323,42 @@ export default function EditProduct({
             onChange={(e) => setAvailableForSale(e.target.checked)}
             className="mt-1 block"
             disabled={!isEditing}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Top Selling
+          </label>
+          <input
+            type="checkbox"
+            checked={topSelling}
+            onChange={(e) => setTopSelling(e.target.checked)}
+            className="mt-1 block"
+            disabled={!isEditing}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            New Arrival
+          </label>
+          <input
+            type="checkbox"
+            checked={newArrival}
+            onChange={(e) => setNewArrival(e.target.checked)}
+            className="mt-1 block"
+            disabled={!isEditing}
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Sale percentage
+          </label>
+          <input
+            type="number"
+            value={sale}
+            disabled={!isEditing}
+            onChange={(e) => setSale(Number(e.target.value))}
+            className="mt-1 block w-16 border border-gray-300 rounded-md shadow-sm p-2"
           />
         </div>
         <div className="mb-4">
@@ -318,6 +425,54 @@ export default function EditProduct({
               );
             })}
           </select>
+        </div>
+        {/* <div className="mb-4">
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700">
+              Available Colors
+            </label>
+            <div className="flex flex-wrap gap-2">
+              {colors.map((color) => (
+                <div
+                  key={color.id}
+                  className={`w-8 h-8 rounded-full cursor-pointer border-2" `}
+                  style={{
+                    backgroundColor:
+                      color.name === "Colorful"
+                        ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
+                        : color.name,
+                    opacity: isColorSelected(color) ? 1 : 0.5,
+                    cursor: isEditing ? "pointer" : "default",
+                  }}
+                ></div>
+              ))}
+            </div>
+          </div>
+        </div> */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Available Colors
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {colors.map((color) => (
+              <div
+                key={color.id}
+                className={`w-8 h-8 rounded-full cursor-pointer border-2${
+                  isColorSelected(color) ? "border-black" : "border-transparent"
+                }
+                `}
+                style={{
+                  backgroundColor:
+                    color.name === "Colorful"
+                      ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
+                      : color.name,
+                  opacity: isColorSelected(color) ? 1 : 0.5,
+                  cursor: isEditing ? "pointer" : "default",
+                }}
+                onClick={isEditing ? () => handleColorClick(color) : undefined}
+              ></div>
+            ))}
+          </div>
         </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
