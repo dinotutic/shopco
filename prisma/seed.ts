@@ -185,12 +185,18 @@ main()
 // top selling boolean
 // reviews - already done i think
 
-//        "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+// Seeding guide:
+
+//  "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
 // "prisma": {
 //   "seed": "node --loader ts-node/esm prisma/seed.ts"
 // },
 
+//______________________________________
 // https://github.com/prisma/prisma/discussions/20369
+
+// Comment:
+//______________________________________
 // Ran:
 
 // npm install tsx --save-dev
