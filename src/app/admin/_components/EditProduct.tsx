@@ -65,7 +65,6 @@ export default function EditProduct({
   const [priceInEuros, setPriceInEuros] = useState<number>(
     product.priceInCents
   );
-  console.log(colors);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [name, setName] = useState<string>(product.name);
   const [description, setDescription] = useState<string>(product.description);
@@ -140,7 +139,6 @@ export default function EditProduct({
       console.error("Error deleting image:", error);
     }
   };
-  console.log("AVAILABLE COLORS: ", availableColors);
   // I feel like I should have just added boolean isAvailable to color model in prisma and avoid computation here. Will revisit this sometime in the future
   const isColorSelected = (color: Color) => {
     return availableColors.some((c) => c.id === color.id);
