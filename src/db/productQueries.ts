@@ -65,7 +65,7 @@ export async function addProduct(formData: FormData) {
   const description = formData.get("description");
   const details = formData.get("details");
   const priceInCents = formData.get("priceInCents");
-  const stock = formData.get("stock");
+  const stockJson = formData.get("stock");
   const isAvailable = formData.get("isAvailable") === "on";
   const images = formData.getAll("images");
   const category = formData.get("category");
@@ -73,12 +73,16 @@ export async function addProduct(formData: FormData) {
   const sale = formData.get("sale");
   const newArrival = formData.get("newArrival") === "on";
   const topSelling = formData.get("topSelling") === "on";
-  const colors = formData.getAll("colors");
+  const colorsJson = formData.getAll("colors");
   const sex = formData.get("sex");
 
   //Parse stock array to be usable here
   type StockData = { size: string; quantity: number }[];
-  const stockData: StockData = JSON.parse(stock as string);
+  const stockData: StockData = JSON.parse(stockJson as string);
+
+  // Parse colors array to be usable here and I have no idea why i first need to pass it as unknown and then as string
+  type ColorsData = { name: string; id: number }[];
+  const colorsData: ColorsData = JSON.parse(colorsJson as unknown as string);
 
   // Create roduct in DB without the images.
   // Image links will be added after the images are uploaded to s3
@@ -94,8 +98,9 @@ export async function addProduct(formData: FormData) {
       topSelling: topSelling,
       gender: sex as string,
       colors: {
-        create: colors.map((color) => ({
-          name: color as string,
+        connect: colorsData.map((color) => ({
+          name: color.name as string,
+          id: color.id,
         })),
       },
       category: {

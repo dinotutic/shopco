@@ -66,9 +66,7 @@ export default function ProductForm({
   const [sale, setSale] = useState<number>(0);
   const [newArrival, setNewArrival] = useState<boolean>(false);
   const [topSelling, setTopSelling] = useState<boolean>(false);
-  const [availableColors, setAvailableColors] = useState<
-    { name: string; id: number }[]
-  >([]);
+  const [availableColors, setAvailableColors] = useState<Color[]>([]);
 
   // Hardcoded sex for now
   const sexList = ["male", "female", "unisex"];
@@ -123,10 +121,10 @@ export default function ProductForm({
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
 
-    // Serializing stock since formData can't handle arrays
+    // Serializing stock and color since formData can't handle arrays
     formData.append("stock", JSON.stringify(stock));
     formData.append("colors", JSON.stringify(availableColors));
-    console.log("formData", formData);
+
     try {
       await addProduct(formData);
 
