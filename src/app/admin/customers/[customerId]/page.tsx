@@ -4,6 +4,7 @@ import { getPurchasesByUserId, getSaleStatsForUser } from "@/db/saleQueries";
 import { getReviewByUser } from "@/db/reviewQueries";
 import CustomerDetail from "../../_components/CustomerDetail";
 
+// I should probably import types from prisma
 type CustomerPageProps = {
   params: { customerId: string };
 };

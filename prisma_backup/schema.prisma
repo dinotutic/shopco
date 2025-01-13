@@ -63,7 +63,7 @@ model Image {
 model User {
   id          Int       @id @default(autoincrement())
   email       String    @unique
-  password    String?    // will integrate authentication later
+  password    String    // Or integrate authentication
   name        String
   orders      Order[]
   createdAt   DateTime  @default(now())

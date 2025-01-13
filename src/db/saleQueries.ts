@@ -1,9 +1,14 @@
 import prisma from "./prisma";
 
-export const getAllSalesasync = async () => {
+export const getAllSales = async () => {
   const sales = await prisma.order.findMany({
     include: {
-      items: true,
+      items: {
+        include: {
+          product: true,
+          color: true,
+        },
+      },
       user: true,
     },
   });

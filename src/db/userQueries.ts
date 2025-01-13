@@ -1,9 +1,10 @@
+"use server";
 import prisma from "./prisma";
 
 type CreateUserInput = {
   name: string;
   email: string;
-  password: string;
+  password?: string; // was only used for testing. Actual passwords wont be saved this way
 };
 
 export async function createCustomer({
@@ -47,4 +48,13 @@ export async function getAllCustomerStats() {
         ? 0
         : (avgSpentPerUser._sum.totalInCents || 0) / userCount,
   };
+}
+
+export async function updateCustomer(userId: number, data: CreateUserInput) {
+  const { password, ...updateData } = data;
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: updateData,
+  });
+  return user;
 }
