@@ -150,34 +150,6 @@ export async function addProduct(formData: FormData) {
   console.log(`Product added: ${name}`);
 }
 
-export async function getCategories() {
-  const categories = await prisma.category.findMany();
-  return categories;
-}
-
-export async function getStyles() {
-  const styles = await prisma.style.findMany();
-  return styles;
-}
-export async function getColors() {
-  const colors = await prisma.color.findMany();
-  return colors;
-}
-
-export async function getProductById(id: number) {
-  const product = await prisma.product.findUnique({
-    where: { id },
-    include: {
-      images: true,
-      category: true,
-      style: true,
-      stock: true,
-      colors: true,
-    },
-  });
-  return product;
-}
-
 export async function editProduct(
   id: number,
   data: {
@@ -258,6 +230,35 @@ export async function editProduct(
   );
 
   return updatedProduct;
+}
+
+export async function getCategories() {
+  const categories = await prisma.category.findMany();
+  return categories;
+}
+
+export async function getStyles() {
+  const styles = await prisma.style.findMany();
+  return styles;
+}
+
+export async function getColors() {
+  const colors = await prisma.color.findMany();
+  return colors;
+}
+
+export async function getProductById(id: number) {
+  const product = await prisma.product.findUnique({
+    where: { id },
+    include: {
+      images: true,
+      category: true,
+      style: true,
+      stock: true,
+      colors: true,
+    },
+  });
+  return product;
 }
 
 export async function deleteSingleImage(productId: number, key: string) {
