@@ -1,19 +1,6 @@
-type CustomersListProps = {
-  users: {
-    id: number;
+import { User } from "@prisma/client";
 
-    email: string;
-
-    password: string;
-
-    name: string;
-
-    createdAt: Date;
-
-    updatedAt: Date;
-  }[];
-};
-const CustomersList = ({ users }: CustomersListProps) => {
+const CustomersList = ({ customers }: { customers: User[] }) => {
   return (
     <>
       <table className="w-full border m-4">
@@ -32,13 +19,13 @@ const CustomersList = ({ users }: CustomersListProps) => {
           </tr>
         </thead>
         <tbody>
-          {users.map((user) => (
-            <tr key={user.id} className="hover:bg-gray-100">
-              <td className="py-2 px-4 border-b border-r">{user.id}</td>
-              <td className="py-2 px-4 border-b border-r">{user.name}</td>
-              <td className="py-2 px-4 border-b border-r">{user.email}</td>
+          {customers.map((customer) => (
+            <tr key={customer.id} className="hover:bg-gray-100">
+              <td className="py-2 px-4 border-b border-r">{customer.id}</td>
+              <td className="py-2 px-4 border-b border-r">{customer.name}</td>
+              <td className="py-2 px-4 border-b border-r">{customer.email}</td>
               <td className="py-2 px-4 border-b">
-                {user.createdAt.toLocaleDateString()}
+                {customer.createdAt.toLocaleDateString()}
               </td>
             </tr>
           ))}

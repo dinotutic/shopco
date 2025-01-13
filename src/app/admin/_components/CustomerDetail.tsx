@@ -1,9 +1,8 @@
 "use client";
 import React, { useState } from "react";
-import { formatCurrency } from "@/app/lib/formatters";
 
-type UserDetailProps = {
-  user: {
+type CustomerDetailProps = {
+  customer: {
     id: number;
     email: string;
     name: string;
@@ -27,27 +26,27 @@ type UserDetailProps = {
   }[];
 };
 
-const renderStars = (rating: number) => {
-  return Array.from({ length: 5 }, (_, index) => (
-    <span
-      key={index}
-      className={index < rating ? "text-yellow-500" : "text-gray-300"}
-    >
-      ★
-    </span>
-  ));
-};
-
-const UserDetail = ({
-  user,
+const CustomerDetail = ({
+  customer,
   purchases,
   salesStats,
   reviews,
-}: UserDetailProps) => {
+}: CustomerDetailProps) => {
   const [showReviews, setShowReviews] = useState(false);
 
   const toggleReviews = () => {
     setShowReviews(!showReviews);
+  };
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, index) => (
+      <span
+        key={index}
+        className={index < rating ? "text-yellow-500" : "text-gray-300"}
+      >
+        ★
+      </span>
+    ));
   };
 
   return (
@@ -56,21 +55,21 @@ const UserDetail = ({
       <section className="mb-6 p-4 border rounded-lg bg-gray-50">
         <h2 className="text-xl font-bold mb-4">User Data</h2>
         <p className="text-gray-700 mb-2">
-          <span className="font-semibold">ID:</span> {user.id}
+          <span className="font-semibold">ID:</span> {customer.id}
         </p>
         <p className="text-gray-700 mb-2">
-          <span className="font-semibold">Name:</span> {user.name}
+          <span className="font-semibold">Name:</span> {customer.name}
         </p>
         <p className="text-gray-700 mb-2">
-          <span className="font-semibold">Email:</span> {user.email}
+          <span className="font-semibold">Email:</span> {customer.email}
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Created At:</span>{" "}
-          {new Date(user.createdAt).toLocaleDateString()}
+          {new Date(customer.createdAt).toLocaleDateString()}
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Updated At:</span>{" "}
-          {new Date(user.updatedAt).toLocaleDateString()}
+          {new Date(customer.updatedAt).toLocaleDateString()}
         </p>
       </section>
 
@@ -79,11 +78,7 @@ const UserDetail = ({
         <h2 className="text-xl font-bold mb-4">Sales Stats</h2>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Total Amount:</span>{" "}
-          {formatCurrency(salesStats.amount)}
-        </p>
-        <p className="text-gray-700 mb-2">
-          <span className="font-semibold">Average per Order:</span>{" "}
-          {formatCurrency(salesStats.amount / salesStats.numberOfOrders)}
+          {salesStats.amount}
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Number of Orders:</span>{" "}
@@ -103,7 +98,7 @@ const UserDetail = ({
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Total:</span>{" "}
-                  {formatCurrency(purchase.totalInCents)}
+                  {purchase.totalInCents}
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Date:</span>{" "}
@@ -161,4 +156,4 @@ const UserDetail = ({
   );
 };
 
-export default UserDetail;
+export default CustomerDetail;

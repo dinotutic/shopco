@@ -30,5 +30,3 @@
 //     </div>
 //   );
 // }
-import User
-const UserActions = ({ user }: {use: }) => {}
