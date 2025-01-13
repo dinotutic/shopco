@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 
 export type User = {
   id: number;
@@ -36,9 +37,6 @@ export type OrderProps = {
 };
 
 const SalesList = ({ sales }: { sales: OrderProps[] }) => {
-  sales.map((sale) =>
-    sale.items.map((item) => console.log(item.product?.name))
-  );
   return (
     <>
       <table className="w-full border m-4">
@@ -68,22 +66,44 @@ const SalesList = ({ sales }: { sales: OrderProps[] }) => {
                 {(sale.totalInCents / 100).toFixed(2)}€
               </td>
               <td className="py-2 px-4 border-b border-r">
-                {sale.createdAt.toLocaleString()}
+                {new Date(sale.createdAt).toLocaleDateString()}
               </td>
               <td className="py-2 px-4 border-b">
-                <ul>
-                  {sale.items.map((item, index) => (
-                    <li key={index}>
-                      {item.product?.name} (x{item.quantity})
-                    </li>
-                  ))}
-                </ul>
+                <ToggleItems items={sale.items} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
     </>
+  );
+};
+
+const ToggleItems = ({ items }: { items: OrderItem[] }) => {
+  const [showItems, setShowItems] = useState(false);
+
+  const toggleItems = () => {
+    setShowItems(!showItems);
+  };
+
+  return (
+    <div>
+      <button
+        onClick={toggleItems}
+        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
+      >
+        {showItems ? "Hide Items" : "Show Items"}
+      </button>
+      {showItems && (
+        <ul className="mt-2">
+          {items.map((item) => (
+            <li key={item.id}>
+              {item.product?.name || "Unknown Product"} (x{item.quantity})
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 };
 
