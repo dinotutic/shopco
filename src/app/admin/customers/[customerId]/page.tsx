@@ -1,6 +1,6 @@
 import { getUserById } from "@/db/userQueries";
 import PageHeader from "../../_components/PageHeader";
-import UserDetail from "../../_components/UserDetail";
+import UserDetail from "../../_components/UserDetail_backup";
 import { getPurchasesByUserId, getSaleStatsForUser } from "@/db/saleQueries";
 import { getReviewByUser } from "@/db/reviewQueries";
 

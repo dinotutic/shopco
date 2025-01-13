@@ -1,3 +1,7 @@
+"use client";
+import React, { useState } from "react";
+import { formatCurrency } from "@/app/lib/formatters";
+
 type UserDetailProps = {
   user: {
     id: number;
@@ -23,19 +27,39 @@ type UserDetailProps = {
   }[];
 };
 
-const UserDetail = async ({
+const renderStars = (rating: number) => {
+  return Array.from({ length: 5 }, (_, index) => (
+    <span
+      key={index}
+      className={index < rating ? "text-yellow-500" : "text-gray-300"}
+    >
+      ★
+    </span>
+  ));
+};
+
+const UserDetail = ({
   user,
   purchases,
   salesStats,
   reviews,
 }: UserDetailProps) => {
-  console.log(reviews);
+  const [showReviews, setShowReviews] = useState(false);
+
+  const toggleReviews = () => {
+    setShowReviews(!showReviews);
+  };
+
   return (
     <div className="p-4">
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-        <h1 className="text-2xl font-bold mb-4">{user.name}</h1>
+      {/* User Data Section */}
+      <section className="mb-6 p-4 border rounded-lg bg-gray-50">
+        <h2 className="text-xl font-bold mb-4">User Data</h2>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">ID:</span> {user.id}
+        </p>
+        <p className="text-gray-700 mb-2">
+          <span className="font-semibold">Name:</span> {user.name}
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Email:</span> {user.email}
@@ -48,30 +72,38 @@ const UserDetail = async ({
           <span className="font-semibold">Updated At:</span>{" "}
           {new Date(user.updatedAt).toLocaleDateString()}
         </p>
-      </div>
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+      </section>
+
+      {/* Sales Stats Section */}
+      <section className="mb-6 p-4 border rounded-lg bg-gray-50">
         <h2 className="text-xl font-bold mb-4">Sales Stats</h2>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Total Amount:</span>{" "}
-          {salesStats.amount}
+          {formatCurrency(salesStats.amount)}
+        </p>
+        <p className="text-gray-700 mb-2">
+          <span className="font-semibold">Average per Order:</span>{" "}
+          {formatCurrency(salesStats.amount / salesStats.numberOfOrders)}
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Number of Orders:</span>{" "}
           {salesStats.numberOfOrders}
         </p>
-      </div>
-      <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+      </section>
+
+      {/* Purchases Section */}
+      <section className="mb-6 p-4 border rounded-lg bg-gray-50">
         <h2 className="text-xl font-bold mb-4">Purchases</h2>
         {purchases.length > 0 ? (
           <ul>
             {purchases.map((purchase) => (
-              <li key={purchase.id} className="mb-2">
+              <li key={purchase.id} className="mb-2 p-2 border-b">
                 <p className="text-gray-700">
                   <span className="font-semibold">Order ID:</span> {purchase.id}
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Total:</span>{" "}
-                  {purchase.totalInCents}
+                  {formatCurrency(purchase.totalInCents)}
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Date:</span>{" "}
@@ -83,34 +115,48 @@ const UserDetail = async ({
         ) : (
           <p>No purchases found</p>
         )}
-      </div>
-      <div className="bg-white shadow-md rounded-lg p-6">
+      </section>
+
+      {/* Reviews Section */}
+      <section className="mb-6 p-4 border rounded-lg bg-gray-50">
         <h2 className="text-xl font-bold mb-4">Reviews</h2>
-        {reviews.length > 0 ? (
-          <ul>
-            {reviews.map((review) => (
-              <li key={review.id} className="mb-2">
-                <p className="text-gray-700">
-                  <span className="font-semibold">Review ID:</span> {review.id}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-semibold">Rating:</span> {review.rating}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-semibold">Comment:</span>{" "}
-                  {review.comment}
-                </p>
-                <p className="text-gray-700">
-                  <span className="font-semibold">Date:</span>{" "}
-                  {new Date(review.createdAt).toLocaleDateString()}
-                </p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No reviews found</p>
+        <button
+          onClick={toggleReviews}
+          className="border rounded-2xl p-4 bg-secondaryBackground text-secondaryText"
+        >
+          {showReviews ? "Hide Reviews" : "Show Reviews"}
+        </button>
+        {showReviews && (
+          <div>
+            {reviews.length > 0 ? (
+              <ul>
+                {reviews.map((review) => (
+                  <li key={review.id} className="mb-2 p-2 border-b">
+                    <p className="text-gray-700">
+                      <span className="font-semibold">Review ID:</span>{" "}
+                      {review.id}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-semibold">Rating:</span>{" "}
+                      {renderStars(review.rating)}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-semibold">Comment:</span>{" "}
+                      {review.comment}
+                    </p>
+                    <p className="text-gray-700">
+                      <span className="font-semibold">Date:</span>{" "}
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No reviews found</p>
+            )}
+          </div>
         )}
-      </div>
+      </section>
     </div>
   );
 };
