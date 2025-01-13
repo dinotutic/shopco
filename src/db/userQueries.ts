@@ -6,7 +6,11 @@ type CreateUserInput = {
   password: string;
 };
 
-export async function createUser({ name, email, password }: CreateUserInput) {
+export async function createCustomer({
+  name,
+  email,
+  password,
+}: CreateUserInput) {
   const user = await prisma.user.create({
     data: {
       name,
@@ -17,14 +21,14 @@ export async function createUser({ name, email, password }: CreateUserInput) {
   return user;
 }
 
-export async function getUserById(userId: number) {
+export async function getCustomerById(userId: number) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
   });
   return user;
 }
 
-export async function getAllUsers() {
+export async function getAllCustomers() {
   const users = await prisma.user.findMany();
   return users;
 }
