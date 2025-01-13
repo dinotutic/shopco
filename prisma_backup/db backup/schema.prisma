@@ -27,20 +27,7 @@ model Product {
   cart         CartItem[]
   style        Style @relation(fields: [styleId], references: [id])
   styleId      Int
-  gender       String 
-  sale         Int
-  details      String
-  colors       Color[]
-  newArrival   Boolean @default(false)
-  topSelling   Boolean @default(false)
-}
-
-
-model Color{
-  id          Int       @id @default(autoincrement())
-  name        String
-  product     Product[]
-  orderItems  OrderItem[]
+  gender       String @default("male")
 }
 
 model Stock {
@@ -63,7 +50,7 @@ model Image {
 model User {
   id          Int       @id @default(autoincrement())
   email       String    @unique
-  password    String?    // will integrate authentication later
+  password    String    // Or integrate authentication
   name        String
   orders      Order[]
   createdAt   DateTime  @default(now())
@@ -76,6 +63,7 @@ model Order {
   id      Int       @id @default(autoincrement())
   totalInCents Float
   createdAt    DateTime  @default(now())
+
   items        OrderItem[]
   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       Int
@@ -85,8 +73,6 @@ model OrderItem {
   id        Int      @id @default(autoincrement())
   order     Order    @relation(fields: [orderId], references: [id])
   orderId   Int
-  colorId   Int
-  color     Color   @relation(fields: [colorId], references: [id])
   product   Product  @relation(fields: [productId], references: [id])
   productId Int
   quantity  Int      @default(1) // Number of this product in the order

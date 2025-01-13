@@ -5,7 +5,7 @@ import { Product } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-export default function ProductActions({ product }: { product: Product }) {
+export const ProductActions = ({ product }: { product: Product }) => {
   const router = useRouter();
 
   const handleDelete = async () => {
@@ -29,4 +29,6 @@ export default function ProductActions({ product }: { product: Product }) {
       </button>
     </div>
   );
-}
+};
+
+export default ProductActions;

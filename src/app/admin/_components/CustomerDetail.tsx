@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from "react";
+import { formatCurrency } from "@/app/lib/formatters";
+import { updateCustomer } from "@/db/userQueries";
 
 type CustomerDetailProps = {
   customer: {
@@ -33,9 +35,28 @@ const CustomerDetail = ({
   reviews,
 }: CustomerDetailProps) => {
   const [showReviews, setShowReviews] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedCustomer, setEditedCustomer] = useState({
+    name: customer.name,
+    email: customer.email,
+  });
 
   const toggleReviews = () => {
     setShowReviews(!showReviews);
+  };
+
+  const handleEditToggle = () => {
+    setIsEditing(!isEditing);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setEditedCustomer({ ...editedCustomer, [name]: value });
+  };
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    await updateCustomer(customer.id, editedCustomer);
+    setIsEditing(false);
   };
 
   const renderStars = (rating: number) => {
@@ -54,23 +75,81 @@ const CustomerDetail = ({
       {/* User Data Section */}
       <section className="mb-6 p-4 border rounded-lg bg-gray-50">
         <h2 className="text-xl font-bold mb-4">User Data</h2>
-        <p className="text-gray-700 mb-2">
-          <span className="font-semibold">ID:</span> {customer.id}
-        </p>
-        <p className="text-gray-700 mb-2">
-          <span className="font-semibold">Name:</span> {customer.name}
-        </p>
-        <p className="text-gray-700 mb-2">
-          <span className="font-semibold">Email:</span> {customer.email}
-        </p>
-        <p className="text-gray-700 mb-2">
-          <span className="font-semibold">Created At:</span>{" "}
-          {new Date(customer.createdAt).toLocaleDateString()}
-        </p>
-        <p className="text-gray-700 mb-2">
-          <span className="font-semibold">Updated At:</span>{" "}
-          {new Date(customer.updatedAt).toLocaleDateString()}
-        </p>
+        {isEditing ? (
+          <form onSubmit={handleFormSubmit}>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 font-semibold mb-2"
+                htmlFor="name"
+              >
+                Name
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="name"
+                value={editedCustomer.name}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                className="block text-gray-700 font-semibold mb-2"
+                htmlFor="email"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={editedCustomer.email}
+                onChange={handleInputChange}
+                className="w-full p-2 border rounded"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={handleEditToggle}
+              className="ml-2 px-4 py-2 bg-gray-500 text-white rounded hover:bg-black"
+            >
+              Cancel
+            </button>
+          </form>
+        ) : (
+          <>
+            <p className="text-gray-700 mb-2">
+              <span className="font-semibold">ID:</span> {customer.id}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <span className="font-semibold">Name:</span> {customer.name}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <span className="font-semibold">Email:</span> {customer.email}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <span className="font-semibold">Created At:</span>{" "}
+              {new Date(customer.createdAt).toLocaleDateString()}
+            </p>
+            <p className="text-gray-700 mb-2">
+              <span className="font-semibold">Updated At:</span>{" "}
+              {new Date(customer.updatedAt).toLocaleDateString()}
+            </p>
+            <button
+              onClick={handleEditToggle}
+              className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
+            >
+              Edit
+            </button>
+          </>
+        )}
       </section>
 
       {/* Sales Stats Section */}
@@ -78,7 +157,11 @@ const CustomerDetail = ({
         <h2 className="text-xl font-bold mb-4">Sales Stats</h2>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Total Amount:</span>{" "}
-          {salesStats.amount}
+          {formatCurrency(salesStats.amount)}
+        </p>
+        <p className="text-gray-700 mb-2">
+          <span className="font-semibold">Average per Order:</span>{" "}
+          {formatCurrency(salesStats.amount / salesStats.numberOfOrders)}
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Number of Orders:</span>{" "}
@@ -98,7 +181,7 @@ const CustomerDetail = ({
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Total:</span>{" "}
-                  {purchase.totalInCents}
+                  {formatCurrency(purchase.totalInCents)}
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Date:</span>{" "}
@@ -117,7 +200,8 @@ const CustomerDetail = ({
         <h2 className="text-xl font-bold mb-4">Reviews</h2>
         <button
           onClick={toggleReviews}
-          className="border rounded-2xl p-4 bg-secondaryBackground text-secondaryText"
+          className="px-4 py-2 bg-black text-white rounded hover:bg-gray-900"
+          aria-expanded={showReviews}
         >
           {showReviews ? "Hide Reviews" : "Show Reviews"}
         </button>

@@ -1,5 +1,5 @@
 import { User } from "@prisma/client";
-
+import { CustomerActions } from "./CustomerActions";
 const CustomersList = ({ customers }: { customers: User[] }) => {
   return (
     <>
@@ -16,6 +16,7 @@ const CustomersList = ({ customers }: { customers: User[] }) => {
               Email
             </th>
             <th className="py-2 px-4 border-b text-start">Member since</th>
+            <th className="py-2 px-4 border-b text-start">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -24,8 +25,11 @@ const CustomersList = ({ customers }: { customers: User[] }) => {
               <td className="py-2 px-4 border-b border-r">{customer.id}</td>
               <td className="py-2 px-4 border-b border-r">{customer.name}</td>
               <td className="py-2 px-4 border-b border-r">{customer.email}</td>
-              <td className="py-2 px-4 border-b">
+              <td className="py-2 px-4 border-b border-r">
                 {customer.createdAt.toLocaleDateString()}
+              </td>
+              <td className="py-2 px-4 border-b border">
+                <CustomerActions customerId={customer.id} />
               </td>
             </tr>
           ))}
