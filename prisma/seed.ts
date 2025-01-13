@@ -176,15 +176,6 @@ main()
     await prisma.$disconnect();
   });
 
-// Things to add
-// Male/Female
-// Sale / If yes how much % off
-// Product details
-// available colors
-// new arrival boolean
-// top selling boolean
-// reviews - already done i think
-
 // Seeding guide:
 
 //  "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
