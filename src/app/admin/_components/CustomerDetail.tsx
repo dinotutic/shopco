@@ -17,7 +17,7 @@ type CustomerDetailProps = {
     createdAt: Date;
     userId: number;
   }[];
-  salesStats: { amount: number; numberOfOrders: number };
+  orders: { amount: number; numberOfOrders: number };
   reviews: {
     id: number;
     userId: number;
@@ -31,7 +31,7 @@ type CustomerDetailProps = {
 const CustomerDetail = ({
   customer,
   purchases,
-  salesStats,
+  orders,
   reviews,
 }: CustomerDetailProps) => {
   const [showReviews, setShowReviews] = useState(false);
@@ -157,15 +157,15 @@ const CustomerDetail = ({
         <h2 className="text-xl font-bold mb-4">Sales Stats</h2>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Total Amount:</span>{" "}
-          {formatCurrency(salesStats.amount)}
+          {formatCurrency(orders.amount)}
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Average per Order:</span>{" "}
-          {formatCurrency(salesStats.amount / salesStats.numberOfOrders)}
+          {formatCurrency(orders.amount / orders.numberOfOrders)}
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Number of Orders:</span>{" "}
-          {salesStats.numberOfOrders}
+          {orders.numberOfOrders}
         </p>
       </section>
 
