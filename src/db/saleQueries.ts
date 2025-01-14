@@ -47,3 +47,38 @@ export const getPurchasesByUserId = async (userId: number) => {
   });
   return purchases;
 };
+
+export const getOrderById = async (orderId: number) => {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      items: {
+        include: {
+          product: true,
+          color: true,
+        },
+      },
+      user: true,
+    },
+  });
+  return order;
+};
+
+export const getTotalItemsInOrder = async (orderId: number) => {
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    include: {
+      items: true,
+    },
+  });
+
+  if (!order) {
+    throw new Error(`Order with ID ${orderId} not found`);
+  }
+
+  const totalItems = order.items.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+  return totalItems;
+};

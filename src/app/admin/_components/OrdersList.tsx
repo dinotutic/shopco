@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import OrdersActions from "./OrdersActions";
 
 export type User = {
   id: number;
@@ -36,7 +37,7 @@ export type OrderProps = {
   userId: number;
 };
 
-const SalesList = ({ sales }: { sales: OrderProps[] }) => {
+const OrdersList = ({ orders }: { orders: OrderProps[] }) => {
   return (
     <>
       <table className="w-full border m-4">
@@ -58,18 +59,18 @@ const SalesList = ({ sales }: { sales: OrderProps[] }) => {
           </tr>
         </thead>
         <tbody>
-          {sales.map((sale) => (
-            <tr key={sale.id} className="hover:bg-gray-100">
-              <td className="py-2 px-4 border-b border-r">{sale.id}</td>
-              <td className="py-2 px-4 border-b border-r">{sale.user.name}</td>
+          {orders.map((order) => (
+            <tr key={order.id} className="hover:bg-gray-100">
+              <td className="py-2 px-4 border-b border-r">{order.id}</td>
+              <td className="py-2 px-4 border-b border-r">{order.user.name}</td>
               <td className="py-2 px-4 border-b border-r">
-                {(sale.totalInCents / 100).toFixed(2)}€
+                {(order.totalInCents / 100).toFixed(2)}€
               </td>
               <td className="py-2 px-4 border-b border-r">
-                {new Date(sale.createdAt).toLocaleDateString()}
+                {new Date(order.createdAt).toLocaleDateString()}
               </td>
               <td className="py-2 px-4 border-b">
-                <ToggleItems items={sale.items} />
+                <OrdersActions orderId={order.id} />
               </td>
             </tr>
           ))}
@@ -79,32 +80,4 @@ const SalesList = ({ sales }: { sales: OrderProps[] }) => {
   );
 };
 
-const ToggleItems = ({ items }: { items: OrderItem[] }) => {
-  const [showItems, setShowItems] = useState(false);
-
-  const toggleItems = () => {
-    setShowItems(!showItems);
-  };
-
-  return (
-    <div>
-      <button
-        onClick={toggleItems}
-        className="px-4 py-2 bg-black text-white rounded hover:bg-gray-800"
-      >
-        {showItems ? "Hide Items" : "Show Items"}
-      </button>
-      {showItems && (
-        <ul className="mt-2">
-          {items.map((item) => (
-            <li key={item.id}>
-              {item.product?.name || "Unknown Product"} (x{item.quantity})
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-};
-
-export default SalesList;
+export default OrdersList;
