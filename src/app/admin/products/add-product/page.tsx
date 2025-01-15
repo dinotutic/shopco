@@ -8,7 +8,9 @@ export default async function AddProduct() {
   const colors = await getColors();
   return (
     <>
-      <PageHeader>Add Product</PageHeader>
+      <div className="flex items-center w-full">
+        <PageHeader>Add Product</PageHeader>
+      </div>
       <ProductForm categories={categories} styles={styles} colors={colors} />
     </>
   );

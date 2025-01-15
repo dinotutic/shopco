@@ -217,7 +217,7 @@ export default function EditProduct({
   };
 
   return (
-    <div className="max-w-4xl p-4">
+    <div className="">
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">

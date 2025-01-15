@@ -16,8 +16,10 @@ const OrderPage = async ({ params }: OrderPageParams) => {
   }
 
   return (
-    <div className="p-4">
-      <PageHeader>Order Detail</PageHeader>
+    <div className="">
+      <div className="flex items-center w-full">
+        <PageHeader>Order Detail</PageHeader>
+      </div>
 
       {/* Order Data Section */}
       <section className="mb-6 p-4 border rounded-lg bg-gray-50">

@@ -6,7 +6,7 @@ export default async function CustomersPage() {
   const customers = await getAllCustomers();
   return (
     <>
-      <div className="flex justify-between items-center w-full mb-4">
+      <div className="w-full flex justify-between items-center">
         <PageHeader>Customers</PageHeader>
       </div>
       <CustomersList customers={customers} />
