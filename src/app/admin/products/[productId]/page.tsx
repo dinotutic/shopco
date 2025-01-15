@@ -23,8 +23,10 @@ export default async function ProductDetail({ params }: ProductDetailProps) {
   }
 
   return (
-    <div>
-      <PageHeader>Product Detail</PageHeader>
+    <div className="">
+      <div className="flex items-center w-full">
+        <PageHeader>Product Detail</PageHeader>
+      </div>
       <EditProduct
         product={product}
         categories={categories}

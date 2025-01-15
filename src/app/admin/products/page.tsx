@@ -9,9 +9,9 @@ export default async function AdminProductsPage() {
   const styles = await getStyles();
   return (
     <>
-      <div className="flex justify-between items-center w-full mb-4">
+      <div className="w-full flex justify-between items-center">
         <PageHeader>Products</PageHeader>
-        <button className="border rounded-2xl p-4 bg-secondaryBackground text-secondaryText">
+        <button className="border rounded-2xl p-4 bg-secondaryBackground text-secondaryText mx-4 ">
           <Link href="/admin/products/add-product">Add Product</Link>
         </button>
       </div>

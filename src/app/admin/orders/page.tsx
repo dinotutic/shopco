@@ -7,7 +7,9 @@ export const OrdersPage = async () => {
   const orders = await getAllSales();
   return (
     <>
-      <PageHeader>Orders</PageHeader>
+      <div className="w-full flex justify-between items-center">
+        <PageHeader>Orders</PageHeader>
+      </div>
       <OrdersList orders={orders} />
     </>
   );

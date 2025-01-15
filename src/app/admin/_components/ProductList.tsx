@@ -33,8 +33,7 @@ export default function ProductList({
   categories: { id: number; name: string }[];
   styles: { id: number; name: string }[];
 }) {
-  const sizes = ["XS", "S", "M", "L", "XL"];
-  const [filter, setFilter] = useState<string>("");
+  const [search, setSearch] = useState<string>("");
   const [sort, setSort] = useState<string>("");
   const [styleFilter, setStyleFilter] = useState<string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
@@ -43,10 +42,21 @@ export default function ProductList({
   );
   const [sexFilter, setSexFilter] = useState<string | null>(null);
 
+  // To format JSX
+  const formateSex = (sex: string) => {
+    if (sex === "male") {
+      return "M";
+    } else if (sex === "female") {
+      return "F";
+    } else if (sex === "unisex") {
+      return "U";
+    }
+  };
+
   const filteredProducts = products.filter((product) => {
     const matchesNameFilter = product.name
       .toLowerCase()
-      .includes(filter.toLowerCase());
+      .includes(search.toLowerCase());
     const matchesAvailability =
       availabilityFilter === null || product.isAvailable === availabilityFilter;
     const matchesCategory =
@@ -64,17 +74,6 @@ export default function ProductList({
     );
   });
 
-  // To format JSX
-  const formattingSex = (product: Product) => {
-    if (product.gender === "male") {
-      return "M";
-    } else if (product.gender === "female") {
-      return "F";
-    } else if (product.gender === "unisex") {
-      return "U";
-    }
-  };
-
   const sortedProducts = filteredProducts.sort((a, b) => {
     if (sort === "priceAsc") {
       return a.priceInCents - b.priceInCents;
@@ -91,14 +90,14 @@ export default function ProductList({
 
   return (
     <div className="overflow-x-auto">
-      <div className="flex mb-4 justify-between">
-        <h1 className="text-xl ml-4 text-gray-500">Filters:</h1>
+      <div className="flex my-8 justify-between items-center">
+        <h1 className="text-xl text-gray-500">Filters:</h1>
         <div className="flex gap-4">
           <input
             type="text"
-            placeholder="Filter by name"
-            value={filter}
-            onChange={(e) => setFilter(e.target.value)}
+            placeholder="Search by name"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
             className="border p-2 rounded-xl"
           />
           <select
@@ -169,63 +168,68 @@ export default function ProductList({
           </select>
         </div>
       </div>
-      <table className="min-w-full bg-white border text-center">
-        <thead>
+
+      <table className="w-full border-separate border-spacing-0">
+        <thead className="bg-gray-200">
           <tr>
-            <th className="py-2 px-4 border-b">ID</th>
-            <th className="py-2 px-4 border-b">Images</th>
-            <th className="py-2 px-4 border-b">Name</th>
-            <th className="py-2 px-4 border-b">Available</th>
-            <th className="py-2 px-4 border-b">Sex</th>
-            <th className="py-2 px-4 border-b">Price</th>
-            <th className="py-2 px-4 border-b">Stock</th>
-            <th className="py-2 px-4 border-b">Category</th>
-            <th className="py-2 px-4 border-b">Style</th>
-            <th className="py-2 px-4 border-b">Action</th>
+            <th className="px-4 py-2 border rounded-tl-lg border-gray-300 text-start">
+              ID
+            </th>
+            <th className="px-4 py-2 border-r border-y border-gray-300 text-start">
+              Name
+            </th>
+            <th className="px-4 py-2 border-r border-y border-gray-300 text-start">
+              Price
+            </th>
+            <th className="px-4 py-2 border-r border-y border-gray-300 text-start">
+              Sex
+            </th>
+            <th className="px-4 py-2 border-r border-y border-gray-300 text-start">
+              Stock
+            </th>
+            <th className="px-4 py-2 border-r border-y border-gray-300 text-start">
+              Category
+            </th>
+            <th className="px-4 py-2 border-r border-y border-gray-300 text-start">
+              Style
+            </th>
+            <th className="px-4 py-2 border-r border-y rounded-tr-lg border-gray-300 text-start">
+              Actions
+            </th>
           </tr>
         </thead>
         <tbody>
-          {sortedProducts.map((product) => (
-            <tr key={product.id}>
-              <td className="py-2 px-4 border-b">{product.id}</td>
-              {product.images && product.images.length > 0 ? (
-                <td>
-                  <img
-                    src={product.images[0].url}
-                    alt={product.name}
-                    className="h-16 w-16 object-cover mb-2"
-                  />
-                </td>
-              ) : (
-                <td className="py-2 px-4 border-b>">No image</td>
-              )}
-              <td className="py-2 px-4 border-b">{product.name}</td>
-              <td className="py-2 px-4 border-b">
-                {product.isAvailable ? "Y" : "N"}
+          {sortedProducts.map((product, index) => (
+            <tr key={product.id} className="hover:bg-gray-100">
+              <td
+                className={`px-4 border-b border-r w-10 border-l ${
+                  index === sortedProducts.length - 1 ? "rounded-bl-lg" : ""
+                }`}
+              >
+                {product.id}
               </td>
-              {/* GENDER */}
-              <td>{formattingSex(product)}</td>
-              <td className="py-2 px-4 border-b">
+              <td className="px-4 border-b border-r">{product.name}</td>
+              <td className="px-4 border-b border-r">
                 {(product.priceInCents / 100).toFixed(2)}€
               </td>
-              <td className="py-2 px-4 border-b">
-                <div className="flex gap-4 justify-center">
-                  {sizes.map((size) => {
-                    const stockEntry = product.stock.find(
-                      (entry) => entry.size === size
-                    );
-                    return (
-                      <div key={size} className="flex flex-col items-center">
-                        <span>{size}</span>
-                        <span>{stockEntry ? stockEntry.quantity : 0}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+              <td className="px-4 border-b border-r">
+                {formateSex(product.gender)}
               </td>
-              <td className="py-2 px-4 border-b">{product.category.name}</td>
-              <td className="py-2 px-4 border-b">{product.style.name}</td>
-              <td className="py-2 px-4 border-b">
+              <td className="px-4 border-b border-r">
+                {product.stock.reduce(
+                  (total, stock) => total + stock.quantity,
+                  0
+                )}
+              </td>
+              <td className="px-4 border-b border-r">
+                {product.category.name}
+              </td>
+              <td className="px-4 border-b border-r">{product.style.name}</td>
+              <td
+                className={`px-4 border-b border-r w-10 ${
+                  index === sortedProducts.length - 1 ? "rounded-br-lg" : ""
+                }`}
+              >
                 <ProductActions product={product} />
               </td>
             </tr>

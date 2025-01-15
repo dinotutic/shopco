@@ -21,15 +21,17 @@ const CustomerPage = async ({ params }: CustomerPageProps) => {
     return <div>Customer not found</div>;
   }
   return (
-    <div>
-      <PageHeader>Customer Page</PageHeader>
+    <>
+      <div className="flex items-center w-full">
+        <PageHeader>Customer Page</PageHeader>
+      </div>
       <CustomerDetail
         customer={customer}
         purchases={purchases}
         orders={orders}
         reviews={reviews}
       />
-    </div>
+    </>
   );
 };
 

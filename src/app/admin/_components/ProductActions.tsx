@@ -14,15 +14,15 @@ export const ProductActions = ({ product }: { product: Product }) => {
   };
 
   return (
-    <div className="flex">
+    <div className="flex items-center justify-center max-w-fit">
       <Link
         href={`/admin/products/${product.id}`}
-        className="border rounded-2xl p-4 bg-gray-500 text-secondaryText  hover:bg-secondaryBackground"
+        className="border rounded-xl p-2 px-4 bg-gray-400 text-secondaryText  hover:bg-secondaryBackground"
       >
         View
       </Link>
       <button
-        className="border rounded-2xl p-4 bg-gray-500 text-secondaryText  hover:bg-secondaryBackground"
+        className="border rounded-xl p-2 px-4 bg-gray-400 text-secondaryText  hover:bg-secondaryBackground"
         onClick={handleDelete}
       >
         Delete
