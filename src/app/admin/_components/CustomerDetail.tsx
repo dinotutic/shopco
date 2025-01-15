@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { formatCurrency } from "@/app/lib/formatters";
 import { updateCustomer } from "@/db/userQueries";
+import Link from "next/link";
 
 type CustomerDetailProps = {
   customer: {
@@ -177,7 +178,13 @@ const CustomerDetail = ({
             {purchases.map((purchase) => (
               <li key={purchase.id} className="mb-2 p-2 border-b">
                 <p className="text-gray-700">
-                  <span className="font-semibold">Order ID:</span> {purchase.id}
+                  <span className="font-semibold">Order ID:</span>{" "}
+                  <Link
+                    href={`/admin/orders/${purchase.id}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {purchase.id}
+                  </Link>
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Total:</span>{" "}

@@ -1,6 +1,7 @@
 import { getOrderById, getTotalItemsInOrder } from "@/db/saleQueries";
 import PageHeader from "../../_components/PageHeader";
 import { formatCurrency } from "@/app/lib/formatters";
+import Link from "next/link";
 
 type OrderPageParams = {
   params: { orderId: number };
@@ -32,7 +33,12 @@ const OrderPage = async ({ params }: OrderPageParams) => {
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Customer Name:</span>{" "}
-          {order.user.name}
+          <Link
+            href={`/admin/customers/${order.userId}`}
+            className="text-blue-500 hover:underline"
+          >
+            {order.user.name}
+          </Link>
         </p>
         <p className="text-gray-700 mb-2">
           <span className="font-semibold">Customer Email:</span>{" "}
@@ -60,7 +66,12 @@ const OrderPage = async ({ params }: OrderPageParams) => {
               <li key={item.id} className="mb-2 p-2 border-b">
                 <p className="text-gray-700">
                   <span className="font-semibold">Product:</span>{" "}
-                  {item.product.name}
+                  <Link
+                    href={`/admin/products/${item.product.id}`}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {item.product.name}
+                  </Link>
                 </p>
                 <p className="text-gray-700">
                   <span className="font-semibold">Color:</span>{" "}

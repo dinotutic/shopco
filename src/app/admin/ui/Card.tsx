@@ -1,4 +1,5 @@
 import React from "react";
+
 type DashboardCardProps = {
   title: string;
   subtitle: string;
@@ -11,10 +12,10 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
   body,
 }) => {
   return (
-    <div className="flex justify-center items-start flex-col border rounded-xl p-4 gap-4 w-1/3">
-      <h2 className="text-2xl inline-block">{title}</h2>
-      <h3 className="text-sm inline-block text-gray-500">{subtitle}</h3>
-      <p className="text-md inline-block">{body}</p>
+    <div className="flex flex-col justify-center items-start border rounded-lg p-4 gap-4 w-full max-w-md bg-gray-50">
+      <h2 className="text-2xl font-bold">{title}</h2>
+      <h3 className="text-sm text-gray-500">{subtitle}</h3>
+      <p className="text-md text-gray-700">{body}</p>
     </div>
   );
 };
