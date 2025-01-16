@@ -2,7 +2,7 @@ import { getCustomerById } from "@/db/userQueries";
 import PageHeader from "../../_components/PageHeader";
 import { getPurchasesByUserId, getSaleStatsForUser } from "@/db/saleQueries";
 import { getReviewByUser } from "@/db/reviewQueries";
-import CustomerDetail from "../../_components/CustomerDetail";
+import CustomerDetail from "../../_components/customers/CustomerDetail";
 
 // I should probably import types from prisma
 type CustomerPageProps = {

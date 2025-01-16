@@ -50,7 +50,7 @@ type Color = {
   name: string;
 };
 
-export default function EditProduct({
+export default function ProductDetail({
   product,
   styles,
   categories,
