@@ -171,6 +171,7 @@ export default function ProductDetail({
     );
     setStock(newStock);
   };
+  console.log("stock-----", stock);
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);

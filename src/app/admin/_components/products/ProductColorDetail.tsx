@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { deleteSingleImage, editProduct } from "@/db/productQueries";
 import { formatCurrency } from "@/app/lib/formatters";
+import { useRouter } from "next/router";
 
 type Product = {
   id: number;
@@ -90,7 +91,7 @@ export default function ProductColorDetail({
   const [newArrival, setNewArrival] = useState<boolean>(product.newArrival);
   const [topSelling, setTopSelling] = useState<boolean>(product.topSelling);
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
+  // next i need to handle clicking on color when in edit mode and clicking on color when NOT in edit mode
 
   // Selected Colors for JSX
 
@@ -99,7 +100,14 @@ export default function ProductColorDetail({
     throw new Error(`Color with id ${colorId} not found`);
   }
 
-  const renderColorful = (color: Color) => {
+  // Link to other color page for the same product
+  const handleColorLink = (colorId: number) => {
+    const router = useRouter();
+    router.push(`/admin/products/${product.id}/${colorId}`);
+  };
+
+  // Edit it to fully render div with colors
+  const renderColors = (color: Color) => {
     if (!color) {
       throw new Error("Color not found");
     }
@@ -109,6 +117,12 @@ export default function ProductColorDetail({
           ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
           : color.name,
       opacity: isColorSelected(color) ? 1 : 0.5,
+      cursor: isEditing ? "pointer" : "default",
+      // I have no clue what this type bellow means means or why I needed it but apparently I do
+      pointerEvents:
+        color.id === colorId
+          ? "none"
+          : ("auto" as React.CSSProperties["pointerEvents"]),
     };
   };
 
@@ -116,7 +130,6 @@ export default function ProductColorDetail({
     return availableColors.some((c) => c.id === color.id);
   };
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////
   // Hardcoded sex for now
   const sexList = ["male", "female", "unisex"];
 
@@ -205,6 +218,20 @@ export default function ProductColorDetail({
     setStock(newStock);
   };
 
+  const handleNewStockChange = (
+    size: string,
+    quantity: number,
+    colorId: number
+  ) => {
+    const newStock = stock.map((item) =>
+      item.size === size && item.color.id === colorId
+        ? { ...item, quantity }
+        : item
+    );
+    setStock(newStock);
+  };
+  stock.map((item) => console.log(item));
+
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     setPriceInEuros(value);
@@ -248,7 +275,7 @@ export default function ProductColorDetail({
     e.preventDefault();
     setIsEditing(true);
   };
-
+  // HAVE TO ADD ALL SIZES TO STOCK RENDER
   return (
     <div className="">
       <form onSubmit={handleSubmit}>
@@ -295,7 +322,9 @@ export default function ProductColorDetail({
               <span className="w-7">{item.size}</span>
               <input
                 type="number"
-                value={item.quantity}
+                value={
+                  stock.find((stock) => stock.size === item.size)?.quantity
+                }
                 onChange={(e) =>
                   handleStockChange(item.size, Number(e.target.value))
                 }
@@ -463,7 +492,7 @@ export default function ProductColorDetail({
           </label>
           <div
             className={`w-8 h-8 rounded-full border border-black`}
-            style={renderColorful(selectedColor)}
+            style={renderColors(selectedColor)}
           ></div>
         </div>
         <div className="mb-4">
@@ -480,17 +509,11 @@ export default function ProductColorDetail({
               >
                 <div
                   className="w-8 h-8 rounded-full cursor-pointer border-2"
-                  style={renderColorful(color)}
-                  // style={{
-                  //   backgroundColor:
-                  //     color.name === "Colorful"
-                  //       ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
-                  //       : color.name,
-                  //   opacity: isColorSelected(color) ? 1 : 0.5,
-                  //   cursor: isEditing ? "pointer" : "default",
-                  // }}
+                  style={renderColors(color)}
                   onClick={
-                    isEditing ? () => handleColorClick(color) : undefined
+                    isEditing
+                      ? () => handleColorClick(color)
+                      : () => handleColorLink(color.id)
                   }
                 ></div>
               </div>
