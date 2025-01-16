@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { deleteSingleImage, editProduct } from "@/db/productQueries";
 import { formatCurrency } from "@/app/lib/formatters";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 type Product = {
   id: number;
@@ -65,7 +65,7 @@ export default function ProductColorDetail({
   colorId: number;
 }) {
   console.log(product);
-  if (!product) throw new Error("Product not found"); // This should never happen, had to add it because typesciprt was not happy
+  if (!product) return <div>Product not found</div>;
   const [priceInEuros, setPriceInEuros] = useState<number>(
     product.priceInCents
   );
@@ -81,7 +81,6 @@ export default function ProductColorDetail({
     product.isAvailable
   );
   const [stock, setStock] = useState<Stock[]>(product.stock);
-  //
   const [sex, setSex] = useState<string>(product.gender);
   const [sale, setSale] = useState<number>(product.sale);
   const [details, setDetails] = useState<string>(product.details);
@@ -91,46 +90,97 @@ export default function ProductColorDetail({
   const [newArrival, setNewArrival] = useState<boolean>(product.newArrival);
   const [topSelling, setTopSelling] = useState<boolean>(product.topSelling);
 
-  // next i need to handle clicking on color when in edit mode and clicking on color when NOT in edit mode
-
-  // Selected Colors for JSX
-
   const selectedColor = availableColors.find((color) => color.id === colorId);
   if (!selectedColor) {
     throw new Error(`Color with id ${colorId} not found`);
   }
 
-  // Link to other color page for the same product
-  const handleColorLink = (colorId: number) => {
+  const ColorRender: React.FC = () => {
     const router = useRouter();
-    router.push(`/admin/products/${product.id}/${colorId}`);
-  };
 
-  // Edit it to fully render div with colors
-  const renderColors = (color: Color) => {
-    if (!color) {
-      throw new Error("Color not found");
-    }
-    return {
-      background:
-        color.name === "Colorful"
-          ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
-          : color.name,
-      opacity: isColorSelected(color) ? 1 : 0.5,
-      cursor: isEditing ? "pointer" : "default",
-      // I have no clue what this type bellow means means or why I needed it but apparently I do
-      pointerEvents:
-        color.id === colorId
-          ? "none"
-          : ("auto" as React.CSSProperties["pointerEvents"]),
+    const isColorAvailable = (color: Color) => {
+      return availableColors.some((c) => c.id === color.id);
     };
+
+    const isColorSelected = (color: Color) => {
+      return availableColors.some((c) => c.id === color.id);
+    };
+
+    const handleColorClick = (color: Color) => {
+      setAvailableColors((prev) =>
+        prev.some((c) => c.id === color.id)
+          ? prev.filter((c) => c.id !== color.id)
+          : [...prev, color]
+      );
+    };
+
+    const handleColorLink = (color: Color) => {
+      if (isColorAvailable(color)) {
+        return router.push(`/admin/products/${product.id}/${color.id}`);
+      }
+    };
+
+    const colorsStyling = (color: Color) => {
+      if (!color) {
+        throw new Error("Color not found");
+      }
+      return {
+        background:
+          color.name === "Colorful"
+            ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
+            : color.name,
+        opacity: isColorSelected(color) ? 1 : 0.5,
+        cursor: !isEditing && isColorAvailable(color) ? "pointer" : "default",
+        // I have no clue what this type bellow means means or why I needed it but apparently I do
+        // I want no pointer if color is not available so that I cant reroute to 404 page with non existing color
+        pointerEvents:
+          color.id === colorId
+            ? "none"
+            : ("auto" as React.CSSProperties["pointerEvents"]),
+      };
+    };
+
+    return (
+      <>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Selected Color
+          </label>
+          <div
+            className={`w-8 h-8 rounded-full border border-black`}
+            style={colorsStyling(selectedColor)}
+          ></div>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Available Colors
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {colors.map((color) => (
+              <div
+                key={color.id}
+                className={`border-2 border-black-500 rounded-full ${
+                  isColorSelected(color) ? "border-black" : "border-transparent"
+                }`}
+              >
+                <div
+                  className="w-8 h-8 rounded-full cursor-pointer border-2"
+                  style={colorsStyling(color)}
+                  onClick={
+                    isEditing
+                      ? () => handleColorClick(color)
+                      : () => handleColorLink(color)
+                  }
+                ></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
+    );
   };
 
-  const isColorSelected = (color: Color) => {
-    return availableColors.some((c) => c.id === color.id);
-  };
-
-  // Hardcoded sex for now
+  // Hardcoded sex for now. NOT HARDCORE! h a r d c o d e d
   const sexList = ["male", "female", "unisex"];
 
   // To only show stock for the selected color
@@ -190,14 +240,6 @@ export default function ProductColorDetail({
   };
   // I feel like I should have just added boolean isAvailable to color model in prisma and avoid computation here. Will revisit this sometime in the future
 
-  const handleColorClick = (color: Color) => {
-    setAvailableColors((prev) =>
-      prev.some((c) => c.id === color.id)
-        ? prev.filter((c) => c.id !== color.id)
-        : [...prev, color]
-    );
-  };
-
   const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -217,20 +259,6 @@ export default function ProductColorDetail({
     );
     setStock(newStock);
   };
-
-  const handleNewStockChange = (
-    size: string,
-    quantity: number,
-    colorId: number
-  ) => {
-    const newStock = stock.map((item) =>
-      item.size === size && item.color.id === colorId
-        ? { ...item, quantity }
-        : item
-    );
-    setStock(newStock);
-  };
-  stock.map((item) => console.log(item));
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
@@ -486,40 +514,7 @@ export default function ProductColorDetail({
             })}
           </select>
         </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Selected Color
-          </label>
-          <div
-            className={`w-8 h-8 rounded-full border border-black`}
-            style={renderColors(selectedColor)}
-          ></div>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Available Colors
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {colors.map((color) => (
-              <div
-                key={color.id}
-                className={`border-2 border-black-500 rounded-full ${
-                  isColorSelected(color) ? "border-black" : "border-transparent"
-                }`}
-              >
-                <div
-                  className="w-8 h-8 rounded-full cursor-pointer border-2"
-                  style={renderColors(color)}
-                  onClick={
-                    isEditing
-                      ? () => handleColorClick(color)
-                      : () => handleColorLink(color.id)
-                  }
-                ></div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <ColorRender />
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Images

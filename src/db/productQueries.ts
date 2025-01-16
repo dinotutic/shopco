@@ -291,24 +291,6 @@ export async function deleteSingleImage(productId: number, key: string) {
   }
 }
 
-export async function updateStock(
-  productId: number,
-  colorId: number,
-  size: string,
-  quantity: number
-) {
-  await prisma.stock.updateMany({
-    where: {
-      productId,
-      colorId,
-      size,
-    },
-    data: {
-      quantity,
-    },
-  });
-}
-
 // export async function addSizesToProductWithColor(
 //   productId: number,
 //   colorId: number
