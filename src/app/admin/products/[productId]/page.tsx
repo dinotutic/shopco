@@ -5,13 +5,13 @@ import {
   getStyles,
 } from "@/db/productQueries";
 import PageHeader from "../../_components/PageHeader";
-import EditProduct from "../../_components/EditProduct";
+import ProductDetail from "../../_components/products/ProductDetail";
 
 type ProductDetailProps = {
   params: { productId: string };
 };
 
-export default async function ProductDetail({ params }: ProductDetailProps) {
+export default async function ProductPage({ params }: ProductDetailProps) {
   const { productId } = await params;
   const product = await getProductById(Number(productId));
   const categories = await getCategories();
@@ -27,7 +27,7 @@ export default async function ProductDetail({ params }: ProductDetailProps) {
       <div className="flex items-center w-full">
         <PageHeader>Product Detail</PageHeader>
       </div>
-      <EditProduct
+      <ProductDetail
         product={product}
         categories={categories}
         styles={styles}

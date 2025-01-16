@@ -1,5 +1,5 @@
 import PageHeader from "../../_components/PageHeader";
-import ProductForm from "../../_components/ProductForm";
+import ProductForm from "../../_components/products/ProductForm";
 import { getCategories, getColors, getStyles } from "@/db/productQueries";
 
 export default async function AddProduct() {
