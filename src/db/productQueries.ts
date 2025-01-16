@@ -3,23 +3,23 @@
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
 
-export async function getAllProducts(page: number = 1) {
-  const itemsPerPage = 50;
-
+export async function getAllProducts() {
   const products = await prisma.product.findMany({
-    take: itemsPerPage,
-    skip: (page - 1) * itemsPerPage,
     include: {
       images: true,
       category: true,
       style: true,
-      stock: true,
-      colors: true,
+      stock: {
+        include: { color: true },
+      },
     },
     orderBy: {
       id: "desc", // Sort by ID in descending order
     },
   });
+  if (products.length < 1) {
+    throw new Error("No products found");
+  }
   return products;
 }
 
@@ -73,16 +73,11 @@ export async function addProduct(formData: FormData) {
   const sale = formData.get("sale");
   const newArrival = formData.get("newArrival") === "on";
   const topSelling = formData.get("topSelling") === "on";
-  const colorsJson = formData.getAll("colors");
   const sex = formData.get("sex");
 
   //Parse stock array to be usable here
-  type StockData = { size: string; quantity: number }[];
+  type StockData = { size: string; quantity: number; colorId: number }[];
   const stockData: StockData = JSON.parse(stockJson as string);
-
-  // Parse colors array to be usable here and I have no idea why i first need to pass it as unknown and then as string
-  type ColorsData = { name: string; id: number }[];
-  const colorsData: ColorsData = JSON.parse(colorsJson as unknown as string);
 
   // Create roduct in DB without the images.
   // Image links will be added after the images are uploaded to s3
@@ -97,12 +92,6 @@ export async function addProduct(formData: FormData) {
       newArrival: newArrival,
       topSelling: topSelling,
       gender: sex as string,
-      colors: {
-        connect: colorsData.map((color) => ({
-          name: color.name as string,
-          id: color.id,
-        })),
-      },
       category: {
         connect: {
           name: category as string,
@@ -113,11 +102,15 @@ export async function addProduct(formData: FormData) {
           name: style as string,
         },
       },
-
       stock: {
         create: stockData.map((item) => ({
           size: item.size,
           quantity: item.quantity,
+          color: {
+            connect: {
+              id: item.colorId,
+            },
+          },
         })),
       },
     },
@@ -160,13 +153,16 @@ export async function editProduct(
     style?: { id: number; name: string };
     isAvailable?: boolean;
     images?: File[] | string[];
-    stock: { size: string; quantity: number }[];
+    stock: {
+      size: string;
+      quantity: number;
+      color: { name: string; id: number };
+    }[];
     sex: string;
     sale: number;
     details: string;
     newArrival: boolean;
     topSelling: boolean;
-    colors: { name: string; id: number }[];
   },
   newImages: File[] = []
 ) {
@@ -213,9 +209,6 @@ export async function editProduct(
       newArrival: data.newArrival,
       topSelling: data.topSelling,
       gender: data.sex,
-      colors: {
-        set: data.colors.map((color) => ({ id: color.id })),
-      },
     },
   });
 
@@ -223,7 +216,7 @@ export async function editProduct(
   await Promise.all(
     data.stock.map(async (item) =>
       prisma.stock.updateMany({
-        where: { productId: id, size: item.size },
+        where: { productId: id, size: item.size, color: item.color },
         data: { quantity: item.quantity },
       })
     )
@@ -254,16 +247,78 @@ export async function getProductById(id: number) {
       images: true,
       category: true,
       style: true,
-      stock: true,
-      colors: true,
+      stock: { include: { color: true } },
     },
   });
   return product;
 }
 
+export async function getProductByIdAndColor(id: number, colorId: number) {
+  const product = await prisma.product.findUnique({
+    where: {
+      id,
+      stock: {
+        some: {
+          colorId,
+        },
+      },
+    },
+    include: {
+      images: true,
+      category: true,
+      style: true,
+      stock: {
+        include: {
+          color: true,
+        },
+      },
+    },
+  });
+  if (!product) {
+    throw new Error("Product not found");
+  }
+  return product;
+}
+
 export async function deleteSingleImage(productId: number, key: string) {
   // expected key = https://shopco-project.s3.eu-north-1.amazonaws.com/products/images/97/green thing.png
-  const location = key.split("amazonaws.com/")[1];
-  await deleteFile(location);
-  await prisma.image.deleteMany({ where: { productId, url: key } });
+  try {
+    const location = key.split("amazonaws.com/")[1];
+    await deleteFile(location);
+    await prisma.image.deleteMany({ where: { productId, url: key } });
+  } catch (error) {
+    throw new Error("Error deleting image");
+  }
+}
+
+export async function addSizesToProductWithColor(
+  productId: number,
+  colorId: number
+) {
+  try {
+    // Define the sizes to be added
+    const sizes = ["S", "M", "L"]; // Replace with the desired sizes
+
+    // Add the new sizes to the product's stock
+    const stockEntries = sizes.map((size) => ({
+      size,
+      quantity: 10, // Replace with the desired quantity
+      colorId: colorId,
+      productId: productId,
+    }));
+
+    // Update the product's stock
+    await prisma.stock.createMany({
+      data: stockEntries,
+    });
+
+    console.log(
+      `Added sizes ${sizes.join(
+        ", "
+      )} to product ID ${productId} with color ID ${colorId}`
+    );
+  } catch (error) {
+    console.error("Error adding sizes to product:", error);
+    throw new Error("Failed to add sizes to product");
+  }
 }

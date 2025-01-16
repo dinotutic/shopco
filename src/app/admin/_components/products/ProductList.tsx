@@ -8,7 +8,13 @@ type Product = {
   name: string;
   description: string;
   priceInCents: number;
-  stock: { id: number; size: string; quantity: number; productId: number }[];
+  stock: {
+    id: number;
+    color: { id: number; name: string };
+    size: string;
+    quantity: number;
+    productId: number;
+  }[];
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
