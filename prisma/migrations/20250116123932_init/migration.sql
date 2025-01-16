@@ -30,7 +30,9 @@ CREATE TABLE "Stock" (
     "size" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "productId" INTEGER NOT NULL,
-    CONSTRAINT "Stock_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "colorId" INTEGER NOT NULL,
+    CONSTRAINT "Stock_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Stock_colorId_fkey" FOREIGN KEY ("colorId") REFERENCES "Color" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -45,7 +47,7 @@ CREATE TABLE "Image" (
 CREATE TABLE "User" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
+    "password" TEXT,
     "name" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
@@ -116,16 +118,11 @@ CREATE TABLE "CartItem" (
     CONSTRAINT "CartItem_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
--- CreateTable
-CREATE TABLE "_ColorToProduct" (
-    "A" INTEGER NOT NULL,
-    "B" INTEGER NOT NULL,
-    CONSTRAINT "_ColorToProduct_A_fkey" FOREIGN KEY ("A") REFERENCES "Color" ("id") ON DELETE CASCADE ON UPDATE CASCADE,
-    CONSTRAINT "_ColorToProduct_B_fkey" FOREIGN KEY ("B") REFERENCES "Product" ("id") ON DELETE CASCADE ON UPDATE CASCADE
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "Stock_productId_size_key" ON "Stock"("productId", "size");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Stock_productId_colorId_size_key" ON "Stock"("productId", "colorId", "size");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
@@ -135,9 +132,3 @@ CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Style_name_key" ON "Style"("name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "_ColorToProduct_AB_unique" ON "_ColorToProduct"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_ColorToProduct_B_index" ON "_ColorToProduct"("B");

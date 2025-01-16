@@ -50,17 +50,20 @@ type Color = {
   name: string;
 };
 
-export default function ProductDetail({
+export default function ProductColorDetail({
   product,
   styles,
   categories,
   colors,
+  colorId,
 }: {
   categories: Category[];
   styles: Style[];
   product?: Product;
   colors: Color[];
+  colorId: number;
 }) {
+  console.log(product);
   if (!product) throw new Error("Product not found"); // This should never happen, had to add it because typesciprt was not happy
   const [priceInEuros, setPriceInEuros] = useState<number>(
     product.priceInCents
@@ -82,16 +85,50 @@ export default function ProductDetail({
   const [sale, setSale] = useState<number>(product.sale);
   const [details, setDetails] = useState<string>(product.details);
   const [availableColors, setAvailableColors] = useState<Color[]>(
-    product.colors
+    product.stock.map((item) => item.color)
   );
   const [newArrival, setNewArrival] = useState<boolean>(product.newArrival);
   const [topSelling, setTopSelling] = useState<boolean>(product.topSelling);
 
+  ////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // Selected Colors for JSX
+
+  const selectedColor = availableColors.find((color) => color.id === colorId);
+  if (!selectedColor) {
+    throw new Error(`Color with id ${colorId} not found`);
+  }
+
+  const renderColorful = (color: Color) => {
+    if (!color) {
+      throw new Error("Color not found");
+    }
+    return {
+      background:
+        color.name === "Colorful"
+          ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
+          : color.name,
+      opacity: isColorSelected(color) ? 1 : 0.5,
+    };
+  };
+
+  const isColorSelected = (color: Color) => {
+    return availableColors.some((c) => c.id === color.id);
+  };
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   // Hardcoded sex for now
   const sexList = ["male", "female", "unisex"];
+
+  // To only show stock for the selected color
+  const stockByColor = product.stock.filter(
+    (stock) => stock.color.id === colorId
+  );
+
   // Sorting sizes
   const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
-  const sortedStock = [...stock].sort((a, b) => {
+
+  const sortedStock = [...stockByColor].sort((a, b) => {
     return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
   });
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
@@ -115,8 +152,7 @@ export default function ProductDetail({
       setImagesToDelete(updatedImagesToDelete);
     }
     // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
-    // Edit: I have no idea what I was thinking at the time, but it seems to works and I kinda get it so I wont touch it
-    // Edit2: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
+    // Edit: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
     // remove the correct image from the newImages array
     if (isNew) {
       const startIndexOfNewImages = images.length - newImages.length;
@@ -140,9 +176,6 @@ export default function ProductDetail({
     }
   };
   // I feel like I should have just added boolean isAvailable to color model in prisma and avoid computation here. Will revisit this sometime in the future
-  const isColorSelected = (color: Color) => {
-    return availableColors.some((c) => c.id === color.id);
-  };
 
   const handleColorClick = (color: Color) => {
     setAvailableColors((prev) =>
@@ -258,7 +291,7 @@ export default function ProductDetail({
             Stock
           </label>
           {sortedStock.map((item) => (
-            <div key={item.size} className="flex items-center mb-2">
+            <div key={item.id} className="flex items-center mb-2">
               <span className="w-7">{item.size}</span>
               <input
                 type="number"
@@ -424,29 +457,15 @@ export default function ProductDetail({
             })}
           </select>
         </div>
-        {/* <div className="mb-4">
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Available Colors
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {colors.map((color) => (
-                <div
-                  key={color.id}
-                  className={`w-8 h-8 rounded-full cursor-pointer border-2" `}
-                  style={{
-                    backgroundColor:
-                      color.name === "Colorful"
-                        ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
-                        : color.name,
-                    opacity: isColorSelected(color) ? 1 : 0.5,
-                    cursor: isEditing ? "pointer" : "default",
-                  }}
-                ></div>
-              ))}
-            </div>
-          </div>
-        </div> */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Selected Color
+          </label>
+          <div
+            className={`w-8 h-8 rounded-full border border-black`}
+            style={renderColorful(selectedColor)}
+          ></div>
+        </div>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Available Colors
@@ -455,20 +474,26 @@ export default function ProductDetail({
             {colors.map((color) => (
               <div
                 key={color.id}
-                className={`w-8 h-8 rounded-full cursor-pointer border-2 ${
+                className={`border-2 border-black-500 rounded-full ${
                   isColorSelected(color) ? "border-black" : "border-transparent"
-                }
-                `}
-                style={{
-                  backgroundColor:
-                    color.name === "Colorful"
-                      ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
-                      : color.name,
-                  opacity: isColorSelected(color) ? 1 : 0.5,
-                  cursor: isEditing ? "pointer" : "default",
-                }}
-                onClick={isEditing ? () => handleColorClick(color) : undefined}
-              ></div>
+                }`}
+              >
+                <div
+                  className="w-8 h-8 rounded-full cursor-pointer border-2"
+                  style={renderColorful(color)}
+                  // style={{
+                  //   backgroundColor:
+                  //     color.name === "Colorful"
+                  //       ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
+                  //       : color.name,
+                  //   opacity: isColorSelected(color) ? 1 : 0.5,
+                  //   cursor: isEditing ? "pointer" : "default",
+                  // }}
+                  onClick={
+                    isEditing ? () => handleColorClick(color) : undefined
+                  }
+                ></div>
+              </div>
             ))}
           </div>
         </div>

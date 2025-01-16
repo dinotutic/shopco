@@ -77,6 +77,11 @@ async function main() {
       stockEntries.push({
         size,
         quantity: faker.number.int({ min: 0, max: 30 }),
+        color: {
+          connect: {
+            id: colorIds[Math.floor(Math.random() * colorIds.length)].id,
+          },
+        },
       });
     }
     console.log(`Creating product ${i + 1}`);
@@ -109,14 +114,6 @@ async function main() {
         gender: faker.helpers.arrayElement(["male", "female", "unisex"]),
         sale: faker.helpers.arrayElement([0, 20, 30]),
         details: faker.lorem.paragraph(),
-        colors: {
-          connect: Array.from(
-            { length: faker.number.int({ min: 1, max: 3 }) },
-            () => ({
-              id: colorIds[Math.floor(Math.random() * colorIds.length)].id,
-            })
-          ),
-        },
         newArrival: faker.datatype.boolean(),
         topSelling: faker.datatype.boolean(),
       },
