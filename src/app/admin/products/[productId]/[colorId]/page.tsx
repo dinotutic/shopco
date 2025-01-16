@@ -3,7 +3,6 @@ import {
   getStyles,
   getColors,
   getProductByIdAndColor,
-  addSizesToProductWithColor,
 } from "@/db/productQueries";
 import PageHeader from "@/app/admin/_components/PageHeader";
 import ProductColorDetail from "@/app/admin/_components/products/ProductColorDetail";
@@ -22,7 +21,6 @@ export default async function ProductPage({
   const styles = await getStyles();
   const colors = await getColors();
 
-  // await addSizesToProductWithColor(Number(product.id), 1);
   return (
     <div>
       <PageHeader>Product Detail (with color)</PageHeader>

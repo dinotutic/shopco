@@ -291,34 +291,52 @@ export async function deleteSingleImage(productId: number, key: string) {
   }
 }
 
-export async function addSizesToProductWithColor(
+export async function updateStock(
   productId: number,
-  colorId: number
+  colorId: number,
+  size: string,
+  quantity: number
 ) {
-  try {
-    // Define the sizes to be added
-    const sizes = ["S", "M", "L"]; // Replace with the desired sizes
-
-    // Add the new sizes to the product's stock
-    const stockEntries = sizes.map((size) => ({
+  await prisma.stock.updateMany({
+    where: {
+      productId,
+      colorId,
       size,
-      quantity: 10, // Replace with the desired quantity
-      colorId: colorId,
-      productId: productId,
-    }));
-
-    // Update the product's stock
-    await prisma.stock.createMany({
-      data: stockEntries,
-    });
-
-    console.log(
-      `Added sizes ${sizes.join(
-        ", "
-      )} to product ID ${productId} with color ID ${colorId}`
-    );
-  } catch (error) {
-    console.error("Error adding sizes to product:", error);
-    throw new Error("Failed to add sizes to product");
-  }
+    },
+    data: {
+      quantity,
+    },
+  });
 }
+
+// export async function addSizesToProductWithColor(
+//   productId: number,
+//   colorId: number
+// ) {
+//   try {
+//     // Define the sizes to be added
+//     const sizes = ["S", "M", "L"]; // Replace with the desired sizes
+
+//     // Add the new sizes to the product's stock
+//     const stockEntries = sizes.map((size) => ({
+//       size,
+//       quantity: 10, // Replace with the desired quantity
+//       colorId: colorId,
+//       productId: productId,
+//     }));
+
+//     // Update the product's stock
+//     await prisma.stock.createMany({
+//       data: stockEntries,
+//     });
+
+//     console.log(
+//       `Added sizes ${sizes.join(
+//         ", "
+//       )} to product ID ${productId} with color ID ${colorId}`
+//     );
+//   } catch (error) {
+//     console.error("Error adding sizes to product:", error);
+//     throw new Error("Failed to add sizes to product");
+//   }
+// }
