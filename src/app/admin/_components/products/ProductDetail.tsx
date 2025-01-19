@@ -5,6 +5,7 @@ import { deleteSingleImage, editProduct } from "@/db/productQueries";
 import { formatCurrency } from "@/app/lib/formatters";
 import ProductColors from "./ProductColors";
 import { Product, Style, Color, Category, Stock, Image } from "../shared.types";
+import ProductStock from "./ProductStock";
 
 export default function ProductDetail({
   product,
@@ -24,11 +25,14 @@ export default function ProductDetail({
   const [availableColors, setAvailableColors] = useState<Color[]>(
     product.stock.map((item) => item.color)
   );
+  const [stock, setStock] = useState<Stock[]>(
+    product.stock.filter((size) => size.color.id === colorId)
+  );
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const [priceInEuros, setPriceInEuros] = useState<number>(
     product.priceInCents
   );
-  const [isEditing, setIsEditing] = useState<boolean>(false);
   const [name, setName] = useState<string>(product.name);
   const [description, setDescription] = useState<string>(product.description);
   const [priceInCents, setPriceInCents] = useState<number>(
@@ -39,9 +43,6 @@ export default function ProductDetail({
   const [availableForSale, setAvailableForSale] = useState<boolean>(
     product.isAvailable
   );
-  const [stock, setStock] = useState<Stock[]>(
-    product.stock.filter((size) => size.color.id === colorId)
-  );
 
   const [sex, setSex] = useState<string>(product.gender);
   const [sale, setSale] = useState<number>(product.sale);
@@ -50,32 +51,6 @@ export default function ProductDetail({
   const [newArrival, setNewArrival] = useState<boolean>(product.newArrival);
   const [topSelling, setTopSelling] = useState<boolean>(product.topSelling);
 
-  const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
-  const StockRender: React.FC = () => {
-    const sortedStock = [...stock].sort((a, b) => {
-      return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
-    });
-
-    return (
-      <div className="mb-4 flex gap-6">
-        <label className="block text-sm font-medium text-gray-700">Stock</label>
-        {sortedStock.map((item) => (
-          <div key={item.id} className="flex items-center mb-2">
-            <span className="w-7">{item.size}</span>
-            <input
-              type="number"
-              value={stock.find((stock) => stock.id === item.id)?.quantity}
-              onChange={(e) =>
-                handleStockChange(item.size, Number(e.target.value))
-              }
-              className="mt-1 block border border-gray-300 rounded-md shadow-sm py-2 px-2 w-14"
-              disabled={!isEditing}
-            />
-          </div>
-        ))}
-      </div>
-    );
-  };
   // Hardcoded sex for now. NOT HARDCORE! h a r d c o d e d
   const sexList = ["male", "female", "unisex"];
 
@@ -138,19 +113,11 @@ export default function ProductDetail({
     }
   };
 
-  const handleStockChange = (size: string, quantity: number) => {
-    const newStock = stock.map((item) =>
-      item.size === size ? { ...item, quantity } : item
-    );
-    setStock(newStock);
-  };
-
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     setPriceInEuros(value);
     setPriceInCents(value);
   };
-  console.log("stock productdetail", stock);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -241,7 +208,7 @@ export default function ProductDetail({
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
           />
         </div>
-        <StockRender />
+        <ProductStock stock={stock} setStock={setStock} isEditing={isEditing} />
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Price (in cents)
