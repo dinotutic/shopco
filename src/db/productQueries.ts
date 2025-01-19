@@ -131,7 +131,6 @@ export async function addProduct(formData: FormData) {
       imageUrls.push(imageUrl);
     }
   }
-  console.log("IMAGE URLS", imageUrls);
   await prisma.product.update({
     where: { id: newProductId },
     data: {
@@ -212,19 +211,51 @@ export async function editProduct(
     },
   });
 
-  // Update stock quantities
-  await Promise.all(
-    data.stock.map(async (item) =>
-      prisma.stock.updateMany({
-        where: { productId: id, size: item.size, color: item.color },
-        data: { quantity: item.quantity },
-      })
-    )
-  );
+  if (Array.isArray(data.stock)) {
+    console.log("data.stock", data.stock);
+    try {
+      await Promise.all(
+        data.stock.map(async (item) => {
+          console.log("Updating stock item:", item);
+          const result = await prisma.stock.updateMany({
+            where: { productId: id, size: item.size, colorId: item.color.id },
+            data: { quantity: item.quantity },
+          });
+          console.log("Update result:", result);
+        })
+      );
+      console.log("Stock updated successfully");
+    } catch (error) {
+      console.error("Error updating stock:", error);
+    }
+  } else {
+    console.error("data.stock is not an array or is undefined");
+  }
 
   return updatedProduct;
 }
 
+export async function updateStock(
+  action: "add" | "delete",
+  productId: number,
+  stock: { size: string; quantity: number; colorId: number }[]
+) {
+  if (action === "add") {
+    await prisma.stock.createMany({
+      data: stock.map((item) => ({
+        size: item.size,
+        quantity: item.quantity,
+        colorId: item.colorId,
+        productId,
+      })),
+    });
+  }
+  if (action == "delete") {
+  }
+}
+export async function deleteStock(stockId: number) {
+  await prisma.stock.delete({ where: { id: stockId } });
+}
 export async function getCategories() {
   const categories = await prisma.category.findMany();
   return categories;
@@ -290,35 +321,3 @@ export async function deleteSingleImage(productId: number, key: string) {
     throw new Error("Error deleting image");
   }
 }
-
-// export async function addSizesToProductWithColor(
-//   productId: number,
-//   colorId: number
-// ) {
-//   try {
-//     // Define the sizes to be added
-//     const sizes = ["S", "M", "L"]; // Replace with the desired sizes
-
-//     // Add the new sizes to the product's stock
-//     const stockEntries = sizes.map((size) => ({
-//       size,
-//       quantity: 10, // Replace with the desired quantity
-//       colorId: colorId,
-//       productId: productId,
-//     }));
-
-//     // Update the product's stock
-//     await prisma.stock.createMany({
-//       data: stockEntries,
-//     });
-
-//     console.log(
-//       `Added sizes ${sizes.join(
-//         ", "
-//       )} to product ID ${productId} with color ID ${colorId}`
-//     );
-//   } catch (error) {
-//     console.error("Error adding sizes to product:", error);
-//     throw new Error("Failed to add sizes to product");
-//   }
-// }

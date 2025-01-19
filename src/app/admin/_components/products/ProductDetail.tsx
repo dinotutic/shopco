@@ -1,10 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { deleteSingleImage, editProduct } from "@/db/productQueries";
+import {
+  updateStock,
+  deleteSingleImage,
+  editProduct,
+  deleteStock,
+} from "@/db/productQueries";
 import { formatCurrency } from "@/app/lib/formatters";
+import { useRouter } from "next/navigation";
 
-type Product = {
+export type Product = {
   id: number;
   name: string;
   description: string;
@@ -55,13 +61,15 @@ export default function ProductDetail({
   styles,
   categories,
   colors,
+  colorId,
 }: {
   categories: Category[];
   styles: Style[];
   product?: Product;
   colors: Color[];
+  colorId: number;
 }) {
-  if (!product) throw new Error("Product not found"); // This should never happen, had to add it because typesciprt was not happy
+  if (!product) return <div>Product not found</div>;
   const [priceInEuros, setPriceInEuros] = useState<number>(
     product.priceInCents
   );
@@ -76,24 +84,136 @@ export default function ProductDetail({
   const [availableForSale, setAvailableForSale] = useState<boolean>(
     product.isAvailable
   );
-  const [stock, setStock] = useState<Stock[]>(product.stock);
-  //
+  const [stock, setStock] = useState<Stock[]>(
+    product.stock.filter((size) => size.color.id === colorId)
+  );
+
   const [sex, setSex] = useState<string>(product.gender);
   const [sale, setSale] = useState<number>(product.sale);
   const [details, setDetails] = useState<string>(product.details);
   const [availableColors, setAvailableColors] = useState<Color[]>(
-    product.colors
+    product.stock.map((item) => item.color)
   );
   const [newArrival, setNewArrival] = useState<boolean>(product.newArrival);
   const [topSelling, setTopSelling] = useState<boolean>(product.topSelling);
 
-  // Hardcoded sex for now
-  const sexList = ["male", "female", "unisex"];
-  // Sorting sizes
+  const ColorRender: React.FC = () => {
+    const router = useRouter();
+
+    const selectedColor = availableColors.find((color) => color.id === colorId);
+    if (!selectedColor) {
+      throw new Error(`Color with id ${colorId} not found`);
+    }
+    const isColorAvailable = (color: Color) => {
+      return availableColors.some((c) => c.id === color.id);
+    };
+
+    const isColorSelected = (color: Color) => {
+      return availableColors.some((c) => c.id === color.id);
+    };
+
+    const handleColorClick = (color: Color) => {
+      setAvailableColors((prev) =>
+        prev.some((c) => c.id === color.id)
+          ? prev.filter((c) => c.id !== color.id)
+          : [...prev, color]
+      );
+    };
+
+    const handleColorLink = (color: Color) => {
+      if (isColorAvailable(color)) {
+        return router.push(`/admin/products/${product.id}/${color.id}`);
+      }
+    };
+
+    const colorsStyling = (color: Color) => {
+      if (!color) {
+        throw new Error("Color not found");
+      }
+      return {
+        background:
+          color.name === "Colorful"
+            ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
+            : color.name,
+        opacity: isColorSelected(color) ? 1 : 0.5,
+        cursor: !isEditing && isColorAvailable(color) ? "pointer" : "default",
+        // I have no clue what this type bellow means means or why I needed it but apparently I do
+        // I want no pointer if color is not available so that I cant reroute to 404 page with non existing color
+        pointerEvents:
+          color.id === colorId
+            ? "none"
+            : ("auto" as React.CSSProperties["pointerEvents"]),
+      };
+    };
+    return (
+      <>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Selected Color
+          </label>
+          <div
+            className={`w-8 h-8 rounded-full border border-black`}
+            style={colorsStyling(selectedColor)}
+          ></div>
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Available Colors
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {colors.map((color) => (
+              <div
+                key={color.id}
+                className={`border-2 border-black-500 rounded-full ${
+                  isColorSelected(color) ? "border-black" : "border-transparent"
+                }`}
+              >
+                <div
+                  className="w-8 h-8 rounded-full cursor-pointer border-2"
+                  style={colorsStyling(color)}
+                  onClick={
+                    isEditing
+                      ? () => handleColorClick(color)
+                      : () => handleColorLink(color)
+                  }
+                ></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
+    );
+  };
+
   const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
-  const sortedStock = [...stock].sort((a, b) => {
-    return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
-  });
+  const StockRender: React.FC = () => {
+    const sortedStock = [...stock].sort((a, b) => {
+      return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
+    });
+
+    return (
+      <div className="mb-4 flex gap-6">
+        <label className="block text-sm font-medium text-gray-700">Stock</label>
+        {sortedStock.map((item) => (
+          <div key={item.id} className="flex items-center mb-2">
+            <span className="w-7">{item.size}</span>
+            <input
+              type="number"
+              value={stock.find((stock) => stock.id === item.id)?.quantity}
+              onChange={(e) =>
+                handleStockChange(item.size, Number(e.target.value))
+              }
+              className="mt-1 block border border-gray-300 rounded-md shadow-sm py-2 px-2 w-14"
+              disabled={!isEditing}
+            />
+          </div>
+        ))}
+      </div>
+    );
+  };
+  // Hardcoded sex for now. NOT HARDCORE! h a r d c o d e d
+  const sexList = ["male", "female", "unisex"];
+
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [images, setImages] = useState<Image[]>(product.images);
@@ -115,8 +235,7 @@ export default function ProductDetail({
       setImagesToDelete(updatedImagesToDelete);
     }
     // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
-    // Edit: I have no idea what I was thinking at the time, but it seems to works and I kinda get it so I wont touch it
-    // Edit2: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
+    // Edit: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
     // remove the correct image from the newImages array
     if (isNew) {
       const startIndexOfNewImages = images.length - newImages.length;
@@ -140,17 +259,6 @@ export default function ProductDetail({
     }
   };
   // I feel like I should have just added boolean isAvailable to color model in prisma and avoid computation here. Will revisit this sometime in the future
-  const isColorSelected = (color: Color) => {
-    return availableColors.some((c) => c.id === color.id);
-  };
-
-  const handleColorClick = (color: Color) => {
-    setAvailableColors((prev) =>
-      prev.some((c) => c.id === color.id)
-        ? prev.filter((c) => c.id !== color.id)
-        : [...prev, color]
-    );
-  };
 
   const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -177,6 +285,7 @@ export default function ProductDetail({
     setPriceInEuros(value);
     setPriceInCents(value);
   };
+  console.log("stock productdetail", stock);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -202,20 +311,34 @@ export default function ProductDetail({
       colors: availableColors,
     };
 
+    // // Add stock for colors that are not available
+    // availableColors.map(async (color) => {
+    //   const stockItem = stock.find((item) => item.color.id === color.id);
+    //   if (!stockItem) {
+    //     const stockToAdd = stockSizeOrder.map((size) => ({
+    //       size,
+    //       quantity: 0,
+    //       colorId: color.id,
+    //     }));
+    //     await updateStock("add", product.id, stockToAdd);
+    //   }
+    //   console.log("stockitem---------", stockItem);
+    // });
+
     try {
       const updatedProduct = await editProduct(product.id, data, newImages);
       console.log("Product updated successfully:", updatedProduct);
     } catch (error) {
       console.error("Error updating product:", error);
     }
-    window.location.reload();
+    // window.location.reload();
   };
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsEditing(true);
   };
-
+  // HAVE TO ADD ALL SIZES TO STOCK RENDER
   return (
     <div className="">
       <form onSubmit={handleSubmit}>
@@ -253,25 +376,7 @@ export default function ProductDetail({
             className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
           />
         </div>
-        <div className="mb-4 flex gap-6">
-          <label className="block text-sm font-medium text-gray-700">
-            Stock
-          </label>
-          {sortedStock.map((item) => (
-            <div key={item.size} className="flex items-center mb-2">
-              <span className="w-7">{item.size}</span>
-              <input
-                type="number"
-                value={item.quantity}
-                onChange={(e) =>
-                  handleStockChange(item.size, Number(e.target.value))
-                }
-                className="mt-1 block border border-gray-300 rounded-md shadow-sm py-2 px-2 w-14"
-                disabled={!isEditing}
-              />
-            </div>
-          ))}
-        </div>
+        <StockRender />
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Price (in cents)
@@ -424,54 +529,7 @@ export default function ProductDetail({
             })}
           </select>
         </div>
-        {/* <div className="mb-4">
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
-              Available Colors
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {colors.map((color) => (
-                <div
-                  key={color.id}
-                  className={`w-8 h-8 rounded-full cursor-pointer border-2" `}
-                  style={{
-                    backgroundColor:
-                      color.name === "Colorful"
-                        ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
-                        : color.name,
-                    opacity: isColorSelected(color) ? 1 : 0.5,
-                    cursor: isEditing ? "pointer" : "default",
-                  }}
-                ></div>
-              ))}
-            </div>
-          </div>
-        </div> */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Available Colors
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {colors.map((color) => (
-              <div
-                key={color.id}
-                className={`w-8 h-8 rounded-full cursor-pointer border-2 ${
-                  isColorSelected(color) ? "border-black" : "border-transparent"
-                }
-                `}
-                style={{
-                  backgroundColor:
-                    color.name === "Colorful"
-                      ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
-                      : color.name,
-                  opacity: isColorSelected(color) ? 1 : 0.5,
-                  cursor: isEditing ? "pointer" : "default",
-                }}
-                onClick={isEditing ? () => handleColorClick(color) : undefined}
-              ></div>
-            ))}
-          </div>
-        </div>
+        <ColorRender />
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Images

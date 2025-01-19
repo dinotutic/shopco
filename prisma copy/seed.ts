@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-import { array } from "zod";
-import { getColors } from "@/db/productQueries";
 
 const prisma = new PrismaClient();
 
@@ -64,34 +62,25 @@ async function main() {
       { name: "Colorful" },
     ],
   });
-  const colorsList = await getColors();
 
-  const getColorIndexes = () => {
-    const arrOfIndexes: number[] = [];
-    const numberOfColors = Math.round(Math.random() * 3) + 1;
-    for (let i = 0; i < numberOfColors; i++) {
-      let index = Math.round(Math.random() * 10);
-      while (arrOfIndexes.includes(index)) {
-        index = Math.round(Math.random() * 10);
-      }
-      arrOfIndexes.push(index);
-    }
-    return arrOfIndexes.sort((a, b) => a - b);
-  };
+  const colorIds = await prisma.color.findMany({
+    select: {
+      id: true,
+    },
+  });
 
   // Create products
   const products = [];
   for (let i = 0; i < 50; i++) {
-    const colorIndexes = getColorIndexes();
     const stockEntries = [];
     for (const size of availableSizes) {
-      for (const colorIndex of colorIndexes) {
+      for (const color of colors) {
         stockEntries.push({
           size,
           quantity: faker.number.int({ min: 0, max: 30 }),
           color: {
             connect: {
-              id: colorsList[colorIndex].id,
+              id: colorIds[Math.floor(Math.random() * colorIds.length)].id,
             },
           },
         });
@@ -141,7 +130,7 @@ async function main() {
       const orderItems = [];
       for (let j = 0; j < faker.number.int({ min: 1, max: 5 }); j++) {
         const product = products[Math.floor(Math.random() * products.length)];
-        const color = colorsList[Math.floor(Math.random() * colorsList.length)];
+        const color = colorIds[Math.floor(Math.random() * colorIds.length)];
         const size =
           availableSizes[Math.floor(Math.random() * availableSizes.length)];
         orderItems.push({

@@ -1,7 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-import { array } from "zod";
-import { getColors } from "@/db/productQueries";
 
 const prisma = new PrismaClient();
 
@@ -47,55 +45,16 @@ async function main() {
     });
     users.push(user);
   }
-  // Add Colors
-
-  const colors = await prisma.color.createMany({
-    data: [
-      { name: "Black" },
-      { name: "White" },
-      { name: "Red" },
-      { name: "Blue" },
-      { name: "Green" },
-      { name: "Yellow" },
-      { name: "Orange" },
-      { name: "Purple" },
-      { name: "Pink" },
-      { name: "Brown" },
-      { name: "Colorful" },
-    ],
-  });
-  const colorsList = await getColors();
-
-  const getColorIndexes = () => {
-    const arrOfIndexes: number[] = [];
-    const numberOfColors = Math.round(Math.random() * 3) + 1;
-    for (let i = 0; i < numberOfColors; i++) {
-      let index = Math.round(Math.random() * 10);
-      while (arrOfIndexes.includes(index)) {
-        index = Math.round(Math.random() * 10);
-      }
-      arrOfIndexes.push(index);
-    }
-    return arrOfIndexes.sort((a, b) => a - b);
-  };
 
   // Create products
   const products = [];
   for (let i = 0; i < 50; i++) {
-    const colorIndexes = getColorIndexes();
     const stockEntries = [];
     for (const size of availableSizes) {
-      for (const colorIndex of colorIndexes) {
-        stockEntries.push({
-          size,
-          quantity: faker.number.int({ min: 0, max: 30 }),
-          color: {
-            connect: {
-              id: colorsList[colorIndex].id,
-            },
-          },
-        });
-      }
+      stockEntries.push({
+        size,
+        quantity: faker.number.int({ min: 0, max: 30 }),
+      });
     }
     console.log(`Creating product ${i + 1}`);
     const product = await prisma.product.create({
@@ -124,11 +83,6 @@ async function main() {
         stock: {
           create: stockEntries,
         },
-        gender: faker.helpers.arrayElement(["male", "female", "unisex"]),
-        sale: faker.helpers.arrayElement([0, 20, 30]),
-        details: faker.lorem.paragraph(),
-        newArrival: faker.datatype.boolean(),
-        topSelling: faker.datatype.boolean(),
       },
     });
     products.push(product);
@@ -141,19 +95,13 @@ async function main() {
       const orderItems = [];
       for (let j = 0; j < faker.number.int({ min: 1, max: 5 }); j++) {
         const product = products[Math.floor(Math.random() * products.length)];
-        const color = colorsList[Math.floor(Math.random() * colorsList.length)];
         const size =
           availableSizes[Math.floor(Math.random() * availableSizes.length)];
         orderItems.push({
+          productId: product.id,
           quantity: faker.number.int({ min: 1, max: 5 }),
           price: product.priceInCents,
           size: size,
-          color: {
-            connect: { id: color.id },
-          },
-          product: {
-            connect: { id: product.id },
-          },
         });
       }
       console.log(`Creating order ${i + 1} for user ${user.id}`);
@@ -185,31 +133,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-// Seeding guide:
-
-//  "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
-// "prisma": {
-//   "seed": "node --loader ts-node/esm prisma/seed.ts"
-// },
-
-//______________________________________
-// https://github.com/prisma/prisma/discussions/20369
-
-// Comment:
-//______________________________________
-// Ran:
-
-// npm install tsx --save-dev
-// Added
-
-// "prisma": {
-// 		"seed": "tsx prisma/seed.ts"
-// 	},
-// to package.json
-
-// and
-
-// ran the migration steps.
-
-// npx prisma migrate dev --name init
