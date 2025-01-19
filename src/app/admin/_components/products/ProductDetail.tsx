@@ -1,60 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import {
-  updateStock,
-  deleteSingleImage,
-  editProduct,
-  deleteStock,
-} from "@/db/productQueries";
+import { deleteSingleImage, editProduct } from "@/db/productQueries";
 import { formatCurrency } from "@/app/lib/formatters";
-import { useRouter } from "next/navigation";
-
-export type Product = {
-  id: number;
-  name: string;
-  description: string;
-  priceInCents: number;
-  stock: Stock[];
-  isAvailable: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  category: Category;
-  style: Style;
-  images: Image[];
-  gender: string;
-  sale: number;
-  details: string;
-  newArrival: boolean;
-  topSelling: boolean;
-};
-
-type Image = {
-  url: string;
-  isNew?: boolean;
-};
-type Style = {
-  id: number;
-  name: string;
-};
-
-type Category = {
-  id: number;
-  name: string;
-};
-
-type Stock = {
-  id: number;
-  productId: number;
-  size: string;
-  quantity: number;
-  color: Color;
-};
-
-type Color = {
-  id: number;
-  name: string;
-};
+import ProductColors from "./ProductColors";
+import { Product, Style, Color, Category, Stock, Image } from "../shared.types";
 
 export default function ProductDetail({
   product,
@@ -63,13 +13,18 @@ export default function ProductDetail({
   colors,
   colorId,
 }: {
-  categories: Category[];
-  styles: Style[];
   product?: Product;
+  styles: Style[];
+  categories: Category[];
   colors: Color[];
   colorId: number;
 }) {
   if (!product) return <div>Product not found</div>;
+
+  const [availableColors, setAvailableColors] = useState<Color[]>(
+    product.stock.map((item) => item.color)
+  );
+
   const [priceInEuros, setPriceInEuros] = useState<number>(
     product.priceInCents
   );
@@ -91,99 +46,9 @@ export default function ProductDetail({
   const [sex, setSex] = useState<string>(product.gender);
   const [sale, setSale] = useState<number>(product.sale);
   const [details, setDetails] = useState<string>(product.details);
-  const [availableColors, setAvailableColors] = useState<Color[]>(
-    product.stock.map((item) => item.color)
-  );
+
   const [newArrival, setNewArrival] = useState<boolean>(product.newArrival);
   const [topSelling, setTopSelling] = useState<boolean>(product.topSelling);
-
-  const ColorRender: React.FC = () => {
-    const router = useRouter();
-
-    const selectedColor = availableColors.find((color) => color.id === colorId);
-    if (!selectedColor) {
-      throw new Error(`Color with id ${colorId} not found`);
-    }
-    const isColorAvailable = (color: Color) => {
-      return availableColors.some((c) => c.id === color.id);
-    };
-
-    const isColorSelected = (color: Color) => {
-      return availableColors.some((c) => c.id === color.id);
-    };
-
-    const handleColorClick = (color: Color) => {
-      setAvailableColors((prev) =>
-        prev.some((c) => c.id === color.id)
-          ? prev.filter((c) => c.id !== color.id)
-          : [...prev, color]
-      );
-    };
-
-    const handleColorLink = (color: Color) => {
-      if (isColorAvailable(color)) {
-        return router.push(`/admin/products/${product.id}/${color.id}`);
-      }
-    };
-
-    const colorsStyling = (color: Color) => {
-      if (!color) {
-        throw new Error("Color not found");
-      }
-      return {
-        background:
-          color.name === "Colorful"
-            ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
-            : color.name,
-        opacity: isColorSelected(color) ? 1 : 0.5,
-        cursor: !isEditing && isColorAvailable(color) ? "pointer" : "default",
-        // I have no clue what this type bellow means means or why I needed it but apparently I do
-        // I want no pointer if color is not available so that I cant reroute to 404 page with non existing color
-        pointerEvents:
-          color.id === colorId
-            ? "none"
-            : ("auto" as React.CSSProperties["pointerEvents"]),
-      };
-    };
-    return (
-      <>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Selected Color
-          </label>
-          <div
-            className={`w-8 h-8 rounded-full border border-black`}
-            style={colorsStyling(selectedColor)}
-          ></div>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Available Colors
-          </label>
-          <div className="flex flex-wrap gap-2">
-            {colors.map((color) => (
-              <div
-                key={color.id}
-                className={`border-2 border-black-500 rounded-full ${
-                  isColorSelected(color) ? "border-black" : "border-transparent"
-                }`}
-              >
-                <div
-                  className="w-8 h-8 rounded-full cursor-pointer border-2"
-                  style={colorsStyling(color)}
-                  onClick={
-                    isEditing
-                      ? () => handleColorClick(color)
-                      : () => handleColorLink(color)
-                  }
-                ></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </>
-    );
-  };
 
   const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
   const StockRender: React.FC = () => {
@@ -529,7 +394,13 @@ export default function ProductDetail({
             })}
           </select>
         </div>
-        <ColorRender />
+        <ProductColors
+          isEditing={isEditing}
+          product={product}
+          colors={colors}
+          availableColors={availableColors}
+          setAvailableColors={setAvailableColors}
+        />
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Images
