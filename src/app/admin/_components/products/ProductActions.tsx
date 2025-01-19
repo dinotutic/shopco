@@ -2,7 +2,7 @@
 
 import { deleteProduct } from "@/db/productQueries";
 import Link from "next/link";
-import { Product } from "./ProductDetail";
+import { Product } from "../shared.types";
 
 export const ProductActions = ({ product }: { product: Product }) => {
   const handleDelete = async () => {
