@@ -235,24 +235,24 @@ export async function editProduct(
   return updatedProduct;
 }
 
-export async function updateStock(
-  action: "add" | "delete",
-  productId: number,
-  stock: { size: string; quantity: number; colorId: number }[]
-) {
-  if (action === "add") {
-    await prisma.stock.createMany({
-      data: stock.map((item) => ({
-        size: item.size,
-        quantity: item.quantity,
-        colorId: item.colorId,
-        productId,
-      })),
-    });
-  }
-  if (action == "delete") {
-  }
-}
+// export async function updateStock(
+//   action: "add" | "delete",
+//   productId: number,
+//   stock: { size: string; quantity: number; colorId: number }[]
+// ) {
+//   if (action === "add") {
+//     await prisma.stock.createMany({
+//       data: stock.map((item) => ({
+//         size: item.size,
+//         quantity: item.quantity,
+//         colorId: item.colorId,
+//         productId,
+//       })),
+//     });
+//   }
+//   if (action == "delete") {
+//   }
+// }
 export async function deleteStock(stockId: number) {
   await prisma.stock.delete({ where: { id: stockId } });
 }
