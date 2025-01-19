@@ -10,7 +10,6 @@ export const ProductActions = ({ product }: { product: Product }) => {
     window.location.reload(); // Refresh the page for now, later will probably add state and make this fancier
   };
   const firstColorId = product.stock[0].color.id;
-
   return (
     <div className="flex items-center justify-center max-w-fit">
       <Link

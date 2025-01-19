@@ -39,6 +39,7 @@ export default function ProductList({
   categories: { id: number; name: string }[];
   styles: { id: number; name: string }[];
 }) {
+  console.log(products);
   const [search, setSearch] = useState<string>("");
   const [sort, setSort] = useState<string>("");
   const [styleFilter, setStyleFilter] = useState<string | null>(null);
