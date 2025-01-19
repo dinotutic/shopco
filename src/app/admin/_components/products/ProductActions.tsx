@@ -1,22 +1,20 @@
 "use client";
 
 import { deleteProduct } from "@/db/productQueries";
-import { Product } from "@prisma/client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { Product } from "./ProductDetail";
 
 export const ProductActions = ({ product }: { product: Product }) => {
-  const router = useRouter();
-
   const handleDelete = async () => {
     await deleteProduct(product.id, product.name);
     window.location.reload(); // Refresh the page for now, later will probably add state and make this fancier
   };
+  const firstColorId = product.stock[0].color.id;
 
   return (
     <div className="flex items-center justify-center max-w-fit">
       <Link
-        href={`/admin/products/${product.id}`}
+        href={`/admin/products/${product.id}/${firstColorId}`}
         className="border rounded-xl p-2 px-4 bg-gray-400 text-secondaryText  hover:bg-secondaryBackground"
       >
         View

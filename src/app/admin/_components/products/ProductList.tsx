@@ -47,7 +47,6 @@ export default function ProductList({
     null
   );
   const [sexFilter, setSexFilter] = useState<string | null>(null);
-
   // To format JSX
   const formateSex = (sex: string) => {
     if (sex === "male") {

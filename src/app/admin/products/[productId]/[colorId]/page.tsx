@@ -5,7 +5,7 @@ import {
   getProductByIdAndColor,
 } from "@/db/productQueries";
 import PageHeader from "@/app/admin/_components/PageHeader";
-import ProductColorDetail from "@/app/admin/_components/products/ProductColorDetail";
+import ProductDetail from "@/app/admin/_components/products/ProductDetail";
 
 export default async function ProductPage({
   params,
@@ -25,7 +25,7 @@ export default async function ProductPage({
     <div>
       <PageHeader>Product Detail (with color)</PageHeader>
       <div>
-        <ProductColorDetail
+        <ProductDetail
           product={product}
           categories={categories}
           styles={styles}
