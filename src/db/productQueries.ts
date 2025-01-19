@@ -212,7 +212,6 @@ export async function editProduct(
   });
 
   if (Array.isArray(data.stock)) {
-    console.log("data.stock", data.stock);
     try {
       await Promise.all(
         data.stock.map(async (item) => {
