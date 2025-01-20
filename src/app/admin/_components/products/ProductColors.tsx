@@ -7,6 +7,7 @@ interface ProductColorsProps {
   colors: Color[];
   availableColors: Color[];
   setAvailableColors: React.Dispatch<React.SetStateAction<Color[]>>;
+  selectedColorId: number;
 }
 
 const ProductColors: React.FC<ProductColorsProps> = ({
@@ -15,8 +16,12 @@ const ProductColors: React.FC<ProductColorsProps> = ({
   colors,
   availableColors,
   setAvailableColors,
+  selectedColorId,
 }) => {
   const router = useRouter();
+
+  const selectedColor =
+    colors.find((c) => c.id === selectedColorId) || colors[0];
 
   const handleColorClick = (color: Color) => {
     setAvailableColors((prev) =>
@@ -33,18 +38,33 @@ const ProductColors: React.FC<ProductColorsProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {colors.map((color) => (
+    <div className="mb-4 flex flex-col">
+      <label className="text-sm font-medium text-gray-700">SelectedColor</label>
+      <div className="inline-block">
         <ColorItem
-          key={color.id}
-          color={color}
+          key={selectedColorId}
+          color={selectedColor}
           isEditing={isEditing}
-          isSelected={availableColors.some((c) => c.id === color.id)}
+          isSelected={true}
           handleColorClick={handleColorClick}
           handleColorLink={handleColorLink}
           availableColors={availableColors}
         />
-      ))}
+      </div>
+      <label className="block text-sm font-medium text-gray-700">Colors</label>
+      <div className="flex gap-1">
+        {colors.map((color) => (
+          <ColorItem
+            key={color.id}
+            color={color}
+            isEditing={isEditing}
+            isSelected={availableColors.some((c) => c.id === color.id)}
+            handleColorClick={handleColorClick}
+            handleColorLink={handleColorLink}
+            availableColors={availableColors}
+          />
+        ))}
+      </div>
     </div>
   );
 };
@@ -81,7 +101,7 @@ const ColorItem: React.FC<ColorItemProps> = ({
 
   return (
     <div
-      className={`border-2 border-black-500 rounded-full ${
+      className={`border-2 border-black-500 rounded-full inline-block ${
         isSelected ? "border-black" : "border-transparent"
       }`}
     >

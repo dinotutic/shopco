@@ -31,7 +31,7 @@ export default async function ProductPage({
           categories={categories}
           styles={styles}
           colors={colors}
-          colorId={Number(colorId)}
+          selectedColorId={Number(colorId)}
         />
       </div>
     </div>
