@@ -17,14 +17,12 @@ const ProductStock: React.FC<ProductStockProps> = ({
     return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
   });
 
-  const handleStockChange =
-    (size: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const quantity = Number(event.target.value);
-      const newStock = stock.map((item) =>
-        item.size === size ? { ...item, quantity } : item
-      );
-      setStock(newStock);
-    };
+  const handleStockChange = (size: string, quantity: number) => {
+    const newStock = stock.map((item) =>
+      item.size === size ? { ...item, quantity } : item
+    );
+    setStock(newStock);
+  };
 
   return (
     <div className="mb-4 flex gap-6">
@@ -35,7 +33,9 @@ const ProductStock: React.FC<ProductStockProps> = ({
           <input
             type="number"
             value={item.quantity}
-            onChange={handleStockChange(item.size)}
+            onChange={(e) =>
+              handleStockChange(item.size, Number(e.target.value))
+            }
             className="mt-1 block border border-gray-300 rounded-md shadow-sm py-2 px-2 w-14"
             disabled={!isEditing}
           />

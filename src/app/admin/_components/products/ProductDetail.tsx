@@ -6,19 +6,20 @@ import { formatCurrency } from "@/app/lib/formatters";
 import ProductColors from "./ProductColors";
 import { Product, Style, Color, Category, Stock, Image } from "../shared.types";
 import ProductStock from "./ProductStock";
+import FormField from "./FormField";
 
 export default function ProductDetail({
   product,
   styles,
   categories,
   colors,
-  colorId,
+  selectedColorId,
 }: {
   product?: Product;
   styles: Style[];
   categories: Category[];
   colors: Color[];
-  colorId: number;
+  selectedColorId: number;
 }) {
   if (!product) return <div>Product not found</div>;
 
@@ -26,13 +27,10 @@ export default function ProductDetail({
     product.stock.map((item) => item.color)
   );
   const [stock, setStock] = useState<Stock[]>(
-    product.stock.filter((size) => size.color.id === colorId)
+    product.stock.filter((size) => size.color.id === selectedColorId)
   );
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
-  const [priceInEuros, setPriceInEuros] = useState<number>(
-    product.priceInCents
-  );
   const [name, setName] = useState<string>(product.name);
   const [description, setDescription] = useState<string>(product.description);
   const [priceInCents, setPriceInCents] = useState<number>(
@@ -52,7 +50,12 @@ export default function ProductDetail({
   const [topSelling, setTopSelling] = useState<boolean>(product.topSelling);
 
   // Hardcoded sex for now. NOT HARDCORE! h a r d c o d e d
-  const sexList = ["male", "female", "unisex"];
+  // It needed to be in this format to align with categories and styles in FormElemenet
+  const sexList = [
+    { id: 1, name: "male" },
+    { id: 2, name: "female" },
+    { id: 3, name: "unisex" },
+  ];
 
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
@@ -115,7 +118,6 @@ export default function ProductDetail({
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
-    setPriceInEuros(value);
     setPriceInCents(value);
   };
 
@@ -170,203 +172,113 @@ export default function ProductDetail({
     e.preventDefault();
     setIsEditing(true);
   };
-  // HAVE TO ADD ALL SIZES TO STOCK RENDER
+
   return (
     <div className="">
       <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Name
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-            disabled={!isEditing}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Description
-          </label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            disabled={!isEditing}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Details
-          </label>
-          <textarea
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-            disabled={!isEditing}
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-          />
-        </div>
+        <FormField
+          label="Name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          disabled={!isEditing}
+        />
+        <FormField
+          label="Description"
+          type="textarea"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          disabled={!isEditing}
+        />
+        <FormField
+          label="Details"
+          type="textarea"
+          value={details}
+          onChange={(e) => setDetails(e.target.value)}
+          disabled={!isEditing}
+        />
         <ProductStock stock={stock} setStock={setStock} isEditing={isEditing} />
+        <FormField
+          label="Price (in cents)"
+          type="number"
+          value={priceInCents}
+          onChange={(e) => setPriceInCents(Number(e.target.value))}
+          disabled={!isEditing}
+        />
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Price (in cents)
-          </label>
-          <input
-            type="number"
-            value={priceInCents}
-            disabled={!isEditing}
-            onChange={handlePriceChange}
-            className="mt-1 block w-[20%] border border-gray-300 rounded-md shadow-sm p-2"
-          />
+          <p>{formatCurrency(priceInCents || 0)}</p>
         </div>
-        <div className="mb-4">
-          <p>{formatCurrency(priceInEuros || 0)}</p>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">Sex</label>
-          <select
-            id="sex"
-            name="sex"
-            value={sex}
-            onChange={(e) => {
-              setSex(e.target.value);
-            }}
-            className="border rounded-md py-1"
-            disabled={!isEditing}
-          >
-            <option value="" disabled>
-              Select sex
-            </option>
-            {sexList.map((sex) => {
-              return (
-                <option key={sex} value={sex}>
-                  {sex}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Available for Sale
-          </label>
-          <input
-            type="checkbox"
-            checked={availableForSale}
-            onChange={(e) => setAvailableForSale(e.target.checked)}
-            className="mt-1 block"
-            disabled={!isEditing}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Top Selling
-          </label>
-          <input
-            type="checkbox"
-            checked={topSelling}
-            onChange={(e) => setTopSelling(e.target.checked)}
-            className="mt-1 block"
-            disabled={!isEditing}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            New Arrival
-          </label>
-          <input
-            type="checkbox"
-            checked={newArrival}
-            onChange={(e) => setNewArrival(e.target.checked)}
-            className="mt-1 block"
-            disabled={!isEditing}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Sale percentage
-          </label>
-          <input
-            type="number"
-            value={sale}
-            disabled={!isEditing}
-            onChange={(e) => setSale(Number(e.target.value))}
-            className="mt-1 block w-16 border border-gray-300 rounded-md shadow-sm p-2"
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Category
-          </label>
-          <select
-            id="category"
-            name="category"
-            value={category.name}
-            onChange={(e) => {
-              const selectedCategory = categories.find(
-                (cat) => cat.name === e.target.value
-              );
-              if (selectedCategory) {
-                setCategory({
-                  id: selectedCategory.id,
-                  name: selectedCategory.name,
-                });
-              }
-            }}
-            className="border rounded-md py-1"
-            disabled={!isEditing}
-          >
-            <option value="" disabled>
-              Select a category
-            </option>
-            {categories.map((category) => {
-              return (
-                <option key={category.id} value={category.name}>
-                  {category.name}
-                </option>
-              );
-            })}
-          </select>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Style
-          </label>
-          <select
-            id="style"
-            name="style"
-            value={style.name}
-            onChange={(e) => {
-              const selectedStyle = styles.find(
-                (st) => st.name === e.target.value
-              );
-              if (selectedStyle) {
-                setStyle({ id: selectedStyle.id, name: selectedStyle.name });
-              }
-            }}
-            className="border rounded-md py-1"
-            disabled={!isEditing}
-          >
-            <option value="" disabled>
-              Select a style
-            </option>
-            {styles.map((style) => {
-              return (
-                <option key={style.id} value={style.name}>
-                  {style.name}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+        <FormField
+          label="Gender"
+          type="select"
+          value={sex}
+          onChange={(e) => setSex(e.target.value)}
+          disabled={!isEditing}
+          options={sexList}
+        />
+        <FormField
+          label="Available for Sale"
+          type="checkbox"
+          checked={availableForSale}
+          onChange={(e) =>
+            setAvailableForSale((e.target as HTMLInputElement).checked)
+          }
+          disabled={!isEditing}
+        />
+        <FormField
+          label="Top Selling"
+          type="checkbox"
+          checked={topSelling}
+          onChange={(e) =>
+            setTopSelling((e.target as HTMLInputElement).checked)
+          }
+          disabled={!isEditing}
+        />
+        <FormField
+          label="New Arrival"
+          type="checkbox"
+          checked={newArrival}
+          onChange={(e) =>
+            setNewArrival((e.target as HTMLInputElement).checked)
+          }
+          disabled={!isEditing}
+        />
+        <FormField
+          label="Sale Percentage"
+          type="number"
+          value={sale}
+          onChange={(e) => setSale(Number(e.target.value))}
+          disabled={!isEditing}
+        />
+        <FormField
+          label="Category"
+          type="select"
+          value={category.id}
+          onChange={(e) =>
+            setCategory(
+              categories.find((c) => c.id === Number(e.target.value))!
+            )
+          }
+          options={categories}
+          disabled={!isEditing}
+        />
+        <FormField
+          label="Style"
+          type="select"
+          value={style.id}
+          onChange={(e) =>
+            setStyle(styles.find((c) => c.id === Number(e.target.value))!)
+          }
+          options={styles}
+          disabled={!isEditing}
+        />
         <ProductColors
           isEditing={isEditing}
           product={product}
           colors={colors}
           availableColors={availableColors}
           setAvailableColors={setAvailableColors}
+          selectedColorId={selectedColorId}
         />
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
@@ -433,4 +345,31 @@ export default function ProductDetail({
       </form>
     </div>
   );
+}
+
+{
+  /* <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">Sex</label>
+          <select
+            id="sex"
+            name="sex"
+            value={sex}
+            onChange={(e) => {
+              setSex(e.target.value);
+            }}
+            className="border rounded-md py-1"
+            disabled={!isEditing}
+          >
+            <option value="" disabled>
+              Select sex
+            </option>
+            {sexList.map((sex) => {
+              return (
+                <option key={sex} value={sex}>
+                  {sex}
+                </option>
+              );
+            })}
+          </select>
+        </div> */
 }
