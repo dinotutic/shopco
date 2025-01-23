@@ -3,7 +3,6 @@
 import { formatCurrency } from "@/app/lib/formatters";
 import { addProduct } from "@/db/productQueries";
 import { useRef, useState } from "react";
-import { set } from "zod";
 
 type Product = {
   id: number;

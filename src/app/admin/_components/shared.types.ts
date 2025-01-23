@@ -1,8 +1,10 @@
 export interface Image {
   url: string;
   isNew?: boolean;
+  markedForDeletion?: boolean;
   id?: number | undefined;
   productId?: number;
+  file?: File;
 }
 
 export interface Style {

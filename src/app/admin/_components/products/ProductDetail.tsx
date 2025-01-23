@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { deleteSingleImage, editProduct } from "@/db/productQueries";
 import { formatCurrency } from "@/app/lib/formatters";
 import ProductColors from "./ProductColors";
 import { Product, Style, Color, Category, Stock, Image } from "../shared.types";
 import ProductStock from "./ProductStock";
 import FormField from "./FormField";
-import Images from "./ProductImages";
+import RethinkImages from "./RethinkImages";
 
 export default function ProductDetail({
   product,
@@ -58,76 +58,47 @@ export default function ProductDetail({
     { id: 3, name: "unisex" },
   ];
 
-  const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
-  const [newImages, setNewImages] = useState<File[]>([]);
+  // const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
+  // const [newImages, setNewImages] = useState<File[]>([]);
   const [images, setImages] = useState<Image[]>(product.images);
-  ////////////////////////////////////////////////////////////////////////////////////////////////
-  // Marks images for deletion on submit
-  // const handleMarkImagesToDelete = (
-  //   e: React.MouseEvent<HTMLButtonElement>,
-  //   link: string,
-  //   isNew?: boolean,
-  //   index?: number
-  // ) => {
-  //   e.preventDefault();
-  //   if (!imagesToDelete.includes(link)) {
-  //     setImagesToDelete([...imagesToDelete, link]);
-  //   } else {
-  //     const updatedImagesToDelete = imagesToDelete.filter(
-  //       (imageUrl) => imageUrl !== link
-  //     );
-  //     setImagesToDelete(updatedImagesToDelete);
-  //   }
-  //   // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
-  //   // Edit: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
-  //   // remove the correct image from the newImages array
-  //   if (isNew) {
-  //     const startIndexOfNewImages = images.length - newImages.length;
-  //     const newImagesIndex =
-  //       index !== undefined ? index - startIndexOfNewImages : -1;
-  //     if (newImagesIndex !== -1) {
-  //       const updatedNewImages = newImages.filter(
-  //         (_, i) => i !== newImagesIndex
-  //       );
-  //       setNewImages(updatedNewImages);
-  //     }
-  //   }
-  // };
-  // do not delete!
-  const handleDeleteImage = async (link: string) => {
-    try {
-      await deleteSingleImage(product.id, link);
-      console.log(`Deleting ${product.id} / ${link}`);
-    } catch (error) {
-      console.error("Error deleting image:", error);
-    }
-  };
-  // I feel like I should have just added boolean isAvailable to color model in prisma and avoid computation here. Will revisit this sometime in the future
 
-  // const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   if (e.target.files) {
-  //     const files = Array.from(e.target.files);
-  //     setNewImages([...newImages, ...files]);
-  //     const previews = files.map((file) => ({
-  //       file,
-  //       url: URL.createObjectURL(file),
-  //       isNew: true,
-  //     }));
-  //     setImages([...images, ...previews]);
+  // const handleDeleteImage = async (link: string) => {
+  //   try {
+  //     await deleteSingleImage(product.id, link);
+  //     console.log(`Deleting ${product.id} / ${link}`);
+  //   } catch (error) {
+  //     console.error("Error deleting image:", error);
   //   }
   // };
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Number(e.target.value);
-    setPriceInCents(value);
-  };
+
+  // useEffect(() => {
+  //   console.log("images", images);
+  //   const newImages = images
+  //     .filter((image) => !image.markedForDeletion && image.isNew)
+  //     .map((image) => image.file);
+  //   console.log("newImages", newImages);
+  // }, [images]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     // Delete images in S3 and DB
     await Promise.all(
-      imagesToDelete.map((imageUrl) => handleDeleteImage(imageUrl))
+      images
+        .filter((image) => image.markedForDeletion && !image.isNew)
+        .map(async (image) => await deleteSingleImage(product.id, image.url))
     );
+
+    const newImages: File[] = images.reduce((acc, image) => {
+      if (
+        !image.markedForDeletion &&
+        image.isNew &&
+        image.file instanceof File
+      ) {
+        acc.push(image.file);
+      }
+      return acc;
+    }, [] as File[]);
 
     const data = {
       name,
@@ -135,8 +106,7 @@ export default function ProductDetail({
       priceInCents,
       category: { id: category.id, name: category.name },
       style: { id: style.id, name: style.name },
-      isAvailable: availableForSale,
-      images: newImages,
+      images: newImages as File[],
       stock,
       sex,
       sale,
@@ -152,7 +122,7 @@ export default function ProductDetail({
     } catch (error) {
       console.error("Error updating product:", error);
     }
-    // window.location.reload();
+    window.location.reload();
   };
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -267,7 +237,7 @@ export default function ProductDetail({
           setAvailableColors={setAvailableColors}
           selectedColorId={selectedColorId}
         />
-        <Images
+        {/* <Images
           images={images}
           setImages={setImages}
           newImages={newImages}
@@ -276,45 +246,14 @@ export default function ProductDetail({
           setImagesToDelete={setImagesToDelete}
           isEditing={isEditing}
           product={product}
+        /> */}
+        <RethinkImages
+          isEditing={isEditing}
+          images={images}
+          product={product}
+          setImages={setImages}
         />
-        {/* <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
-            Images
-          </label>
-          <div className="flex flex-wrap gap-4">
-            {images.map((image, index) => (
-              <div className="relative" key={`div ${index}`}>
-                <img
-                  key={index}
-                  src={image.url}
-                  alt={product.name}
-                  className={`h-32 w-32 object-cover ${
-                    imagesToDelete.includes(image.url) ? "opacity-20" : ""
-                  }`}
-                />
-                {isEditing && (
-                  <button
-                    onClick={(e) =>
-                      handleMarkImagesToDelete(e, image.url, image.isNew, index)
-                    }
-                    key={`button ${index}`}
-                    className="absolute top-0 right-0 bg-red-500 text-white px-2 rounded-full text-md"
-                  >
-                    X
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-          {isEditing && (
-            <input
-              type="file"
-              multiple
-              className="mt-2"
-              onChange={handleImageAdd}
-            />
-          )}
-        </div> */}
+
         <div className="my-4">
           <p className="text-gray-500">
             Created at: {product.createdAt.toLocaleString("de-de")}
@@ -370,3 +309,96 @@ export default function ProductDetail({
           </select>
         </div> */
 }
+{
+  /* <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700">
+            Images
+          </label>
+          <div className="flex flex-wrap gap-4">
+            {images.map((image, index) => (
+              <div className="relative" key={`div ${index}`}>
+                <img
+                  key={index}
+                  src={image.url}
+                  alt={product.name}
+                  className={`h-32 w-32 object-cover ${
+                    imagesToDelete.includes(image.url) ? "opacity-20" : ""
+                  }`}
+                />
+                {isEditing && (
+                  <button
+                    onClick={(e) =>
+                      handleMarkImagesToDelete(e, image.url, image.isNew, index)
+                    }
+                    key={`button ${index}`}
+                    className="absolute top-0 right-0 bg-red-500 text-white px-2 rounded-full text-md"
+                  >
+                    X
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          {isEditing && (
+            <input
+              type="file"
+              multiple
+              className="mt-2"
+              onChange={handleImageAdd}
+            />
+          )}
+        </div> */
+}
+////////////////////////////////////////////////////////////////////////////////////////////////
+// Marks images for deletion on submit
+// const handleMarkImagesToDelete = (
+//   e: React.MouseEvent<HTMLButtonElement>,
+//   link: string,
+//   isNew?: boolean,
+//   index?: number
+// ) => {
+//   e.preventDefault();
+//   if (!imagesToDelete.includes(link)) {
+//     setImagesToDelete([...imagesToDelete, link]);
+//   } else {
+//     const updatedImagesToDelete = imagesToDelete.filter(
+//       (imageUrl) => imageUrl !== link
+//     );
+//     setImagesToDelete(updatedImagesToDelete);
+//   }
+//   // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
+//   // Edit: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
+//   // remove the correct image from the newImages array
+//   if (isNew) {
+//     const startIndexOfNewImages = images.length - newImages.length;
+//     const newImagesIndex =
+//       index !== undefined ? index - startIndexOfNewImages : -1;
+//     if (newImagesIndex !== -1) {
+//       const updatedNewImages = newImages.filter(
+//         (_, i) => i !== newImagesIndex
+//       );
+//       setNewImages(updatedNewImages);
+//     }
+//   }
+// };
+// do not delete!
+
+// I feel like I should have just added boolean isAvailable to color model in prisma and avoid computation here. Will revisit this sometime in the future
+
+// const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+//   if (e.target.files) {
+//     const files = Array.from(e.target.files);
+//     setNewImages([...newImages, ...files]);
+//     const previews = files.map((file) => ({
+//       file,
+//       url: URL.createObjectURL(file),
+//       isNew: true,
+//     }));
+//     setImages([...images, ...previews]);
+//   }
+// };
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//   const value = Number(e.target.value);
+//   setPriceInCents(value);
+// };
