@@ -1,7 +1,10 @@
 export interface Image {
   url: string;
   isNew?: boolean;
+  id?: number | undefined;
+  productId?: number;
 }
+
 export interface Style {
   id: number;
   name: string;
