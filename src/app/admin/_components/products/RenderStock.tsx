@@ -6,7 +6,7 @@ interface ProductStockProps {
   setStock: React.Dispatch<React.SetStateAction<Stock[]>>;
 }
 
-const ProductStock: React.FC<ProductStockProps> = ({
+const RenderStock: React.FC<ProductStockProps> = ({
   stock,
   isEditing,
   setStock,
@@ -45,4 +45,4 @@ const ProductStock: React.FC<ProductStockProps> = ({
   );
 };
 
-export default ProductStock;
+export default RenderStock;

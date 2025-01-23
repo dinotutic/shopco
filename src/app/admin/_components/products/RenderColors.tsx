@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { Product, Color } from "../shared.types";
 
-interface ProductColorsProps {
+interface RenderColorsProps {
   isEditing: boolean;
   product: Product;
   colors: Color[];
@@ -10,7 +10,7 @@ interface ProductColorsProps {
   selectedColorId: number;
 }
 
-const ProductColors: React.FC<ProductColorsProps> = ({
+const RenderColors: React.FC<RenderColorsProps> = ({
   isEditing,
   product,
   colors,
@@ -118,4 +118,4 @@ const ColorItem: React.FC<ColorItemProps> = ({
   );
 };
 
-export default ProductColors;
+export default RenderColors;
