@@ -1,5 +1,5 @@
 "use client";
-
+import Button from "./Button";
 import { deleteProduct } from "@/db/productQueries";
 import Link from "next/link";
 import { Product } from "../shared.types";
@@ -18,12 +18,7 @@ export const ProductActions = ({ product }: { product: Product }) => {
       >
         View
       </Link>
-      <button
-        className="border rounded-xl p-2 px-4 bg-gray-400 text-secondaryText  hover:bg-secondaryBackground"
-        onClick={handleDelete}
-      >
-        Delete
-      </button>
+      <Button onClick={handleDelete}>Delete</Button>
     </div>
   );
 };

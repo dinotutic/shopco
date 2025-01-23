@@ -21,18 +21,6 @@ const RenderImages: React.FC<RenderImagesProps> = ({
       isNew: true,
     }));
     setImages([...images, ...previews]);
-    // If the images array initially contains:
-    // [
-    //   { file: File, url: 'blob:http://example.com/1', isNew: false },
-    //   { file: File, url: 'blob:http://example.com/2', isNew: false }
-    // ]
-    // And the user selects two new files, the images array will be updated to:
-    // [
-    //   { file: File, url: 'blob:http://example.com/1', isNew: false },
-    //   { file: File, url: 'blob:http://example.com/2', isNew: false },
-    //   { file: File, url: 'blob:http://example.com/3', isNew: true },
-    //   { file: File, url: 'blob:http://example.com/4', isNew: true }
-    // ]
   };
 
   const handleMarkImageForDeletion = (
@@ -48,17 +36,6 @@ const RenderImages: React.FC<RenderImagesProps> = ({
         return image;
       })
     );
-    // [
-    //   { file: File, url: "blob:http://example.com/1", isNew: false },
-    //   { file: File, url: "blob:http://example.com/2", isNew: false },
-    //   {
-    //     file: File,
-    //     url: "blob:http://example.com/3",
-    //     isNew: true,
-    //     markedForDeletion: false,
-    //   },
-    //   { file: File, url: "blob:http://example.com/4", isNew: true },
-    // ];
   };
 
   return (
@@ -66,24 +43,14 @@ const RenderImages: React.FC<RenderImagesProps> = ({
       <label className="block text-sm font-medium text-gray-700">Images</label>
       <div className="flex flex-wrap gap-4">
         {images.map((image, index) => (
-          <div className="relative" key={`div ${index}`}>
-            <img
-              src={image.url}
-              alt={product.name}
-              className={`h-32 w-32 object-cover ${
-                image.markedForDeletion ? "opacity-20" : ""
-              }`}
-            />
-            {isEditing && (
-              <button
-                onClick={(e) => handleMarkImageForDeletion(e, image.url)}
-                key={`button ${index}`}
-                className="absolute top-0 right-0 bg-red-500 text-white px-2 rounded-full text-md"
-              >
-                X
-              </button>
-            )}
-          </div>
+          <RenderImage
+            key={index}
+            image={image}
+            index={index}
+            product={product}
+            isEditing={isEditing}
+            handleMarkImageForDeletion={handleMarkImageForDeletion}
+          />
         ))}
       </div>
       {isEditing && (
@@ -98,13 +65,44 @@ const RenderImages: React.FC<RenderImagesProps> = ({
   );
 };
 
-export default RenderImages;
+interface RenderImageProps {
+  image: Image;
+  index: number;
+  product: Product;
+  isEditing: boolean;
+  key: number;
+  handleMarkImageForDeletion: (
+    e: React.MouseEvent<HTMLButtonElement>,
+    url: string
+  ) => void;
+}
 
-// if (!imagesToDelete.includes(link)) {
-//   setImagesToDelete([...imagesToDelete, link]);
-// } else {
-//   const updatedImagesToDelete = imagesToDelete.filter(
-//     (imageUrl) => imageUrl !== link
-//   );
-//   setImagesToDelete(updatedImagesToDelete);
-// }
+const RenderImage: React.FC<RenderImageProps> = ({
+  image,
+  index,
+  product,
+  isEditing,
+  handleMarkImageForDeletion,
+}) => {
+  return (
+    <div className="relative">
+      <img
+        src={image.url}
+        alt={product.name}
+        className={`h-32 w-32 object-cover ${
+          image.markedForDeletion ? "opacity-20" : ""
+        }`}
+      />
+      {isEditing && (
+        <button
+          onClick={(e) => handleMarkImageForDeletion(e, image.url)}
+          key={`button ${index}`}
+          className="absolute top-0 right-0 bg-red-500 text-white px-2 rounded-full text-md"
+        >
+          X
+        </button>
+      )}
+    </div>
+  );
+};
+export default RenderImages;
