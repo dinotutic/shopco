@@ -7,6 +7,7 @@ import ProductColors from "./ProductColors";
 import { Product, Style, Color, Category, Stock, Image } from "../shared.types";
 import ProductStock from "./ProductStock";
 import FormField from "./FormField";
+import Images from "./ProductImages";
 
 export default function ProductDetail({
   product,
@@ -60,39 +61,39 @@ export default function ProductDetail({
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
   const [images, setImages] = useState<Image[]>(product.images);
-
+  ////////////////////////////////////////////////////////////////////////////////////////////////
   // Marks images for deletion on submit
-  const handleMarkImagesToDelete = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    link: string,
-    isNew?: boolean,
-    index?: number
-  ) => {
-    e.preventDefault();
-    if (!imagesToDelete.includes(link)) {
-      setImagesToDelete([...imagesToDelete, link]);
-    } else {
-      const updatedImagesToDelete = imagesToDelete.filter(
-        (imageUrl) => imageUrl !== link
-      );
-      setImagesToDelete(updatedImagesToDelete);
-    }
-    // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
-    // Edit: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
-    // remove the correct image from the newImages array
-    if (isNew) {
-      const startIndexOfNewImages = images.length - newImages.length;
-      const newImagesIndex =
-        index !== undefined ? index - startIndexOfNewImages : -1;
-      if (newImagesIndex !== -1) {
-        const updatedNewImages = newImages.filter(
-          (_, i) => i !== newImagesIndex
-        );
-        setNewImages(updatedNewImages);
-      }
-    }
-  };
-
+  // const handleMarkImagesToDelete = (
+  //   e: React.MouseEvent<HTMLButtonElement>,
+  //   link: string,
+  //   isNew?: boolean,
+  //   index?: number
+  // ) => {
+  //   e.preventDefault();
+  //   if (!imagesToDelete.includes(link)) {
+  //     setImagesToDelete([...imagesToDelete, link]);
+  //   } else {
+  //     const updatedImagesToDelete = imagesToDelete.filter(
+  //       (imageUrl) => imageUrl !== link
+  //     );
+  //     setImagesToDelete(updatedImagesToDelete);
+  //   }
+  //   // Compares newImages and already uploaded images. If the image is new, it will be removed from the newImages array
+  //   // Edit: I believe since already uploaded images and preview images created with createObjectURL are in the same array, I had to calculate the index of the new images so that I can
+  //   // remove the correct image from the newImages array
+  //   if (isNew) {
+  //     const startIndexOfNewImages = images.length - newImages.length;
+  //     const newImagesIndex =
+  //       index !== undefined ? index - startIndexOfNewImages : -1;
+  //     if (newImagesIndex !== -1) {
+  //       const updatedNewImages = newImages.filter(
+  //         (_, i) => i !== newImagesIndex
+  //       );
+  //       setNewImages(updatedNewImages);
+  //     }
+  //   }
+  // };
+  // do not delete!
   const handleDeleteImage = async (link: string) => {
     try {
       await deleteSingleImage(product.id, link);
@@ -103,19 +104,19 @@ export default function ProductDetail({
   };
   // I feel like I should have just added boolean isAvailable to color model in prisma and avoid computation here. Will revisit this sometime in the future
 
-  const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setNewImages([...newImages, ...files]);
-      const previews = files.map((file) => ({
-        file,
-        url: URL.createObjectURL(file),
-        isNew: true,
-      }));
-      setImages([...images, ...previews]);
-    }
-  };
-
+  // const handleImageAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (e.target.files) {
+  //     const files = Array.from(e.target.files);
+  //     setNewImages([...newImages, ...files]);
+  //     const previews = files.map((file) => ({
+  //       file,
+  //       url: URL.createObjectURL(file),
+  //       isNew: true,
+  //     }));
+  //     setImages([...images, ...previews]);
+  //   }
+  // };
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = Number(e.target.value);
     setPriceInCents(value);
@@ -144,20 +145,6 @@ export default function ProductDetail({
       topSelling,
       colors: availableColors,
     };
-
-    // // Add stock for colors that are not available
-    // availableColors.map(async (color) => {
-    //   const stockItem = stock.find((item) => item.color.id === color.id);
-    //   if (!stockItem) {
-    //     const stockToAdd = stockSizeOrder.map((size) => ({
-    //       size,
-    //       quantity: 0,
-    //       colorId: color.id,
-    //     }));
-    //     await updateStock("add", product.id, stockToAdd);
-    //   }
-    //   console.log("stockitem---------", stockItem);
-    // });
 
     try {
       const updatedProduct = await editProduct(product.id, data, newImages);
@@ -280,7 +267,17 @@ export default function ProductDetail({
           setAvailableColors={setAvailableColors}
           selectedColorId={selectedColorId}
         />
-        <div className="mb-4">
+        <Images
+          images={images}
+          setImages={setImages}
+          newImages={newImages}
+          setNewImages={setNewImages}
+          imagesToDelete={imagesToDelete}
+          setImagesToDelete={setImagesToDelete}
+          isEditing={isEditing}
+          product={product}
+        />
+        {/* <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700">
             Images
           </label>
@@ -317,7 +314,7 @@ export default function ProductDetail({
               onChange={handleImageAdd}
             />
           )}
-        </div>
+        </div> */}
         <div className="my-4">
           <p className="text-gray-500">
             Created at: {product.createdAt.toLocaleString("de-de")}
