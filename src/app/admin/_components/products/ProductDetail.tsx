@@ -8,6 +8,8 @@ import { Product, Style, Color, Category, Stock, Image } from "../shared.types";
 import ProductStock from "./RenderStock";
 import FormField from "./FormField";
 import RethinkImages from "./RenderImages";
+import Button from "./Button";
+import Timestamp from "./Timestamp";
 
 export default function ProductDetail({
   product,
@@ -78,7 +80,7 @@ export default function ProductDetail({
         .map(async (image) => await deleteSingleImage(product.id, image.url))
     );
 
-    // Prepare images for upload
+    // Prepare data for upload
     const newImages: File[] = images.reduce((acc, image) => {
       if (
         !image.markedForDeletion &&
@@ -106,6 +108,7 @@ export default function ProductDetail({
       colors: availableColors,
     };
 
+    // Edit PRoduct
     try {
       const updatedProduct = await editProduct(product.id, data, newImages);
       console.log("Product updated successfully:", updatedProduct);
@@ -118,6 +121,10 @@ export default function ProductDetail({
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsEditing(true);
+  };
+  const handleDiscard = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    window.location.reload();
   };
 
   return (
@@ -233,30 +240,21 @@ export default function ProductDetail({
           product={product}
           setImages={setImages}
         />
-
-        <div className="my-4">
-          <p className="text-gray-500">
-            Created at: {product.createdAt.toLocaleString("de-de")}
-          </p>
-          <p className="text-gray-500">
-            Updated at: {product.updatedAt.toLocaleString("de-de")}
-          </p>
+        <div className="mb-4">
+          <Timestamp label="Created at" date={product.createdAt} />
+          <Timestamp label="Updated at" date={product.updatedAt} />
         </div>
         {isEditing ? (
-          <button
-            type="submit"
-            className="border rounded-2xl p-4 bg-gray-500 text-secondaryText"
-          >
-            Save Changes
-          </button>
+          <>
+            <Button type="submit">Save Changes</Button>
+            <Button type="submit" onClick={handleDiscard}>
+              Discard Changes
+            </Button>
+          </>
         ) : (
-          <button
-            type="submit"
-            className="border rounded-2xl p-4 bg-gray-500 text-secondaryText"
-            onClick={handleEdit}
-          >
+          <Button type="submit" onClick={handleEdit}>
             Edit
-          </button>
+          </Button>
         )}
       </form>
     </div>
