@@ -1,48 +1,64 @@
 import { useRouter } from "next/navigation";
 import { Product, Color } from "../shared.types";
 
-interface RenderColorsProps {
+interface ColorsProps {
   isEditing: boolean;
-  product: Product;
+  product?: Product;
   colors: Color[];
   availableColors: Color[];
   setAvailableColors: React.Dispatch<React.SetStateAction<Color[]>>;
-  selectedColorId: number;
+  selectedColor: Color;
+  setSelectedColor?: React.Dispatch<React.SetStateAction<Color>>;
+  // setSelectedColorId?: React.Dispatch<React.SetStateAction<number>>;
+  // selectedColorId: number;
+  mode: "create" | "edit";
 }
 
-const RenderColors: React.FC<RenderColorsProps> = ({
+const Colors: React.FC<ColorsProps> = ({
   isEditing,
   product,
   colors,
   availableColors,
   setAvailableColors,
-  selectedColorId,
+  selectedColor,
+  setSelectedColor,
+  // setSelectedColorId,
+  // selectedColorId,
+  mode,
 }) => {
   const router = useRouter();
 
-  const selectedColor =
-    colors.find((c) => c.id === selectedColorId) || colors[0];
+  // const selectedColor =
+  //   colors.find((c) => c.id === selectedColorId) || colors[0];
 
   const handleColorClick = (color: Color) => {
-    setAvailableColors((prev) =>
-      prev.some((c) => c.id === color.id)
-        ? prev.filter((c) => c.id !== color.id)
-        : [...prev, color]
-    );
+    if (mode === "edit") {
+      setAvailableColors((prev) =>
+        prev.some((c) => c.id === color.id)
+          ? prev.filter((c) => c.id !== color.id)
+          : [...prev, color]
+      );
+    } else if (mode === "create" && setSelectedColor) {
+      setSelectedColor(color);
+    }
   };
 
   const handleColorLink = (color: Color) => {
     if (availableColors.some((c) => c.id === color.id)) {
-      return router.push(`/admin/products/${product.id}/${color.id}`);
+      if (product) {
+        return router.push(`/admin/products/${product.id}/${color.id}`);
+      }
     }
   };
 
   return (
     <div className="mb-4 flex flex-col">
-      <label className="text-sm font-medium text-gray-700">SelectedColor</label>
+      <label className="text-sm font-medium text-gray-700">
+        Selected Color
+      </label>
       <div className="inline-block">
         <ColorItem
-          key={selectedColorId}
+          key={selectedColor.id}
           color={selectedColor}
           isEditing={isEditing}
           isSelected={true}
@@ -118,4 +134,4 @@ const ColorItem: React.FC<ColorItemProps> = ({
   );
 };
 
-export default RenderColors;
+export default Colors;

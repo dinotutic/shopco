@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import ProductActions from "./ProductActions";
+import Actions from "./Actions";
 
 type Product = {
   id: number;
@@ -236,7 +236,7 @@ export default function ProductList({
                   index === sortedProducts.length - 1 ? "rounded-br-lg" : ""
                 }`}
               >
-                <ProductActions product={product} />
+                <Actions product={product} />
               </td>
             </tr>
           ))}

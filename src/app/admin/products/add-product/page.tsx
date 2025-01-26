@@ -1,5 +1,5 @@
 import PageHeader from "../../_components/PageHeader";
-import ProductForm from "../../_components/products/ProductForm";
+import ProductForm from "../../_components/productPage/ProductForm";
 import { getCategories, getColors, getStyles } from "@/db/productQueries";
 
 export default async function AddProduct() {
@@ -11,7 +11,12 @@ export default async function AddProduct() {
       <div className="flex items-center w-full">
         <PageHeader>Add Product</PageHeader>
       </div>
-      <ProductForm categories={categories} styles={styles} colors={colors} />
+      <ProductForm
+        categories={categories}
+        styles={styles}
+        colors={colors}
+        mode={"create"}
+      />
     </>
   );
 }

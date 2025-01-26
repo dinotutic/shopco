@@ -1,6 +1,6 @@
 import Link from "next/link";
 import PageHeader from "../_components/PageHeader";
-import ProductList from "../_components/products/ProductList";
+import ProductList from "../_components/productPage/ProductList";
 import { getAllProducts, getCategories, getStyles } from "@/db/productQueries";
 
 export default async function AdminProductsPage() {

@@ -3,9 +3,10 @@ import {
   getStyles,
   getColors,
   getProductByIdAndColor,
+  getColorByColorId,
 } from "@/db/productQueries";
 import PageHeader from "@/app/admin/_components/PageHeader";
-import ProductDetail from "@/app/admin/_components/products/ProductDetail";
+import ProductForm from "@/app/admin/_components/productPage/ProductForm";
 
 export default async function ProductPage({
   params,
@@ -21,17 +22,19 @@ export default async function ProductPage({
   const styles = await getStyles();
   const categories = await getCategories();
   const colors = await getColors();
+  const color = await getColorByColorId(Number(colorId));
 
   return (
     <div>
       <PageHeader>Product Detail</PageHeader>
       <div>
-        <ProductDetail
+        <ProductForm
           product={product}
           categories={categories}
           styles={styles}
           colors={colors}
-          selectedColorId={Number(colorId)}
+          color={color ?? undefined}
+          mode={"edit"}
         />
       </div>
     </div>
