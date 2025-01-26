@@ -1,13 +1,13 @@
 import { Image, Product } from "../shared.types";
 
-interface RenderImagesProps {
+interface ImagesProps {
   isEditing: boolean;
   images: Image[];
-  product: Product;
+  product?: Product;
   setImages: React.Dispatch<React.SetStateAction<Image[]>>;
 }
 
-const RenderImages: React.FC<RenderImagesProps> = ({
+const Images: React.FC<ImagesProps> = ({
   isEditing,
   images,
   product,
@@ -68,7 +68,7 @@ const RenderImages: React.FC<RenderImagesProps> = ({
 interface RenderImageProps {
   image: Image;
   index: number;
-  product: Product;
+  product?: Product;
   isEditing: boolean;
   key: number;
   handleMarkImageForDeletion: (
@@ -88,7 +88,7 @@ const RenderImage: React.FC<RenderImageProps> = ({
     <div className="relative">
       <img
         src={image.url}
-        alt={product.name}
+        alt={product?.name || "Product image"}
         className={`h-32 w-32 object-cover ${
           image.markedForDeletion ? "opacity-20" : ""
         }`}
@@ -105,4 +105,4 @@ const RenderImage: React.FC<RenderImageProps> = ({
     </div>
   );
 };
-export default RenderImages;
+export default Images;

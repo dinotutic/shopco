@@ -4,11 +4,11 @@ import { deleteProduct } from "@/db/productQueries";
 import Link from "next/link";
 import { Product } from "../shared.types";
 
-export const ProductActions = ({ product }: { product: Product }) => {
-  const handleDelete = async () => {
-    await deleteProduct(product.id, product.name);
-    window.location.reload(); // Refresh the page for now, later will probably add state and make this fancier
-  };
+export const Actions = ({ product }: { product: Product }) => {
+  // const handleDelete = async () => {
+  //   await deleteProduct(product.id);
+  //   window.location.reload(); // Refresh the page for now, later will probably add state and make this fancier
+  // };
   const firstColorId = product.stock[0].color.id;
   return (
     <div className="flex items-center justify-center max-w-fit">
@@ -18,9 +18,9 @@ export const ProductActions = ({ product }: { product: Product }) => {
       >
         View
       </Link>
-      <Button onClick={handleDelete}>Delete</Button>
+      {/* <Button onClick={handleDelete}>Delete</Button> */}
     </div>
   );
 };
 
-export default ProductActions;
+export default Actions;

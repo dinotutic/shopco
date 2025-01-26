@@ -34,12 +34,14 @@ export async function getProductCount() {
     totalPages: Math.ceil(productCount / 50), // 50 items per page
   };
 }
-
+////
+// IF I ADD IMAGES TO COLORS LATER, THERE COULD BE ISSUES WHEN DELETING
+////
 // I should probably only delete image from s3 if DB delete was successful and vice versa. Will look into it sometime in the future
-export async function deleteProduct(id: number, name: string) {
+export async function deleteProduct(id: number) {
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { images: true, stock: true },
+    include: { images: true, stock: { include: { color: true } } },
   });
   if (!product) {
     throw new Error("Product not found");
@@ -52,63 +54,69 @@ export async function deleteProduct(id: number, name: string) {
     where: { productId: id },
   });
 
-  await prisma.stock.deleteMany({ where: { productId: id } });
-  await prisma.product.delete({ where: { id } });
+  // Delete related stock from db
+  await prisma.stock.deleteMany({
+    where: { productId: id },
+  });
+
+  // Delete the product itself
+  await prisma.product.delete({
+    where: { id },
+  });
 
   // Delete images from s3
   await deleteFile(`products/images/${id}`);
 }
 
-export async function addProduct(formData: FormData) {
-  // GOTTA HANDLE THIS LATER
-  const name = formData.get("name");
-  const description = formData.get("description");
-  const details = formData.get("details");
-  const priceInCents = formData.get("priceInCents");
-  const stockJson = formData.get("stock");
-  const isAvailable = formData.get("isAvailable") === "on";
-  const images = formData.getAll("images");
-  const category = formData.get("category");
-  const style = formData.get("style");
-  const sale = formData.get("sale");
-  const newArrival = formData.get("newArrival") === "on";
-  const topSelling = formData.get("topSelling") === "on";
-  const sex = formData.get("sex");
-
-  //Parse stock array to be usable here
-  type StockData = { size: string; quantity: number; colorId: number }[];
-  const stockData: StockData = JSON.parse(stockJson as string);
-
+export async function addProduct(data: {
+  name: string;
+  description: string;
+  details: string;
+  stock: {
+    size: string;
+    quantity: number;
+    color: { name: string; id: number };
+  }[];
+  priceInCents: number;
+  sex: string;
+  isAvailable: boolean;
+  topSelling: boolean;
+  newArrival: boolean;
+  sale: number;
+  category: { id: number; name: string };
+  style: { id: number; name: string };
+  images: File[] | string[];
+}) {
   // Create roduct in DB without the images.
   // Image links will be added after the images are uploaded to s3
   const newProduct = await prisma.product.create({
     data: {
-      name: name as string,
-      description: description as string,
-      priceInCents: parseInt(priceInCents as string),
-      isAvailable: isAvailable,
-      sale: parseInt(sale as string),
-      details: details as string,
-      newArrival: newArrival,
-      topSelling: topSelling,
-      gender: sex as string,
+      name: data.name,
+      description: data.description,
+      priceInCents: data.priceInCents,
+      isAvailable: data.isAvailable,
+      sale: data.sale,
+      details: data.details,
+      newArrival: data.newArrival,
+      topSelling: data.topSelling,
+      gender: data.sex,
       category: {
         connect: {
-          name: category as string,
+          id: data.category.id,
         },
       },
       style: {
         connect: {
-          name: style as string,
+          id: data.style.id,
         },
       },
       stock: {
-        create: stockData.map((item) => ({
+        create: data.stock.map((item) => ({
           size: item.size,
           quantity: item.quantity,
           color: {
             connect: {
-              id: item.colorId,
+              id: item.color.id,
             },
           },
         })),
@@ -119,7 +127,7 @@ export async function addProduct(formData: FormData) {
 
   // Upload images to s3
   const imageUrls = [];
-  for (const image of images) {
+  for (const image of data.images) {
     if (!(image instanceof File) || !image.type.startsWith("image/")) {
       throw new Error("All files must be images");
     }
@@ -139,7 +147,7 @@ export async function addProduct(formData: FormData) {
       },
     },
   });
-  console.log(`Product added: ${name}`);
+  console.log(`Product added: ${data.name}`);
 }
 
 export async function editProduct(
@@ -147,21 +155,21 @@ export async function editProduct(
   data: {
     name?: string;
     description?: string;
-    priceInCents?: number;
-    category?: { id: number; name: string };
-    style?: { id: number; name: string };
-    isAvailable?: boolean;
-    images?: File[] | string[];
+    details: string;
     stock: {
       size: string;
       quantity: number;
       color: { name: string; id: number };
     }[];
+    priceInCents?: number;
     sex: string;
-    sale: number;
-    details: string;
-    newArrival: boolean;
+    isAvailable?: boolean;
     topSelling: boolean;
+    newArrival: boolean;
+    sale: number;
+    category?: { id: number; name: string };
+    style?: { id: number; name: string };
+    images?: File[] | string[];
   },
   newImages: File[] = []
 ) {
@@ -181,7 +189,7 @@ export async function editProduct(
       return null;
     })
   ).then((images) => images.filter((image) => image !== null));
-
+  console.log(category);
   // Update product in DB
   const updatedProduct = await prisma.product.update({
     where: { id },
@@ -234,24 +242,6 @@ export async function editProduct(
   return updatedProduct;
 }
 
-// export async function updateStock(
-//   action: "add" | "delete",
-//   productId: number,
-//   stock: { size: string; quantity: number; colorId: number }[]
-// ) {
-//   if (action === "add") {
-//     await prisma.stock.createMany({
-//       data: stock.map((item) => ({
-//         size: item.size,
-//         quantity: item.quantity,
-//         colorId: item.colorId,
-//         productId,
-//       })),
-//     });
-//   }
-//   if (action == "delete") {
-//   }
-// }
 export async function deleteStock(stockId: number) {
   await prisma.stock.delete({ where: { id: stockId } });
 }
@@ -268,6 +258,11 @@ export async function getStyles() {
 export async function getColors() {
   const colors = await prisma.color.findMany();
   return colors;
+}
+
+export async function getColorByColorId(colorId: number) {
+  const color = await prisma.color.findUnique({ where: { id: colorId } });
+  return color;
 }
 
 export async function getProductById(id: number) {
@@ -320,3 +315,101 @@ export async function deleteSingleImage(productId: number, key: string) {
     throw new Error("Error deleting image");
   }
 }
+
+// export async function addProduct(formData: FormData) {
+//   // GOTTA HANDLE THIS LATER
+//   const name = formData.get("name");
+//   const description = formData.get("description");
+//   const details = formData.get("details");
+//   const priceInCents = formData.get("priceInCents");
+//   const stockJson = formData.get("stock");
+//   const isAvailable = formData.get("isAvailable") === "on";
+//   const images = formData.getAll("images");
+//   const category = formData.get("category");
+//   const style = formData.get("style");
+//   const sale = formData.get("sale");
+//   const newArrival = formData.get("newArrival") === "on";
+//   const topSelling = formData.get("topSelling") === "on";
+//   const sex = formData.get("sex");
+//   console.log("backend");
+//   console.log("formData", formData);
+//   console.log("name", name);
+//   console.log("description", description);
+//   console.log("details", details);
+//   console.log("priceInCents", priceInCents);
+//   console.log("stockJson", stockJson);
+//   console.log("isAvailable", isAvailable);
+//   console.log("images", images);
+//   console.log("category", category);
+//   console.log("style", style);
+//   console.log("sale", sale);
+//   console.log("newArrival", newArrival);
+//   console.log("topSelling", topSelling);
+//   console.log("topSelling", topSelling);
+//   console.log("sex", sex);
+//   //Parse stock array to be usable here
+//   type StockData = { size: string; quantity: number; colorId: number }[];
+//   const stockData: StockData = JSON.parse(stockJson as string);
+
+//   // Create roduct in DB without the images.
+//   // Image links will be added after the images are uploaded to s3
+//   const newProduct = await prisma.product.create({
+//     data: {
+//       name: name as string,
+//       description: description as string,
+//       priceInCents: parseInt(priceInCents as string),
+//       isAvailable: isAvailable,
+//       sale: parseInt(sale as string),
+//       details: details as string,
+//       newArrival: newArrival,
+//       topSelling: topSelling,
+//       gender: sex as string,
+//       category: {
+//         connect: {
+//           name: category as string,
+//         },
+//       },
+//       style: {
+//         connect: {
+//           name: style as string,
+//         },
+//       },
+//       stock: {
+//         create: stockData.map((item) => ({
+//           size: item.size,
+//           quantity: item.quantity,
+//           color: {
+//             connect: {
+//               id: item.colorId,
+//             },
+//           },
+//         })),
+//       },
+//     },
+//   });
+//   const newProductId = newProduct.id;
+
+//   // Upload images to s3
+//   const imageUrls = [];
+//   for (const image of images) {
+//     if (!(image instanceof File) || !image.type.startsWith("image/")) {
+//       throw new Error("All files must be images");
+//     }
+//     const arrayBuffer = await image.arrayBuffer();
+//     const buffer = Buffer.from(arrayBuffer);
+//     const key = `products/images/${newProductId}/${image.name}`;
+//     const imageUrl = await uploadFile(key, buffer, image.type);
+//     if (typeof imageUrl === "string") {
+//       imageUrls.push(imageUrl);
+//     }
+//   }
+//   await prisma.product.update({
+//     where: { id: newProductId },
+//     data: {
+//       images: {
+//         create: imageUrls.map((image) => ({ url: image })),
+//       },
+//     },
+//   });
+//   console.log(`Product added: ${name}`);
+// }

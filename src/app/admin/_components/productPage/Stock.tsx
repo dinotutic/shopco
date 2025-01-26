@@ -1,12 +1,12 @@
 import { Stock } from "../shared.types";
 
-interface ProductStockProps {
+interface StockRenderProps {
   stock: Stock[];
   isEditing: boolean;
   setStock: React.Dispatch<React.SetStateAction<Stock[]>>;
 }
 
-const RenderStock: React.FC<ProductStockProps> = ({
+const StockRender: React.FC<StockRenderProps> = ({
   stock,
   isEditing,
   setStock,
@@ -45,4 +45,4 @@ const RenderStock: React.FC<ProductStockProps> = ({
   );
 };
 
-export default RenderStock;
+export default StockRender;

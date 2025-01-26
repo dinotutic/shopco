@@ -119,9 +119,6 @@ CREATE TABLE "CartItem" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Stock_productId_size_key" ON "Stock"("productId", "size");
-
--- CreateIndex
 CREATE UNIQUE INDEX "Stock_productId_colorId_size_key" ON "Stock"("productId", "colorId", "size");
 
 -- CreateIndex
