@@ -193,6 +193,9 @@ export async function editProduct(
     images?: Image[];
   }
 ) {
+  console.log("is data available", data.isAvailable);
+  console.log("is top selling", data.topSelling);
+  console.log("is new product", data.newArrival);
   // Turn images into files to upload
   const newImages: File[] = (data.images || []).reduce((acc: File[], image) => {
     if (!image.markedForDeletion && image.isNew && image.file instanceof File) {
@@ -235,12 +238,12 @@ export async function editProduct(
           id: data.style?.id,
         },
       },
-      isAvailable: data.isAvailable,
       images: {
         create: uploadedImages.map((image) => ({ url: image.url })),
       },
       details: data.details,
       sale: data.sale,
+      isAvailable: data.isAvailable,
       newArrival: data.newArrival,
       topSelling: data.topSelling,
       gender: {

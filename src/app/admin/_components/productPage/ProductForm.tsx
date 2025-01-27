@@ -51,7 +51,7 @@ export default function ProductForm({
   } = product || {};
 
   const [selectedColor, setSelectedColor] = useState<Color>(color || colors[0]);
-
+  console.log("prod isavailable", product?.isAvailable);
   const [name, setName] = useState<string>(initialName || "");
   const [description, setDescription] = useState<string>(
     initialDescription || ""
@@ -78,7 +78,7 @@ export default function ProductForm({
     (initialStock || []).map((item) => item.color)
   );
   const [availableForSale, setAvailableForSale] = useState<boolean>(
-    initialIsAvailableForSale || true
+    initialIsAvailableForSale || false
   );
 
   // Handle either creating a new stock if there is no product or filtering the stock by color id
