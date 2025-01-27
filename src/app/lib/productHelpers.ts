@@ -1,5 +1,5 @@
 import { Color } from "@prisma/client";
-import { Stock } from "../admin/_components/shared.types";
+import { Image, Stock } from "../admin/_components/shared.types";
 
 const createDefaultStock = (selectedColor: Color, stock?: Stock[]) => {
   const defaultStock: Stock[] = [];
@@ -30,4 +30,22 @@ export const initializeStock = (
       (size) => size.color.id === selectedColor.id
     );
   }
+};
+
+export const processImagesArray = (
+  images: Image[],
+  action: "upload" | "delete"
+): Image[] => {
+  if (action === "upload") {
+    return images.filter(
+      (image) =>
+        !image.markedForDeletion && image.isNew && image.file instanceof File
+    );
+  }
+  if (action === "delete") {
+    return images.filter(
+      (image) => image.markedForDeletion && !image.isNew && image.url
+    );
+  }
+  return [];
 };

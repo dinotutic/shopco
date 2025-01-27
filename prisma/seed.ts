@@ -79,6 +79,18 @@ async function main() {
     return arrOfIndexes.sort((a, b) => a - b);
   };
 
+  // Create a gender list
+
+  const genderList = [
+    { id: 1, name: "Male" },
+    { id: 2, name: "Female" },
+    { id: 3, name: "Unisex" },
+  ];
+  for (const gender of genderList) {
+    await prisma.gender.create({
+      data: gender,
+    });
+  }
   // Create products
   const products = [];
   for (let i = 0; i < 50; i++) {
@@ -124,7 +136,11 @@ async function main() {
         stock: {
           create: stockEntries,
         },
-        gender: faker.helpers.arrayElement(["male", "female", "unisex"]),
+        gender: {
+          connect: {
+            id: faker.helpers.arrayElement([1, 2, 3]),
+          },
+        },
         sale: faker.helpers.arrayElement([0, 20, 30]),
         details: faker.lorem.paragraph(),
         newArrival: faker.datatype.boolean(),

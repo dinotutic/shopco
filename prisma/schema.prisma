@@ -27,13 +27,19 @@ model Product {
   cart         CartItem[]
   style        Style @relation(fields: [styleId], references: [id])
   styleId      Int
-  gender       String 
+  gender       Gender@relation(fields: [genderId], references: [id]) 
+  genderId     Int
   sale         Int
   details      String
   newArrival   Boolean @default(false)
   topSelling   Boolean @default(false)
 }
 
+model Gender {
+  id    Int    @id @default(autoincrement())
+  name  String
+  products Product[]
+}
 
 model Color{
   id          Int       @id @default(autoincrement())
