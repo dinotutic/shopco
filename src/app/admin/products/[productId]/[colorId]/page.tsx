@@ -4,6 +4,7 @@ import {
   getColors,
   getProductByIdAndColor,
   getColorByColorId,
+  getGenders,
 } from "@/db/productQueries";
 import PageHeader from "@/app/admin/_components/PageHeader";
 import ProductForm from "@/app/admin/_components/productPage/ProductForm";
@@ -23,6 +24,7 @@ export default async function ProductPage({
   const categories = await getCategories();
   const colors = await getColors();
   const color = await getColorByColorId(Number(colorId));
+  const genders = await getGenders();
 
   return (
     <div>
@@ -35,6 +37,7 @@ export default async function ProductPage({
           colors={colors}
           color={color ?? undefined}
           mode={"edit"}
+          genders={genders}
         />
       </div>
     </div>

@@ -1,5 +1,6 @@
 "use client";
 
+// NEED TO FIX MY SEED SCRIPT. COLORS NOT INCLUDED IN ORDERS I THINK OR NOT FORWARDED CORRECTLY
 import { useEffect, useState } from "react";
 import { formatCurrency } from "@/app/lib/formatters";
 import Colors from "./Colors";
@@ -10,12 +11,9 @@ import Images from "./Images";
 import Button from "./Button";
 import Timestamp from "./Timestamp";
 import FormButtons from "./FormButtons";
-import {
-  addProduct,
-  deleteSingleImage,
-  editProduct,
-} from "@/db/productQueries";
 import { initializeStock } from "@/app/lib/productHelpers";
+import { Gender } from "@prisma/client";
+import { handleSubmitCreate, handleSubmitEdit } from "@/app/lib/submitHelpers";
 
 interface ProductDetailProps {
   product?: Product;
@@ -24,6 +22,7 @@ interface ProductDetailProps {
   colors: Color[];
   color?: Color;
   mode: "create" | "edit";
+  genders: Gender[];
 }
 // add required fields to the product object
 export default function ProductForm({
@@ -33,6 +32,7 @@ export default function ProductForm({
   colors,
   color,
   mode,
+  genders,
 }: ProductDetailProps) {
   const {
     name: initialName,
@@ -41,13 +41,13 @@ export default function ProductForm({
     style: initialStyle,
     category: initialCategory,
     isAvailable: initialIsAvailableForSale,
-    gender: initialSex,
     sale: initialSale,
     details: initialDetails,
     newArrival: initialNewArrival,
     topSelling: initialTopSelling,
     images: initialImages,
     stock: initialStock,
+    gender: initialGender,
   } = product || {};
 
   const [selectedColor, setSelectedColor] = useState<Color>(color || colors[0]);
@@ -60,7 +60,8 @@ export default function ProductForm({
   const [priceInCents, setPriceInCents] = useState<number>(
     initialPriceInCents || 0
   );
-  const [sex, setSex] = useState<string>(initialSex || "");
+
+  const [gender, setGender] = useState<Gender>(initialGender || genders[0]);
   const [sale, setSale] = useState<number>(initialSale || 0);
   const [newArrival, setNewArrival] = useState<boolean>(
     initialNewArrival || false
@@ -79,7 +80,7 @@ export default function ProductForm({
   const [availableForSale, setAvailableForSale] = useState<boolean>(
     initialIsAvailableForSale || true
   );
-  console.log(category);
+
   // Handle either creating a new stock if there is no product or filtering the stock by color id
   const [stock, setStock] = useState<Stock[]>([]);
   useEffect(() => {
@@ -95,22 +96,7 @@ export default function ProductForm({
   const [isEditing, setIsEditing] = useState<boolean>(
     mode === "create" ? true : false
   );
-  // It needed to be in this format to align with categories and styles in FormElemenet
-  const sexList = [
-    { id: 1, name: "male" },
-    { id: 2, name: "female" },
-    { id: 3, name: "unisex" },
-  ];
-  const handleSexChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
-  ) => {
-    const selectedSex = sexList.find((s) => s.id === Number(e.target.value));
-    if (selectedSex) {
-      setSex(selectedSex.name);
-    }
-  };
+
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsEditing(true);
@@ -122,77 +108,31 @@ export default function ProductForm({
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const data = {
+      name,
+      description,
+      details,
+      stock,
+      priceInCents,
+      gender,
+      isAvailable: availableForSale,
+      topSelling,
+      newArrival,
+      sale,
+      category: { id: category.id, name: category.name },
+      style: { id: style.id, name: style.name },
+      images,
+      colors: availableColors,
+    };
     if (mode === "edit" && product) {
       e.preventDefault();
-
-      // Delete images in S3 and DB
-      await Promise.all(
-        images
-          .filter((image) => image.markedForDeletion && !image.isNew)
-          .map(async (image) => await deleteSingleImage(product.id, image.url))
-      );
-
-      // Prepare data for upload
-      const newImages: File[] = images.reduce((acc, image) => {
-        if (
-          !image.markedForDeletion &&
-          image.isNew &&
-          image.file instanceof File
-        ) {
-          acc.push(image.file);
-        }
-        return acc;
-      }, [] as File[]);
-
-      const data = {
-        name,
-        description,
-        priceInCents,
-        category: { id: category.id, name: category.name },
-        style: { id: style.id, name: style.name },
-        images: newImages as File[],
-        stock,
-        sex,
-        sale,
-        details,
-        newArrival,
-        topSelling,
-        colors: availableColors,
-      };
-
-      // Edit Product
-      try {
-        const updatedProduct = await editProduct(product.id, data, newImages);
-        console.log("Product updated successfully:", updatedProduct);
-      } catch (error) {
-        console.error("Error updating product:", error);
-      }
-      window.location.reload();
+      handleSubmitEdit(e, data, product.id);
     }
     if (mode === "create") {
       e.preventDefault();
-      const filteredImages = images.filter((image) => !image.markedForDeletion);
-      try {
-        const data = {
-          name,
-          description,
-          details,
-          stock,
-          priceInCents,
-          sex,
-          isAvailable: availableForSale,
-          topSelling,
-          newArrival,
-          sale,
-          category: { id: category.id, name: category.name },
-          style: { id: style.id, name: style.name },
-          images: filteredImages.every((image) => image.file instanceof File)
-            ? filteredImages.map((image) => image.file as File)
-            : filteredImages.map((image) => image.url as string),
-        };
-        await addProduct(data);
-      } catch (error) {
-        console.error("Error adding product:", error);
+      const newProd = await handleSubmitCreate(e, data);
+      if (newProd) {
+        window.location.href = `/admin/products/${newProd.id}/${newProd.stock[0].color.id}`;
       }
     }
   };
@@ -235,10 +175,12 @@ export default function ProductForm({
         <FormField
           label="Gender"
           type="select"
-          value={sex}
-          onChange={handleSexChange}
+          value={gender.id}
+          onChange={(e) =>
+            setGender(genders.find((g) => g.id === Number(e.target.value))!)
+          }
           disabled={!isEditing}
-          options={sexList}
+          options={genders}
         />
         <FormField
           label="Available for Sale"
@@ -334,29 +276,3 @@ export default function ProductForm({
     </div>
   );
 }
-// useEffect(() => {
-//   if (mode === "create") {
-//     if (isStockEmpty(stock)) {
-//       setStock(createDefaultStock(selectedColorId));
-//     }
-//   } else {
-//     setStock(
-//       (initialStock || []).filter((size) => size.color.id === selectedColorId)
-//     );
-//   }
-// }, [selectedColorId, mode, initialStock]);
-
-// CHANGING COLOR RESETS STOCK VALUE?
-
-// const [stock, setStock] = useState<Stock[]>(
-//   (initialStock || []).filter((size) => size.color.id === selectedColorId)
-// );
-
-// In case there is no product.
-// const emptyStock = createDefaultStock(selectedColorId);
-// const stockValue =
-//   mode === "create"
-//     ? emptyStock
-//     : (initialStock ?? []).filter(
-//         (size) => size.color.id === selectedColorId
-//       );

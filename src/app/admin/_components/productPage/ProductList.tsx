@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Actions from "./Actions";
+import { Category, Color, Gender, Style } from "@prisma/client";
 
 type Product = {
   id: number;
@@ -10,7 +11,7 @@ type Product = {
   priceInCents: number;
   stock: {
     id: number;
-    color: { id: number; name: string };
+    color: Color;
     size: string;
     quantity: number;
     productId: number;
@@ -18,12 +19,12 @@ type Product = {
   isAvailable: boolean;
   createdAt: Date;
   updatedAt: Date;
-  style: { id: number; name: string };
-  category: { id: number; name: string };
+  style: Style;
+  category: Category;
   images: { url: string }[];
   categoryId: number;
   styleId: number;
-  gender: string;
+  gender: Gender;
   sale: number;
   details: string;
   newArrival: boolean;
@@ -34,10 +35,12 @@ export default function ProductList({
   products,
   categories,
   styles,
+  genders,
 }: {
   products: Product[];
-  categories: { id: number; name: string }[];
-  styles: { id: number; name: string }[];
+  categories: Category[];
+  styles: Style[];
+  genders: Gender[];
 }) {
   console.log(products);
   const [search, setSearch] = useState<string>("");
@@ -47,17 +50,7 @@ export default function ProductList({
   const [availabilityFilter, setAvailabilityFilter] = useState<boolean | null>(
     null
   );
-  const [sexFilter, setSexFilter] = useState<string | null>(null);
-  // To format JSX
-  const formateSex = (sex: string) => {
-    if (sex === "male") {
-      return "M";
-    } else if (sex === "female") {
-      return "F";
-    } else if (sex === "unisex") {
-      return "U";
-    }
-  };
+  const [genderFilter, setGenderFilter] = useState<string | null>(null);
 
   const filteredProducts = products.filter((product) => {
     const matchesNameFilter = product.name
@@ -69,14 +62,15 @@ export default function ProductList({
       categoryFilter === null || product.category.name === categoryFilter;
     const matchesStyle =
       styleFilter === null || product.style.name === styleFilter;
-    const matchesSex = sexFilter === null || product.gender === sexFilter;
+    const matchesGender =
+      genderFilter === null || product.gender.name === genderFilter;
 
     return (
       matchesNameFilter &&
       matchesAvailability &&
       matchesCategory &&
       matchesStyle &&
-      matchesSex
+      matchesGender
     );
   });
 
@@ -161,16 +155,18 @@ export default function ProductList({
             <option value="false">Not Available</option>
           </select>
           <select
-            value={sexFilter ?? ""}
+            value={genderFilter ?? ""}
             onChange={(e) =>
-              setSexFilter(e.target.value === "" ? null : e.target.value)
+              setGenderFilter(e.target.value === "" ? null : e.target.value)
             }
             className="border p-2 rounded-xl"
           >
-            <option value="">Sex</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="unisex">Unisex</option>
+            <option value="">Gender</option>
+            {genders.map((gender) => (
+              <option key={gender.name} value={gender.name}>
+                {gender.name}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -188,7 +184,7 @@ export default function ProductList({
               Price
             </th>
             <th className="px-4 py-2 border-r border-y border-gray-300 text-start">
-              Sex
+              Gender
             </th>
             <th className="px-4 py-2 border-r border-y border-gray-300 text-start">
               Stock
@@ -218,9 +214,7 @@ export default function ProductList({
               <td className="px-4 border-b border-r">
                 {(product.priceInCents / 100).toFixed(2)}€
               </td>
-              <td className="px-4 border-b border-r">
-                {formateSex(product.gender)}
-              </td>
+              <td className="px-4 border-b border-r">{product.gender.name}</td>
               <td className="px-4 border-b border-r">
                 {product.stock.reduce(
                   (total, stock) => total + stock.quantity,

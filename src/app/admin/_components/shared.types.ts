@@ -1,8 +1,10 @@
+import { Gender } from "@prisma/client";
+
 export interface Image {
-  url: string;
+  url?: string;
   isNew?: boolean;
   markedForDeletion?: boolean;
-  id?: number | undefined;
+  id?: number;
   productId?: number;
   file?: File;
 }
@@ -42,7 +44,7 @@ export interface Product {
   category: Category;
   style: Style;
   images: Image[];
-  gender: string;
+  gender: Gender;
   sale: number;
   details: string;
   newArrival: boolean;
