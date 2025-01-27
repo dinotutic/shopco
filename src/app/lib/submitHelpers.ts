@@ -83,6 +83,5 @@ export const handleSubmitEdit = async (
     console.error("Error updating product:", error);
   }
 
-  // window.location.reload();
-  // }
+  window.location.reload();
 };
