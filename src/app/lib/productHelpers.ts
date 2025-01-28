@@ -1,6 +1,5 @@
 import { Color } from "@prisma/client";
 import { Image, Stock } from "../admin/_components/shared.types";
-import { addStock } from "@/db/productQueries";
 
 const createDefaultStock = (selectedColor: Color, stock?: Stock[]) => {
   const defaultStock: Stock[] = [];
@@ -18,20 +17,20 @@ const createDefaultStock = (selectedColor: Color, stock?: Stock[]) => {
   return defaultStock;
 };
 
-export const initializeStock = (
-  mode: "create" | "edit",
-  stock: Stock[],
-  initialStock: Stock[] | undefined,
-  selectedColor: Color
-): Stock[] => {
-  if (mode === "create") {
-    return createDefaultStock(selectedColor, stock);
-  } else {
-    return (initialStock || []).filter(
-      (size) => size.color.id === selectedColor.id
-    );
-  }
-};
+// export const initializeStock = (
+//   mode: "create" | "edit",
+//   stock: Stock[],
+//   initialStock: Stock[] | undefined,
+//   selectedColor: Color
+// ): Stock[] => {
+//   if (mode === "create") {
+//     return createDefaultStock(selectedColor, stock);
+//   } else {
+//     return (initialStock || []).filter(
+//       (size) => size.color.id === selectedColor.id
+//     );
+//   }
+// };
 
 export const processImagesArray = (
   images: Image[],
@@ -65,3 +64,20 @@ export const createEmptyStock = (
   }));
   return emptyStock;
 };
+
+export const removeDuplicatesInArr = (array: any[], key: any) => {
+  const seen = new Set();
+  return array.filter((item) => {
+    const duplicate = seen.has(item[key]);
+    seen.add(item[key]);
+    return !duplicate;
+  });
+};
+// export const removeDuplicatesInArr = (array: any[]) => {
+//   const seen = new Set();
+//   return array.filter((item) => {
+//     const duplicate = seen.has(item.id);
+//     seen.add(item.id);
+//     return !duplicate;
+//   });
+// };
