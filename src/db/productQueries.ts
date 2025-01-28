@@ -1,6 +1,6 @@
 "use server";
 
-import { Category, Gender, Style } from "@prisma/client";
+import { Category, Gender, Stock, Style } from "@prisma/client";
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
 import { Image } from "@/app/admin/_components/shared.types";
@@ -170,7 +170,25 @@ export async function addProduct(data: {
   console.log(`Product added: ${data.name}`);
   return { ...newProduct };
 }
-
+export async function addStock(data: Stock, colorId: number) {
+  const newStock = await prisma.stock.create({
+    data: {
+      size: data.size,
+      quantity: data.quantity,
+      product: {
+        connect: {
+          id: data.productId,
+        },
+      },
+      color: {
+        connect: {
+          id: colorId,
+        },
+      },
+    },
+  });
+  return newStock;
+}
 export async function editProduct(
   id: number,
   data: {
@@ -193,9 +211,6 @@ export async function editProduct(
     images?: Image[];
   }
 ) {
-  console.log("is data available", data.isAvailable);
-  console.log("is top selling", data.topSelling);
-  console.log("is new product", data.newArrival);
   // Turn images into files to upload
   const newImages: File[] = (data.images || []).reduce((acc: File[], image) => {
     if (!image.markedForDeletion && image.isNew && image.file instanceof File) {
@@ -254,17 +269,48 @@ export async function editProduct(
     },
   });
 
+  // if (Array.isArray(data.stock)) {
+  //   try {
+  //     await Promise.all(
+  //       data.stock.map(async (item) => {
+  //         await prisma.stock.updateMany({
+  //           where: { productId: id, size: item.size, colorId: item.color.id },
+  //           data: { quantity: item.quantity },
+  //         });
+  //       })
+  //     );
+  //     console.log("Stock updated successfully");
+  //   } catch (error) {
+  //     console.error("Error updating stock:", error);
+  //   }
+  // } else {
+  //   console.error("data.stock is not an array or is undefined");
+  // }
+
+  // i have no idea what is going on here but it works!
   if (Array.isArray(data.stock)) {
     try {
       await Promise.all(
-        data.stock.map(async (item) => {
-          console.log("Updating stock item:", item);
-          const result = await prisma.stock.updateMany({
-            where: { productId: id, size: item.size, colorId: item.color.id },
-            data: { quantity: item.quantity },
-          });
-          console.log("Update result:", result);
-        })
+        data.stock.map((item) =>
+          prisma.stock.upsert({
+            where: {
+              productId_colorId_size: {
+                productId: id,
+                size: item.size,
+                colorId: item.color.id,
+              },
+            },
+            update: {
+              quantity: item.quantity,
+            },
+            create: {
+              productId: id,
+              size: item.size,
+              quantity: item.quantity,
+              colorId: item.color.id,
+            },
+          })
+        )
       );
       console.log("Stock updated successfully");
     } catch (error) {
@@ -280,6 +326,7 @@ export async function editProduct(
 export async function deleteStock(stockId: number) {
   await prisma.stock.delete({ where: { id: stockId } });
 }
+
 export async function getCategories() {
   const categories = await prisma.category.findMany();
   return categories;

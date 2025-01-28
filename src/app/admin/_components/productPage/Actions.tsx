@@ -5,10 +5,10 @@ import Link from "next/link";
 import { Product } from "../shared.types";
 
 export const Actions = ({ product }: { product: Product }) => {
-  // const handleDelete = async () => {
-  //   await deleteProduct(product.id);
-  //   window.location.reload(); // Refresh the page for now, later will probably add state and make this fancier
-  // };
+  const handleDelete = async () => {
+    await deleteProduct(product.id);
+    window.location.reload(); // Refresh the page for now, later will probably add state and make this fancier
+  };
   const firstColorId = product.stock[0].color.id;
   return (
     <div className="flex items-center justify-center max-w-fit">
@@ -18,7 +18,7 @@ export const Actions = ({ product }: { product: Product }) => {
       >
         View
       </Link>
-      {/* <Button onClick={handleDelete}>Delete</Button> */}
+      <Button onClick={handleDelete}>Delete</Button>
     </div>
   );
 };

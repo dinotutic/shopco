@@ -9,8 +9,6 @@ interface ColorsProps {
   setAvailableColors: React.Dispatch<React.SetStateAction<Color[]>>;
   selectedColor: Color;
   setSelectedColor?: React.Dispatch<React.SetStateAction<Color>>;
-  // setSelectedColorId?: React.Dispatch<React.SetStateAction<number>>;
-  // selectedColorId: number;
   mode: "create" | "edit";
 }
 
@@ -22,14 +20,10 @@ const Colors: React.FC<ColorsProps> = ({
   setAvailableColors,
   selectedColor,
   setSelectedColor,
-  // setSelectedColorId,
-  // selectedColorId,
+
   mode,
 }) => {
   const router = useRouter();
-
-  // const selectedColor =
-  //   colors.find((c) => c.id === selectedColorId) || colors[0];
 
   const handleColorClick = (color: Color) => {
     if (mode === "edit") {
@@ -84,8 +78,6 @@ const Colors: React.FC<ColorsProps> = ({
     </div>
   );
 };
-
-// Rendering the color item in ProductColors component
 
 interface ColorItemProps {
   color: Color;

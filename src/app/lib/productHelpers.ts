@@ -1,5 +1,6 @@
 import { Color } from "@prisma/client";
 import { Image, Stock } from "../admin/_components/shared.types";
+import { addStock } from "@/db/productQueries";
 
 const createDefaultStock = (selectedColor: Color, stock?: Stock[]) => {
   const defaultStock: Stock[] = [];
@@ -48,4 +49,19 @@ export const processImagesArray = (
     );
   }
   return [];
+};
+
+export const createEmptyStock = (
+  selectedColor: Color,
+  productId: number
+): Stock[] => {
+  const sizes = ["XS", "S", "M", "L", "XL"];
+  const emptyStock: Stock[] = sizes.map((size, index) => ({
+    id: index,
+    color: { id: selectedColor.id, name: selectedColor.name },
+    productId,
+    size,
+    quantity: 0,
+  }));
+  return emptyStock;
 };
