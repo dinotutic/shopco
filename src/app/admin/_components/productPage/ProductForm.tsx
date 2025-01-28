@@ -158,7 +158,12 @@ export default function ProductForm({
           onChange={(e) => setDetails(e.target.value)}
           disabled={!isEditing}
         />
-        <StockRender stock={stock} setStock={setStock} isEditing={isEditing} />
+        <StockRender
+          stock={stock}
+          setStock={setStock}
+          isEditing={isEditing}
+          selectedColor={selectedColor}
+        />
         <FormField
           label="Price (in cents)"
           type="number"
