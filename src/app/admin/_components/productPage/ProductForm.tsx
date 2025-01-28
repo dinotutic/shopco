@@ -51,7 +51,7 @@ export default function ProductForm({
   } = product || {};
 
   const [selectedColor, setSelectedColor] = useState<Color>(color || colors[0]);
-  console.log("prod isavailable", product?.isAvailable);
+  console.log(product);
   const [name, setName] = useState<string>(initialName || "");
   const [description, setDescription] = useState<string>(
     initialDescription || ""
@@ -108,6 +108,7 @@ export default function ProductForm({
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     const data = {
       name,
       description,
@@ -125,11 +126,8 @@ export default function ProductForm({
       colors: availableColors,
     };
     if (mode === "edit" && product) {
-      e.preventDefault();
-      handleSubmitEdit(e, data, product.id);
-    }
-    if (mode === "create") {
-      e.preventDefault();
+      handleSubmitEdit(e, data, product.id, availableColors);
+    } else if (mode === "create") {
       const newProd = await handleSubmitCreate(e, data);
       if (newProd) {
         window.location.href = `/admin/products/${newProd.id}/${newProd.stock[0].color.id}`;

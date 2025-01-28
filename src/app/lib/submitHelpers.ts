@@ -3,31 +3,15 @@ import {
   deleteSingleImage,
   editProduct,
 } from "@/db/productQueries";
-import { Gender, Category, Style } from "@prisma/client";
 import { processImagesArray } from "@/app/lib/productHelpers";
-import { Image } from "../admin/_components/shared.types";
+import {
+  Color,
+  ProductHandleSubmitProps,
+} from "../admin/_components/shared.types";
 
 export const handleSubmitCreate = async (
   e: { preventDefault: () => void },
-  data: {
-    name: string;
-    description: string;
-    details: string;
-    stock: {
-      size: string;
-      quantity: number;
-      color: { name: string; id: number };
-    }[];
-    priceInCents: number;
-    isAvailable: boolean;
-    topSelling: boolean;
-    newArrival: boolean;
-    sale: number;
-    gender: Gender;
-    category: Category;
-    style: Style;
-    images: Image[];
-  }
+  data: ProductHandleSubmitProps
 ) => {
   e.preventDefault();
   const imagesToUpload = processImagesArray(data.images, "upload") || [];
@@ -40,33 +24,32 @@ export const handleSubmitCreate = async (
     console.error("Error adding product:", error);
   }
 };
+
 export const handleSubmitEdit = async (
   e: { preventDefault: () => void },
-  data: {
-    name: string;
-    description: string;
-    details: string;
-    stock: {
-      size: string;
-      quantity: number;
-      color: { name: string; id: number };
-    }[];
-    priceInCents: number;
-    isAvailable: boolean;
-    topSelling: boolean;
-    newArrival: boolean;
-    sale: number;
-    gender: Gender;
-    category: Category;
-    style: Style;
-    images: Image[];
-  },
-  id: number
+  data: ProductHandleSubmitProps,
+  id: number,
+  availableColors: Color[]
 ) => {
   e.preventDefault();
 
-  const imagesToDelete = processImagesArray(data.images, "delete") || [];
+  // isnt working currently
+  const newColors = availableColors.filter(
+    (color) => !data.stock.some((stock) => stock.color.id === color.id)
+  );
+  const sizes = ["XS", "S", "M", "L", "XL"];
+  const newStock = newColors.flatMap((color) =>
+    sizes.map((size) => ({
+      size,
+      quantity: 0,
+      color: color,
+      productId: id || 0,
+    }))
+  );
+  data.stock = [...data.stock, ...newStock];
 
+  const imagesToDelete = processImagesArray(data.images, "delete") || [];
+  console.log(data.stock);
   // Delete images in S3 and DB
   await Promise.all(
     imagesToDelete.map(async (image) => {
@@ -83,5 +66,5 @@ export const handleSubmitEdit = async (
     console.error("Error updating product:", error);
   }
 
-  window.location.reload();
+  // window.location.reload();
 };

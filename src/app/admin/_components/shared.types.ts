@@ -50,3 +50,23 @@ export interface Product {
   newArrival: boolean;
   topSelling: boolean;
 }
+
+export interface ProductHandleSubmitProps {
+  name: string;
+  description: string;
+  details: string;
+  stock: {
+    size: string;
+    quantity: number;
+    color: { name: string; id: number };
+  }[];
+  priceInCents: number;
+  isAvailable: boolean;
+  topSelling: boolean;
+  newArrival: boolean;
+  sale: number;
+  gender: Gender;
+  category: Category;
+  style: Style;
+  images: Image[];
+}
