@@ -11,7 +11,7 @@ import Images from "./Images";
 import Button from "./Button";
 import Timestamp from "./Timestamp";
 import FormButtons from "./FormButtons";
-import { initializeStock } from "@/app/lib/productHelpers";
+import { removeDuplicatesInArr } from "@/app/lib/productHelpers";
 import { Gender } from "@prisma/client";
 import { handleSubmitCreate, handleSubmitEdit } from "@/app/lib/submitHelpers";
 
@@ -49,9 +49,8 @@ export default function ProductForm({
     stock: initialStock,
     gender: initialGender,
   } = product || {};
-
-  const [selectedColor, setSelectedColor] = useState<Color>(color || colors[0]);
   console.log(product);
+  const [selectedColor, setSelectedColor] = useState<Color>(color || colors[0]);
   const [name, setName] = useState<string>(initialName || "");
   const [description, setDescription] = useState<string>(
     initialDescription || ""
@@ -74,24 +73,23 @@ export default function ProductForm({
     initialCategory || categories[0]
   );
   const [images, setImages] = useState<Image[]>(initialImages || []);
+  // const [availableColors, setAvailableColors] = useState<Color[]>(
+  //   (initialStock || []).map((item) => item.color)
+  // );
+
+  const initialAvailableColors = removeDuplicatesInArr(
+    (initialStock || []).map((item) => item.color),
+    "id"
+  );
+
   const [availableColors, setAvailableColors] = useState<Color[]>(
-    (initialStock || []).map((item) => item.color)
+    initialAvailableColors
   );
   const [availableForSale, setAvailableForSale] = useState<boolean>(
     initialIsAvailableForSale || false
   );
-
   // Handle either creating a new stock if there is no product or filtering the stock by color id
-  const [stock, setStock] = useState<Stock[]>([]);
-  useEffect(() => {
-    const initializedStockValues = initializeStock(
-      mode,
-      stock,
-      initialStock,
-      selectedColor
-    );
-    setStock(initializedStockValues);
-  }, [selectedColor, mode, initialStock]);
+  const [stock, setStock] = useState<Stock[]>(initialStock || []);
 
   const [isEditing, setIsEditing] = useState<boolean>(
     mode === "create" ? true : false
@@ -125,6 +123,7 @@ export default function ProductForm({
       images,
       colors: availableColors,
     };
+
     if (mode === "edit" && product) {
       handleSubmitEdit(e, data, product.id, availableColors);
     } else if (mode === "create") {
