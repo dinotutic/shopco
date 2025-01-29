@@ -55,6 +55,7 @@ const Colors: React.FC<ColorsProps> = ({
           key={selectedColor.id}
           color={selectedColor}
           isEditing={isEditing}
+          selectedColor={selectedColor}
           handleColorClick={handleColorClick}
           handleColorLink={handleColorLink}
           availableColors={availableColors}
@@ -103,7 +104,7 @@ const ColorItem: React.FC<ColorItemProps> = ({
       color.name === "Colorful"
         ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
         : color.name,
-    opacity: isAvailable ? 1 : 0.5,
+    opacity: isAvailable || isSelected ? 1 : 0.5,
     cursor: isEditing || isAvailable ? "pointer" : "default",
     pointerEvents: isSelected ? "none" : "auto",
   };
@@ -111,7 +112,7 @@ const ColorItem: React.FC<ColorItemProps> = ({
   return (
     <div
       className={`border-2 border-black-500 rounded-full inline-block ${
-        isAvailable ? "border-black" : "border-transparent"
+        isAvailable || isSelected ? "border-black" : "border-transparent"
       }`}
     >
       <div
