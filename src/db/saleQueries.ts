@@ -54,7 +54,13 @@ export const getOrderById = async (orderId: number) => {
     include: {
       items: {
         include: {
-          product: true,
+          product: {
+            include: {
+              stock: {
+                include: { color: true },
+              },
+            },
+          },
           color: true,
         },
       },
