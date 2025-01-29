@@ -5,9 +5,10 @@ import { DetailLink, DetailParagraph } from "./DetailComponents";
 
 interface OrderDataProps {
   order: Order;
+  totalItems: number;
 }
 
-export const OrderData = ({ order }: OrderDataProps) => {
+export const OrderData = ({ order, totalItems }: OrderDataProps) => {
   return (
     <section className="mb-6 p-4 border rounded-lg bg-gray-50">
       <h2 className="text-xl font-bold mb-4">Order Data</h2>
@@ -23,7 +24,7 @@ export const OrderData = ({ order }: OrderDataProps) => {
           <DetailParagraph label="Customer Email" value={order.user.email} />
         </div>
         <div className="w-[15%]">
-          <DetailParagraph label="Total Items" value={order.items.length} />
+          <DetailParagraph label="Total Items" value={totalItems} />
           <DetailParagraph
             label="Total"
             value={formatCurrency(order.totalInCents)}

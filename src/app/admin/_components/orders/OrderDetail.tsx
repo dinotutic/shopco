@@ -1,11 +1,10 @@
 import { FC } from "react";
-import { Order, OrderItem, Product } from "../shared.types";
+import { Order } from "../shared.types";
 import { OrderData } from "./OrderData";
 import { OrderItems } from "./OrderItems";
 
 interface OrderDetailProps {
   order: Order;
-  items: OrderItem[];
   totalItems: number;
 }
 
@@ -15,7 +14,7 @@ const OrderDetail: FC<OrderDetailProps> = ({ order, totalItems }) => {
   );
   return (
     <>
-      <OrderData order={order} />
+      <OrderData order={order} totalItems={totalItems} />
       <OrderItems order={order} />
     </>
   );
