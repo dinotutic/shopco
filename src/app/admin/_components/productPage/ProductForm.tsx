@@ -73,9 +73,6 @@ export default function ProductForm({
     initialCategory || categories[0]
   );
   const [images, setImages] = useState<Image[]>(initialImages || []);
-  // const [availableColors, setAvailableColors] = useState<Color[]>(
-  //   (initialStock || []).map((item) => item.color)
-  // );
 
   const initialAvailableColors = removeDuplicatesInArr(
     (initialStock || []).map((item) => item.color),
@@ -88,6 +85,7 @@ export default function ProductForm({
   const [availableForSale, setAvailableForSale] = useState<boolean>(
     initialIsAvailableForSale || false
   );
+
   // Handle either creating a new stock if there is no product or filtering the stock by color id
   const [stock, setStock] = useState<Stock[]>(initialStock || []);
 
