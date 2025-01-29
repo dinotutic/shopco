@@ -51,22 +51,32 @@ export interface Product {
   topSelling: boolean;
 }
 
-export interface ProductHandleSubmitProps {
+export interface OrderItem {
+  id: number;
+  productId: number;
+  product: Product;
+  colorId: number;
+  color: Color;
+  size: string;
+  quantity: number;
+  price: number;
+  orderId: number;
+}
+
+export interface Order {
+  id: number;
+  totalInCents: number;
+  createdAt: Date;
+  items: OrderItem[];
+  user: User;
+  userId: number;
+}
+
+export interface User {
+  id: number;
+  email: string;
+  password?: string;
   name: string;
-  description: string;
-  details: string;
-  stock: {
-    size: string;
-    quantity: number;
-    color: { name: string; id: number };
-  }[];
-  priceInCents: number;
-  isAvailable: boolean;
-  topSelling: boolean;
-  newArrival: boolean;
-  sale: number;
-  gender: Gender;
-  category: Category;
-  style: Style;
-  images: Image[];
+  createdAt: Date;
+  updatedAt: Date;
 }

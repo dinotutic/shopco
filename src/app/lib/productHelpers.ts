@@ -1,21 +1,21 @@
 import { Color } from "@prisma/client";
 import { Image, Stock } from "../admin/_components/shared.types";
 
-const createDefaultStock = (selectedColor: Color, stock?: Stock[]) => {
-  const defaultStock: Stock[] = [];
-  const sizes = ["XS", "S", "M", "L", "XL"];
-  sizes.forEach((size, index) => {
-    const existingStock = stock?.find((item) => item.size === size);
-    defaultStock.push({
-      id: index,
-      color: { id: selectedColor.id, name: selectedColor.name },
-      productId: -10,
-      size,
-      quantity: existingStock ? existingStock.quantity : 0,
-    });
-  });
-  return defaultStock;
-};
+// const createDefaultStock = (selectedColor: Color, stock?: Stock[]) => {
+//   const defaultStock: Stock[] = [];
+//   const sizes = ["XS", "S", "M", "L", "XL"];
+//   sizes.forEach((size, index) => {
+//     const existingStock = stock?.find((item) => item.size === size);
+//     defaultStock.push({
+//       id: index,
+//       color: { id: selectedColor.id, name: selectedColor.name },
+//       productId: -10,
+//       size,
+//       quantity: existingStock ? existingStock.quantity : 0,
+//     });
+//   });
+//   return defaultStock;
+// };
 
 // export const initializeStock = (
 //   mode: "create" | "edit",
@@ -73,11 +73,3 @@ export const removeDuplicatesInArr = (array: any[], key: any) => {
     return !duplicate;
   });
 };
-// export const removeDuplicatesInArr = (array: any[]) => {
-//   const seen = new Set();
-//   return array.filter((item) => {
-//     const duplicate = seen.has(item.id);
-//     seen.add(item.id);
-//     return !duplicate;
-//   });
-// };

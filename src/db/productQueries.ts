@@ -360,6 +360,7 @@ export async function deleteStock(stock: Stock[]) {
     console.error("Error deleting stock items:", error);
   }
 }
+
 export async function getCategories() {
   const categories = await prisma.category.findMany();
   return categories;

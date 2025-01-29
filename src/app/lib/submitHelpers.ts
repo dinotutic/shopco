@@ -8,10 +8,28 @@ import {
   processImagesArray,
   removeDuplicatesInArr,
 } from "@/app/lib/productHelpers";
-import {
-  Color,
-  ProductHandleSubmitProps,
-} from "../admin/_components/shared.types";
+import { Color, Image, Style } from "../admin/_components/shared.types";
+import { Category, Gender } from "@prisma/client";
+
+export interface ProductHandleSubmitProps {
+  name: string;
+  description: string;
+  details: string;
+  stock: {
+    size: string;
+    quantity: number;
+    color: { name: string; id: number };
+  }[];
+  priceInCents: number;
+  isAvailable: boolean;
+  topSelling: boolean;
+  newArrival: boolean;
+  sale: number;
+  gender: Gender;
+  category: Category;
+  style: Style;
+  images: Image[];
+}
 
 export const handleSubmitCreate = async (
   e: { preventDefault: () => void },
