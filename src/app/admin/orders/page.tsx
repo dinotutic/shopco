@@ -16,6 +16,3 @@ export const AdminOrdersPage = async () => {
 };
 
 export default AdminOrdersPage;
-
-// ToDo: If someone buys a product at 20€ and the product's price is then changed. How does it affect already existing orders?
-// Important! The price of the product in the order should not change.
