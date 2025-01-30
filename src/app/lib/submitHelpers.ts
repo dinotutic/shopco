@@ -16,9 +16,12 @@ export interface ProductHandleSubmitProps {
   description: string;
   details: string;
   stock: {
+    productId?: number;
     size: string;
     quantity: number;
-    color: { name: string; id: number };
+    color: Color;
+    isNew?: boolean;
+    toDelete?: boolean;
   }[];
   priceInCents: number;
   isAvailable: boolean;
@@ -55,43 +58,35 @@ export const handleSubmitEdit = async (
   selectedColor: Color
 ) => {
   e.preventDefault();
-  console.log("stock", data.stock);
 
   // Define sizes
   const sizes = ["XS", "S", "M", "L", "XL"];
 
-  // Finds colors to add and creates a new empty stock for those colors
+  // Finds colors that are new and creates a new empty stock for those colors
   const newColors = availableColors.filter(
     (color) => !data.stock.some((stock) => stock.color.id === color.id)
   );
-
   const newStock = newColors.flatMap((color) =>
     sizes.map((size) => ({
       size,
       quantity: 0,
       color: color,
       productId: id || 0,
+      isNew: true,
     }))
   );
-  console.log("newStock", newStock);
-
-  // Determine colors to be removed and remove duplicates from array
-  const colorsToRemove = removeDuplicatesInArr(
-    data.stock.filter(
-      (stock) => !availableColors.some((color) => color.id === stock.color.id)
-    ),
-    "colorId"
-  );
-  // console.log("colorsToRemove", colorsToRemove);
-  // console.log("colorsToAdd", newColors);
-  // console.log("data.stock", data.stock);
-
   data.stock = [...data.stock, ...newStock];
-  console.log("data.stock", data.stock);
-  const imagesToDelete = processImagesArray(data.images, "delete") || [];
-  console.log("colorsToRemove", colorsToRemove);
+
+  // Find colors to be removed and mark them for deletion
+  data.stock.forEach((item) => {
+    item.toDelete = !availableColors.some(
+      (color) => color.id === item.color.id
+    );
+  });
 
   // Delete images in S3 and DB
+  const imagesToDelete = processImagesArray(data.images, "delete") || [];
+
   await Promise.all(
     imagesToDelete.map(async (image) => {
       if (image.url) {
@@ -102,11 +97,9 @@ export const handleSubmitEdit = async (
 
   try {
     const updatedProduct = await editProduct(id, data, selectedColor);
-    await deleteStock(colorsToRemove);
     console.log("Product updated successfully:", updatedProduct);
   } catch (error) {
     console.error("Error updating product:", error);
   }
-
   window.location.reload();
 };
