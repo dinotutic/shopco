@@ -203,6 +203,8 @@ export async function editProduct(
       size: string;
       quantity: number;
       color: { name: string; id: number };
+      toDelete?: boolean;
+      isNew?: boolean;
     }[];
     priceInCents?: number;
     isAvailable?: boolean;
@@ -273,17 +275,12 @@ export async function editProduct(
       },
     },
   });
-  console.log("-----------------------------------------------------");
-  console.log("selectedColors", selectedColor);
-  console.log("-----------------------------------------------------");
 
   // Sort stock for the current selected color
   const selectedStock = data.stock.filter(
     (item) => item.color.id === selectedColor.id
   );
-  console.log("-----------------------------------------------------");
-  console.log("selectedStock", selectedStock);
-  console.log("-----------------------------------------------------");
+
   await Promise.all(
     selectedStock.map((item) =>
       prisma.stock.updateMany({
@@ -299,12 +296,8 @@ export async function editProduct(
     )
   );
 
-  // Take leftover colors and create empty stock for them
-  const newColors = data.stock.filter((item) => !item.id);
-  console.log("-----------------------------------------------------");
-  console.log("newColors", newColors);
-  console.log("-----------------------------------------------------");
-
+  // Take new colors and create empty stock for them
+  const newColors = data.stock.filter((item) => item.isNew);
   await Promise.all(
     newColors.map(async (item) => {
       try {
@@ -335,18 +328,30 @@ export async function editProduct(
       }
     })
   );
+
+  // Take colors marked for deletion and delete them
+  const colorsToDelete = data.stock.filter((item) => item.toDelete);
   await Promise.all(
-    newColors.map((item) => {
-      prisma.stock.create({
-        data: {
-          size: item.size,
-          quantity: item.quantity,
-          product: { connect: { id } },
-          color: { connect: { id: item.color.id } },
-        },
-      });
+    colorsToDelete.map(async (item) => {
+      try {
+        await prisma.stock.deleteMany({
+          where: {
+            productId: id,
+            colorId: item.color.id,
+          },
+        });
+        console.log(
+          `Stock deleted successfully for productId: ${id}, colorId: ${item.color.id}`
+        );
+      } catch (error) {
+        console.error(
+          `Error deleting stock for productId: ${id}, colorId: ${item.color.id}`,
+          error
+        );
+      }
     })
   );
+
   return updatedProduct;
 }
 
