@@ -49,7 +49,7 @@ export default function ProductForm({
     stock: initialStock,
     gender: initialGender,
   } = product || {};
-  console.log(product);
+
   const [selectedColor, setSelectedColor] = useState<Color>(color || colors[0]);
   const [name, setName] = useState<string>(initialName || "");
   const [description, setDescription] = useState<string>(
@@ -59,7 +59,6 @@ export default function ProductForm({
   const [priceInCents, setPriceInCents] = useState<number>(
     initialPriceInCents || 0
   );
-
   const [gender, setGender] = useState<Gender>(initialGender || genders[0]);
   const [sale, setSale] = useState<number>(initialSale || 0);
   const [newArrival, setNewArrival] = useState<boolean>(
@@ -73,20 +72,19 @@ export default function ProductForm({
     initialCategory || categories[0]
   );
   const [images, setImages] = useState<Image[]>(initialImages || []);
-
   const initialAvailableColors = removeDuplicatesInArr(
     (initialStock || []).map((item) => item.color),
     "id"
   );
-
-  const [availableColors, setAvailableColors] = useState<Color[]>(
-    initialAvailableColors
-  );
   const [availableForSale, setAvailableForSale] = useState<boolean>(
     initialIsAvailableForSale || false
   );
-
-  // Handle either creating a new stock if there is no product or filtering the stock by color id
+  const [availableColors, setAvailableColors] = useState<Color[]>(
+    initialAvailableColors
+  );
+  // const selectedColorStock = initialStock?.filter(
+  //   (item) => item.color.id === selectedColor.id
+  // );
   const [stock, setStock] = useState<Stock[]>(initialStock || []);
 
   const [isEditing, setIsEditing] = useState<boolean>(
@@ -123,7 +121,7 @@ export default function ProductForm({
     };
 
     if (mode === "edit" && product) {
-      handleSubmitEdit(e, data, product.id, availableColors);
+      handleSubmitEdit(e, data, product.id, availableColors, selectedColor);
     } else if (mode === "create") {
       const newProd = await handleSubmitCreate(e, data);
       if (newProd) {

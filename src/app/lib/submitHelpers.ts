@@ -51,27 +51,19 @@ export const handleSubmitEdit = async (
   e: { preventDefault: () => void },
   data: ProductHandleSubmitProps,
   id: number,
-  availableColors: Color[]
+  availableColors: Color[],
+  selectedColor: Color
 ) => {
   e.preventDefault();
+  console.log("stock", data.stock);
 
   // Define sizes
   const sizes = ["XS", "S", "M", "L", "XL"];
 
-  // Determine colors to add
+  // Finds colors to add and creates a new empty stock for those colors
   const newColors = availableColors.filter(
     (color) => !data.stock.some((stock) => stock.color.id === color.id)
   );
-
-  // Determine colors to be removed and remove duplicates from array
-  const colorsToRemove = removeDuplicatesInArr(
-    data.stock.filter(
-      (stock) => !availableColors.some((color) => color.id === stock.color.id)
-    ),
-    "colorId"
-  );
-  console.log("newcolors", newColors);
-  console.log("colorsToRemove", colorsToRemove);
 
   const newStock = newColors.flatMap((color) =>
     sizes.map((size) => ({
@@ -81,10 +73,24 @@ export const handleSubmitEdit = async (
       productId: id || 0,
     }))
   );
+  console.log("newStock", newStock);
+
+  // Determine colors to be removed and remove duplicates from array
+  const colorsToRemove = removeDuplicatesInArr(
+    data.stock.filter(
+      (stock) => !availableColors.some((color) => color.id === stock.color.id)
+    ),
+    "colorId"
+  );
+  // console.log("colorsToRemove", colorsToRemove);
+  // console.log("colorsToAdd", newColors);
+  // console.log("data.stock", data.stock);
 
   data.stock = [...data.stock, ...newStock];
-
+  console.log("data.stock", data.stock);
   const imagesToDelete = processImagesArray(data.images, "delete") || [];
+  console.log("colorsToRemove", colorsToRemove);
+
   // Delete images in S3 and DB
   await Promise.all(
     imagesToDelete.map(async (image) => {
@@ -95,7 +101,7 @@ export const handleSubmitEdit = async (
   );
 
   try {
-    const updatedProduct = await editProduct(id, data);
+    const updatedProduct = await editProduct(id, data, selectedColor);
     await deleteStock(colorsToRemove);
     console.log("Product updated successfully:", updatedProduct);
   } catch (error) {

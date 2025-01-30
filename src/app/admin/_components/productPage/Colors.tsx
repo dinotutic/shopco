@@ -9,6 +9,7 @@ interface ColorsProps {
   setAvailableColors: React.Dispatch<React.SetStateAction<Color[]>>;
   selectedColor: Color;
   setSelectedColor?: React.Dispatch<React.SetStateAction<Color>>;
+  setColorsToRemove?: React.Dispatch<React.SetStateAction<Color[]>>;
   mode: "create" | "edit";
 }
 
@@ -20,7 +21,6 @@ const Colors: React.FC<ColorsProps> = ({
   setAvailableColors,
   selectedColor,
   setSelectedColor,
-
   mode,
 }) => {
   const router = useRouter();
@@ -44,7 +44,7 @@ const Colors: React.FC<ColorsProps> = ({
       }
     }
   };
-  console.log("selectedColor", selectedColor);
+
   return (
     <div className="mb-4 flex flex-col">
       <label className="text-sm font-medium text-gray-700">

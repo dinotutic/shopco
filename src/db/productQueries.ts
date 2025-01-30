@@ -3,7 +3,8 @@
 import { Category, Gender, Stock, Style } from "@prisma/client";
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
-import { Image } from "@/app/admin/_components/shared.types";
+import { Color, Image } from "@/app/admin/_components/shared.types";
+import { undefined } from "zod";
 
 export async function getAllProducts() {
   const products = await prisma.product.findMany({
@@ -198,6 +199,7 @@ export async function editProduct(
     description?: string;
     details: string;
     stock: {
+      id?: number;
       size: string;
       quantity: number;
       color: { name: string; id: number };
@@ -211,7 +213,8 @@ export async function editProduct(
     category?: Category;
     style?: Style;
     images?: Image[];
-  }
+  },
+  selectedColor: Color
 ) {
   // Turn images into files to upload
   const newImages: File[] = (data.images || []).reduce((acc: File[], image) => {
@@ -270,40 +273,80 @@ export async function editProduct(
       },
     },
   });
+  console.log("-----------------------------------------------------");
+  console.log("selectedColors", selectedColor);
+  console.log("-----------------------------------------------------");
 
-  if (Array.isArray(data.stock)) {
-    try {
-      await Promise.all(
-        data.stock.map((item) =>
-          prisma.stock.upsert({
-            where: {
-              productId_colorId_size: {
-                productId: id,
-                size: item.size,
-                colorId: item.color.id,
+  // Sort stock for the current selected color
+  const selectedStock = data.stock.filter(
+    (item) => item.color.id === selectedColor.id
+  );
+  console.log("-----------------------------------------------------");
+  console.log("selectedStock", selectedStock);
+  console.log("-----------------------------------------------------");
+  await Promise.all(
+    selectedStock.map((item) =>
+      prisma.stock.updateMany({
+        where: {
+          productId: id,
+          colorId: item.color.id,
+          size: item.size,
+        },
+        data: {
+          quantity: item.quantity,
+        },
+      })
+    )
+  );
+
+  // Take leftover colors and create empty stock for them
+  const newColors = data.stock.filter((item) => !item.id);
+  console.log("-----------------------------------------------------");
+  console.log("newColors", newColors);
+  console.log("-----------------------------------------------------");
+
+  await Promise.all(
+    newColors.map(async (item) => {
+      try {
+        await prisma.stock.create({
+          data: {
+            size: item.size,
+            quantity: item.quantity,
+            product: {
+              connect: {
+                id,
               },
             },
-            update: {
-              quantity: item.quantity,
+            color: {
+              connect: {
+                id: item.color.id,
+              },
             },
-            create: {
-              productId: id,
-              size: item.size,
-              quantity: item.quantity,
-              colorId: item.color.id,
-            },
-          })
-        )
-      );
-
-      console.log("Stock updated successfully");
-    } catch (error) {
-      console.error("Error updating stock:", error);
-    }
-  } else {
-    console.error("data.stock is not an array or is undefined");
-  }
-
+          },
+        });
+        console.log(
+          `Stock created successfully for productId: ${id}, colorId: ${item.color.id}, size: ${item.size}`
+        );
+      } catch (error) {
+        console.error(
+          `Error creating stock for productId: ${id}, colorId: ${item.color.id}, size: ${item.size}`,
+          error
+        );
+      }
+    })
+  );
+  await Promise.all(
+    newColors.map((item) => {
+      prisma.stock.create({
+        data: {
+          size: item.size,
+          quantity: item.quantity,
+          product: { connect: { id } },
+          color: { connect: { id: item.color.id } },
+        },
+      });
+    })
+  );
   return updatedProduct;
 }
 

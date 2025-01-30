@@ -42,7 +42,6 @@ export default function ProductList({
   styles: Style[];
   genders: Gender[];
 }) {
-  console.log(products);
   const [search, setSearch] = useState<string>("");
   const [sort, setSort] = useState<string>("");
   const [styleFilter, setStyleFilter] = useState<string | null>(null);

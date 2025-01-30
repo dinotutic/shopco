@@ -11,7 +11,6 @@ const OrderPage = async ({ params }: OrderPageParams) => {
   const orderIdNum = Number(orderId);
   const order = await getOrderById(orderIdNum);
   const totalItems = await getTotalItemsInOrder(orderIdNum);
-  console.log("totalItems", totalItems);
 
   if (!order) {
     return <div>Order not found</div>;
