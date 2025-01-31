@@ -1,5 +1,7 @@
 "use server";
 
+// Will definitely have to add some error handling here
+
 import { Category, Gender, Stock, Style } from "@prisma/client";
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
@@ -280,21 +282,25 @@ export async function editProduct(
   const selectedStock = data.stock.filter(
     (item) => item.color.id === selectedColor.id
   );
-
-  await Promise.all(
-    selectedStock.map((item) =>
-      prisma.stock.updateMany({
-        where: {
-          productId: id,
-          colorId: item.color.id,
-          size: item.size,
-        },
-        data: {
-          quantity: item.quantity,
-        },
-      })
-    )
-  );
+  try {
+    await Promise.all(
+      selectedStock.map((item) =>
+        prisma.stock.updateMany({
+          where: {
+            productId: id,
+            colorId: item.color.id,
+            size: item.size,
+          },
+          data: {
+            quantity: item.quantity,
+          },
+        })
+      )
+    );
+    console.log("Stock updated successfully");
+  } catch (error) {
+    console.error("Error updating stock:", error);
+  }
 
   // Take new colors and create empty stock for them
   const newColors = data.stock.filter((item) => item.isNew);
@@ -317,9 +323,6 @@ export async function editProduct(
             },
           },
         });
-        console.log(
-          `Stock created successfully for productId: ${id}, colorId: ${item.color.id}, size: ${item.size}`
-        );
       } catch (error) {
         console.error(
           `Error creating stock for productId: ${id}, colorId: ${item.color.id}, size: ${item.size}`,
@@ -356,58 +359,48 @@ export async function editProduct(
 }
 
 // export async function deleteStock(stock: Stock[]) {
-//   await prisma.stock.deleteMany({
-//     where: {
-//       id: {
-//         in: stock.map((item) => item.id),
+//   const stockIdentifiers = stock.map((item) => ({
+//     productId: item.productId,
+//     colorId: item.colorId,
+//   }));
+//   console.log(
+//     `Attempting to delete stock items with productId and colorId pairs: ${JSON.stringify(
+//       stockIdentifiers
+//     )}`
+//   );
+
+//   try {
+//     // Fetch the records that are about to be deleted
+//     const recordsToDelete = await prisma.stock.findMany({
+//       where: {
+//         OR: stockIdentifiers.map(({ productId, colorId }) => ({
+//           productId,
+//           colorId,
+//         })),
 //       },
-//     },
-//   });
+//     });
+
+//     console.log(
+//       "Records to be deleted:",
+//       JSON.stringify(recordsToDelete, null, 2)
+//     );
+
+//     // Perform the deletion
+//     const result = await prisma.stock.deleteMany({
+//       where: {
+//         OR: stockIdentifiers.map(({ productId, colorId }) => ({
+//           productId,
+//           colorId,
+//         })),
+//       },
+//     });
+
+//     console.log(`Successfully deleted ${result.count} stock items.`);
+//     console.log("Deleted records:", JSON.stringify(recordsToDelete, null, 2));
+//   } catch (error) {
+//     console.error("Error deleting stock items:", error);
+//   }
 // }
-
-export async function deleteStock(stock: Stock[]) {
-  const stockIdentifiers = stock.map((item) => ({
-    productId: item.productId,
-    colorId: item.colorId,
-  }));
-  console.log(
-    `Attempting to delete stock items with productId and colorId pairs: ${JSON.stringify(
-      stockIdentifiers
-    )}`
-  );
-
-  try {
-    // Fetch the records that are about to be deleted
-    const recordsToDelete = await prisma.stock.findMany({
-      where: {
-        OR: stockIdentifiers.map(({ productId, colorId }) => ({
-          productId,
-          colorId,
-        })),
-      },
-    });
-
-    console.log(
-      "Records to be deleted:",
-      JSON.stringify(recordsToDelete, null, 2)
-    );
-
-    // Perform the deletion
-    const result = await prisma.stock.deleteMany({
-      where: {
-        OR: stockIdentifiers.map(({ productId, colorId }) => ({
-          productId,
-          colorId,
-        })),
-      },
-    });
-
-    console.log(`Successfully deleted ${result.count} stock items.`);
-    console.log("Deleted records:", JSON.stringify(recordsToDelete, null, 2));
-  } catch (error) {
-    console.error("Error deleting stock items:", error);
-  }
-}
 
 export async function getCategories() {
   const categories = await prisma.category.findMany();

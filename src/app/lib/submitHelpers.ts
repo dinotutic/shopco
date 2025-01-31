@@ -1,13 +1,9 @@
 import {
   addProduct,
   deleteSingleImage,
-  deleteStock,
   editProduct,
 } from "@/db/productQueries";
-import {
-  processImagesArray,
-  removeDuplicatesInArr,
-} from "@/app/lib/productHelpers";
+import { processImagesArray } from "@/app/lib/productHelpers";
 import { Color, Image, Style } from "../admin/_components/shared.types";
 import { Category, Gender } from "@prisma/client";
 
