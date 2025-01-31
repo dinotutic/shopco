@@ -1,6 +1,5 @@
 "use client";
 
-// NEED TO FIX MY SEED SCRIPT. COLORS NOT INCLUDED IN ORDERS I THINK OR NOT FORWARDED CORRECTLY
 import { useEffect, useState } from "react";
 import { formatCurrency } from "@/app/lib/formatters";
 import Colors from "./Colors";
@@ -11,7 +10,10 @@ import Images from "./Images";
 import Button from "./Button";
 import Timestamp from "./Timestamp";
 import FormButtons from "./FormButtons";
-import { removeDuplicatesInArr } from "@/app/lib/productHelpers";
+import {
+  createEmptyStock,
+  removeDuplicatesInArr,
+} from "@/app/lib/productHelpers";
 import { Gender } from "@prisma/client";
 import { handleSubmitCreate, handleSubmitEdit } from "@/app/lib/submitHelpers";
 
@@ -82,9 +84,6 @@ export default function ProductForm({
   const [availableColors, setAvailableColors] = useState<Color[]>(
     initialAvailableColors
   );
-  // const selectedColorStock = initialStock?.filter(
-  //   (item) => item.color.id === selectedColor.id
-  // );
   const [stock, setStock] = useState<Stock[]>(initialStock || []);
 
   const [isEditing, setIsEditing] = useState<boolean>(
@@ -159,6 +158,7 @@ export default function ProductForm({
           setStock={setStock}
           isEditing={isEditing}
           selectedColor={selectedColor}
+          mode={mode}
         />
         <FormField
           label="Price (in cents)"

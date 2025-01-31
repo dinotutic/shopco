@@ -20,11 +20,12 @@ export interface Category {
 }
 
 export interface Stock {
-  id: number;
-  productId: number;
+  id?: number;
+  productId?: number;
   size: string;
   quantity: number;
   color: Color;
+  isNew?: boolean;
 }
 
 export interface Color {

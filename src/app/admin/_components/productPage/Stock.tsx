@@ -1,10 +1,13 @@
+import { createEmptyStock, updateStockColor } from "@/app/lib/productHelpers";
 import { Color, Stock } from "../shared.types";
+import { useEffect } from "react";
 
 interface StockRenderProps {
   stock: Stock[];
   isEditing: boolean;
   setStock: React.Dispatch<React.SetStateAction<Stock[]>>;
   selectedColor: Color;
+  mode: "create" | "edit";
 }
 
 const StockRender: React.FC<StockRenderProps> = ({
@@ -12,17 +15,33 @@ const StockRender: React.FC<StockRenderProps> = ({
   isEditing,
   setStock,
   selectedColor,
+  mode,
 }) => {
+  // Hardoce stock order because it gets mixed up for some reason
   const stockSizeOrder = ["XS", "S", "M", "L", "XL"];
 
   // Sort by size
   const sortedStock = [...stock].sort((a, b) => {
     return stockSizeOrder.indexOf(a.size) - stockSizeOrder.indexOf(b.size);
   });
+
   // Show only for selected color
-  const filteredStock = stock.filter(
+  const filteredStock = sortedStock.filter(
     (item) => item.color.id === selectedColor.id
   );
+
+  // Checks if stock is empty.
+  // If yes, creates a new empty stock object.
+  // If not, uses the existing stock with a new color
+  useEffect(() => {
+    if (mode === "create" && stock.every((item) => item.quantity === 0)) {
+      const newStock = createEmptyStock(selectedColor);
+      setStock(newStock);
+    } else if (mode === "create" && stock.some((item) => item.quantity > 0)) {
+      const newStock = updateStockColor(selectedColor, stock);
+      setStock(newStock);
+    }
+  }, [selectedColor]);
 
   const handleStockChange = (size: string, quantity: number) => {
     const newStock = stock.map((item) =>
