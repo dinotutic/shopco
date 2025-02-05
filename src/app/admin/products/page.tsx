@@ -17,9 +17,12 @@ export default async function AdminProductsPage() {
     <>
       <div className="w-full flex justify-between items-center">
         <PageHeader>Products</PageHeader>
-        <button className="border rounded-2xl p-4 bg-secondaryBackground text-secondaryText mx-4 ">
-          <Link href="/admin/products/add-product">Add Product</Link>
-        </button>
+        <Link
+          className="border rounded-2xl p-4 bg-secondaryBackground text-secondaryText mx-4 "
+          href="/admin/products/add-product"
+        >
+          Add Product
+        </Link>
       </div>
       <ProductList
         products={products}
