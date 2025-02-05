@@ -3,68 +3,53 @@ import React, { useState } from "react";
 import OrdersActions from "./OrdersActions";
 import TableComponent from "../TableComponent";
 import { formatCurrency } from "@/app/lib/formatters";
-import { OrderItem, User } from "../shared.types";
+import { Order } from "../shared.types";
+import { filterOrders } from "@/app/lib/filterUtil";
+import { sortOrders } from "@/app/lib/sortUtils";
+import SortComponent from "../SortComponent";
+import SearchComponent from "../SearchComponent";
 
-export type OrderProps = {
-  id: number;
-  totalInCents: number;
-  createdAt: Date;
-  items: OrderItem[];
-  user: User;
-  userId: number;
-};
-
-const OrdersList = ({ orders }: { orders: OrderProps[] }) => {
-  // I dont like the way I filter stuff. Will redo this sometime later
-
+interface OrderProps {
+  orders: Order[];
+}
+const OrdersList = ({ orders }: OrderProps) => {
   const [search, setSearch] = useState<string>("");
   const [sort, setSort] = useState<string>("");
 
-  const filteredOrders = orders.filter((order) => {
-    const matchesSearchFilter = order.user.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    return matchesSearchFilter;
-  });
-
-  const sortedOrders = filteredOrders.sort((a, b) => {
-    if (sort === "priceAsc") {
-      return a.totalInCents - b.totalInCents;
-    }
-    if (sort === "priceDesc") {
-      return b.totalInCents - a.totalInCents;
-    }
-    if (sort === "dateAsc") {
-      return a.createdAt.getTime() - b.createdAt.getTime();
-    }
-    if (sort === "dateDesc") {
-      return b.createdAt.getTime() - a.createdAt.getTime();
-    }
-    return 0;
-  });
+  const filteredOrders = filterOrders(orders, search);
+  const sortedOrders = sortOrders(filteredOrders, sort);
 
   const tableHeaders = [
-    { id: "id", label: "ID", render: (row: OrderProps) => row.id },
+    { id: "id", label: "ID", render: (row: Order) => row.id },
     {
       id: "customer",
       label: "Customer",
-      render: (row: OrderProps) => row.user.name,
+      render: (row: Order) => row.user.name,
     },
     {
       id: "total",
       label: "Total",
-      render: (row: OrderProps) => formatCurrency(row.totalInCents),
+      render: (row: Order) => formatCurrency(row.totalInCents),
     },
     {
       id: "date",
       label: "Date",
-      render: (row: OrderProps) => row.createdAt.toLocaleDateString("de-DE"),
+      render: (row: Order) => row.createdAt.toLocaleDateString("de-DE"),
     },
     {
       id: "actions",
       label: "Actions",
-      render: (row: OrderProps) => <OrdersActions orderId={row.id} />,
+      render: (row: Order) => <OrdersActions orderId={row.id} />,
     },
+  ];
+  const sortOptions = [
+    {
+      label: "Total: Low to High",
+      value: "totalAsc",
+    },
+    { label: "Total: High to Low", value: "totalDesc" },
+    { label: "Date: Old to New", value: "dateAsc" },
+    { label: "Date: New to Old", value: "dateDesc" },
   ];
 
   return (
@@ -72,24 +57,17 @@ const OrdersList = ({ orders }: { orders: OrderProps[] }) => {
       <div className="flex my-8 justify-between items-center">
         <h1 className="text-xl text-gray-500">Filters:</h1>
         <div className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Search by name"
+          <SearchComponent
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border p-2 rounded-xl"
+            onChange={setSearch}
+            placeholder="Search by name"
           />
-          <select
+          <SortComponent
+            options={sortOptions}
             value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="border p-2 rounded-xl"
-          >
-            <option value="">Sort by</option>
-            <option value="priceAsc">Price: Low to High</option>
-            <option value="priceDesc">Price: High to Low</option>
-            <option value="dateAsc">Date: Old to New</option>
-            <option value="dateDesc">Date: New To Old</option>
-          </select>
+            onChange={setSort}
+            placeholder="Sort by"
+          />
         </div>
       </div>
       <TableComponent data={sortedOrders} headers={tableHeaders} />

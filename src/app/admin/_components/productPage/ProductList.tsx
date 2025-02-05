@@ -2,26 +2,27 @@
 
 import { useState } from "react";
 import Actions from "./Actions";
-import { Category, Color, Gender, Style } from "@prisma/client";
+import { Category, Gender, Style } from "@prisma/client";
 import TableComponent from "../TableComponent";
-import { ro } from "@faker-js/faker";
 import FilterComponent from "../FilterComponent";
 import { Product } from "../shared.types";
 import { sortProducts } from "@/app/lib/sortUtils";
 import SortComponent from "../SortComponent";
 import SearchComponent from "../SearchComponent";
+import { filterProducts } from "@/app/lib/filterUtil";
 
+interface ProductListProps {
+  products: Product[];
+  categories: Category[];
+  styles: Style[];
+  genders: Gender[];
+}
 export default function ProductList({
   products,
   categories,
   styles,
   genders,
-}: {
-  products: Product[];
-  categories: Category[];
-  styles: Style[];
-  genders: Gender[];
-}) {
+}: ProductListProps) {
   const [search, setSearch] = useState<string>("");
   const [sort, setSort] = useState<string>("");
   const [styleFilter, setStyleFilter] = useState<string | null>(null);
@@ -31,27 +32,15 @@ export default function ProductList({
   );
   const [genderFilter, setGenderFilter] = useState<string | null>(null);
 
-  const filteredProducts = products.filter((product) => {
-    const matchesNameFilter = product.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesAvailability =
-      availabilityFilter === null || product.isAvailable === availabilityFilter;
-    const matchesCategory =
-      categoryFilter === null || product.category.name === categoryFilter;
-    const matchesStyle =
-      styleFilter === null || product.style.name === styleFilter;
-    const matchesGender =
-      genderFilter === null || product.gender.name === genderFilter;
+  const filteredProducts = filterProducts(
+    products,
+    search,
+    availabilityFilter,
+    categoryFilter,
+    styleFilter,
+    genderFilter
+  );
 
-    return (
-      matchesNameFilter &&
-      matchesAvailability &&
-      matchesCategory &&
-      matchesStyle &&
-      matchesGender
-    );
-  });
   const sortedProducts = sortProducts(filteredProducts, sort);
 
   const tableHaders = [
@@ -135,13 +124,6 @@ export default function ProductList({
             onChange={setSearch}
             placeholder="Search by name"
           />
-          {/* <input
-            type="text"
-            placeholder="Search by name"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border p-2 rounded-xl"
-          /> */}
           <SortComponent
             options={sortOptions}
             placeholder="Sort by"
