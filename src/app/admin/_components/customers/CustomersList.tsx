@@ -3,29 +3,20 @@ import { User } from "@prisma/client";
 import { CustomerActions } from "./CustomerActions";
 import { useState } from "react";
 import TableComponent from "../TableComponent";
+import SearchComponent from "../SearchComponent";
+import SortComponent from "../SortComponent";
+import { filterCustomers } from "@/app/lib/filterUtil";
+import { sortCustomers } from "@/app/lib/sortUtils";
 
-const CustomersList = ({ customers }: { customers: User[] }) => {
-  // Will redo sorting and filtering. Dont like it
-
+interface CustomerListProps {
+  customers: User[];
+}
+const CustomersList = ({ customers }: CustomerListProps) => {
   const [search, setSearch] = useState<string>("");
   const [sort, setSort] = useState<string>("");
 
-  const filteredCustomers = customers.filter((customer) => {
-    const matchesSearchFilter = customer.name
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    return matchesSearchFilter;
-  });
-
-  const sortedCustomers = filteredCustomers.sort((a, b) => {
-    if (sort === "memberSinceAsc") {
-      return a.createdAt.getTime() - b.createdAt.getTime();
-    }
-    if (sort === "memberSinceDesc") {
-      return b.createdAt.getTime() - a.createdAt.getTime();
-    }
-    return 0;
-  });
+  const filteredCustomers = filterCustomers(customers, search);
+  const sortedCustomers = sortCustomers(filteredCustomers, sort);
 
   const tableHeaders = [
     {
@@ -54,27 +45,33 @@ const CustomersList = ({ customers }: { customers: User[] }) => {
       render: (row: User) => <CustomerActions customerId={row.id} />,
     },
   ];
+
+  const sortOptions = [
+    {
+      label: "Member since: Old to New",
+      value: "memberSinceAsc",
+    },
+    {
+      label: "Member since: New to Old",
+      value: "memberSinceDesc",
+    },
+  ];
   return (
     <div className="overflow-x-auto">
       <div className="flex my-8 justify-between items-center">
         <h1 className="text-xl text-gray-500">Filters:</h1>
         <div className="flex gap-4">
-          <input
-            type="text"
-            placeholder="Search by name"
+          <SearchComponent
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="border p-2 rounded-xl"
+            onChange={setSearch}
+            placeholder="Search by name"
           />
-          <select
+          <SortComponent
             value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="border p-2 rounded-xl"
-          >
-            <option value="">Sort by</option>
-            <option value="memberSinceAsc">Member since: Old to New</option>
-            <option value="memberSinceDesc">Member since: New to Old</option>
-          </select>
+            onChange={setSort}
+            options={sortOptions}
+            placeholder="Sort by"
+          />
         </div>
       </div>
       <TableComponent headers={tableHeaders} data={sortedCustomers} />
