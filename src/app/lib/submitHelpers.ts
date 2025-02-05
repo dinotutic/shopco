@@ -1,9 +1,13 @@
 import {
   addProduct,
+  deleteColorImages,
   deleteSingleImage,
   editProduct,
 } from "@/db/productQueries";
-import { processImagesArray } from "@/app/lib/productHelpers";
+import {
+  processImagesArray,
+  removeDuplicatesInArr,
+} from "@/app/lib/productHelpers";
 import { Color, Image, Style } from "../admin/_components/shared.types";
 import { Category, Gender } from "@prisma/client";
 
@@ -73,16 +77,31 @@ export const handleSubmitEdit = async (
   );
   data.stock = [...data.stock, ...newStock];
 
-  // Find colors to be removed and mark them for deletion
+  // Find and mark colors to be removed and mark them for deletion
   data.stock.forEach((item) => {
     item.toDelete = !availableColors.some(
       (color) => color.id === item.color.id
     );
   });
 
-  // Delete images in S3 and DB
-  const imagesToDelete = processImagesArray(data.images, "delete") || [];
+  // Array of colorsIds to delete. It will be used to remove entire folder in s3.
+  // S3 folder structure: product/images/{productId}/{colorId}/{image.name}
+  const colorsToDelete = removeDuplicatesInArr(
+    data.stock
+      .filter((stock) => stock.toDelete)
+      .map((stock) => stock.color.name)
+  );
+  console.log(colorsToDelete);
 
+  // Delete all images of that color from s3
+  await Promise.all(
+    colorsToDelete.map(async (color: string) => {
+      await deleteColorImages(id, color);
+    })
+  );
+  // // Delete images in S3 and DB
+  const imagesToDelete = processImagesArray(data.images, "delete") || [];
+  console.log("images teo delete in submitHelpers", imagesToDelete);
   await Promise.all(
     imagesToDelete.map(async (image) => {
       if (image.url) {

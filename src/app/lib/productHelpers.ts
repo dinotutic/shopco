@@ -37,7 +37,11 @@ export const updateStockColor = (selectedColor: Color, stock: Stock[]) => {
   }));
 };
 
-export const removeDuplicatesInArr = (array: any[], key: any) => {
+export const removeDuplicatesInArr = (array: any[], key?: any) => {
+  if (key === undefined) {
+    return Array.from(new Set(array));
+  }
+
   const seen = new Set();
   return array.filter((item) => {
     const duplicate = seen.has(item[key]);
@@ -45,6 +49,14 @@ export const removeDuplicatesInArr = (array: any[], key: any) => {
     return !duplicate;
   });
 };
+// export const removeDuplicatesInArr = (array: any[], key: any) => {
+//   const seen = new Set();
+//   return array.filter((item) => {
+//     const duplicate = seen.has(item[key]);
+//     seen.add(item[key]);
+//     return !duplicate;
+//   });
+// };
 
 // export const filterImagesByColor = (images: Image[], color: Color) => {
 //   console.log("helper images", images);

@@ -93,6 +93,8 @@ export async function addProduct(data: {
   style: Style;
   images: Image[];
 }) {
+  //  data.stock[0].color because there is always only 1 color when creating a product
+  const selectedColor = data.stock[0].color;
   const imagesToUpload: File[] = data.images.reduce((acc: File[], image) => {
     if (image.file) {
       acc.push(image.file);
@@ -156,7 +158,7 @@ export async function addProduct(data: {
     }
     const arrayBuffer = await image.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    const key = `products/images/${newProductId}/${image.name}`;
+    const key = `products/images/${newProductId}/${selectedColor.name}/${image.name}`;
     const imageUrl = await uploadFile(key, buffer, image.type);
     if (typeof imageUrl === "string") {
       imageUrls.push(imageUrl);
@@ -166,10 +168,9 @@ export async function addProduct(data: {
     where: { id: newProductId },
     data: {
       images: {
-        // I can use data.stock[0].color.id because there is always only 1 color when creating a product
         create: imageUrls.map((image) => ({
           url: image,
-          color: { connect: { id: data.stock[0].color.id } },
+          color: { connect: { id: selectedColor.id } },
         })),
       },
     },
@@ -240,7 +241,7 @@ export async function editProduct(
       }
       const arrayBuffer = await image.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
-      const key = `products/images/${id}/${image.name}`;
+      const key = `products/images/${id}/${selectedColor.name}/${image.name}`;
       const imageUrl = await uploadFile(key, buffer, image.type);
       if (typeof imageUrl === "string") {
         return { url: imageUrl };
@@ -436,9 +437,20 @@ export async function deleteSingleImage(productId: number, key: string) {
   // expected key = https://shopco-project.s3.eu-north-1.amazonaws.com/products/images/97/green thing.png
   try {
     const location = key.split("amazonaws.com/")[1];
-    await deleteFile(location);
+    // If the image is not from s3, do not run "deleteFile" or else it deletes everything
+    if (!key.includes("https://loremflickr.com/")) {
+      await deleteFile(location);
+    }
     await prisma.image.deleteMany({ where: { productId, url: key } });
   } catch (error) {
     throw new Error("Error deleting image");
   }
+}
+
+export async function deleteColorImages(productId: number, colorName: string) {
+  const location = `products/images/${productId}/${colorName}`;
+  await deleteFile(location);
+  await prisma.image.deleteMany({
+    where: { productId, color: { name: colorName } },
+  });
 }
