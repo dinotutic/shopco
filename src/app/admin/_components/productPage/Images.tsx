@@ -1,10 +1,12 @@
-import { Image, Product } from "../shared.types";
+// import { filterImagesByColor } from "@/app/lib/productHelpers";
+import { Color, Image, Product } from "../shared.types";
 
 interface ImagesProps {
   isEditing: boolean;
   images: Image[];
   product?: Product;
   setImages: React.Dispatch<React.SetStateAction<Image[]>>;
+  // selectedColor: Color;
 }
 
 const Images: React.FC<ImagesProps> = ({
@@ -12,7 +14,10 @@ const Images: React.FC<ImagesProps> = ({
   images,
   product,
   setImages,
+  // selectedColor,
 }) => {
+  // const filteredImagesByColor = filterImagesByColor(images, selectedColor);
+
   const handleMarkImagesToAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
     const imageFiles = Array.from(e.target.files || []);
     const previews = imageFiles.map((file) => ({
@@ -95,7 +100,7 @@ const RenderImage: React.FC<RenderImageProps> = ({
       />
       {isEditing && (
         <button
-          onClick={(e) => handleMarkImageForDeletion(e, image.url)}
+          onClick={(e) => image.url && handleMarkImageForDeletion(e, image.url)}
           key={`button ${index}`}
           className="absolute top-0 right-0 bg-red-500 text-white px-2 rounded-full text-md"
         >

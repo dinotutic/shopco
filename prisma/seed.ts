@@ -47,8 +47,8 @@ async function main() {
     });
     users.push(user);
   }
-  // Add Colors
 
+  // Add Colors
   const colors = await prisma.color.createMany({
     data: [
       { name: "Black" },
@@ -80,7 +80,6 @@ async function main() {
   };
 
   // Create a gender list
-
   const genderList = [
     { id: 1, name: "Male" },
     { id: 2, name: "Female" },
@@ -91,11 +90,13 @@ async function main() {
       data: gender,
     });
   }
+
   // Create products
   const products = [];
   for (let i = 0; i < 50; i++) {
     const colorIndexes = getColorIndexes();
     const stockEntries = [];
+    const images = []; // IMAGES ----------------IMAGES ----------------IMAGES ----------------
     for (const size of availableSizes) {
       for (const colorIndex of colorIndexes) {
         stockEntries.push({
@@ -109,6 +110,16 @@ async function main() {
         });
       }
     }
+    // Create 3 images for each color
+    for (const colorIndex of colorIndexes) {
+      for (let j = 0; j < 3; j++) {
+        images.push({
+          url: faker.image.urlLoremFlickr(),
+          color: { connect: { id: colorsList[colorIndex].id } },
+        });
+      }
+    }
+
     console.log(`Creating product ${i + 1}`);
     const product = await prisma.product.create({
       data: {
@@ -126,13 +137,12 @@ async function main() {
             id: styles[Math.floor(Math.random() * styles.length)].id,
           },
         },
-        images: {
-          create: [
-            { url: faker.image.urlLoremFlickr() },
-            { url: faker.image.urlLoremFlickr() },
-            { url: faker.image.urlLoremFlickr() },
-          ],
-        },
+        images: { create: images },
+        // create: [
+        //   { url: faker.image.urlLoremFlickr() },
+        //   { url: faker.image.urlLoremFlickr() },
+        //   { url: faker.image.urlLoremFlickr() },
+        // ],
         stock: {
           create: stockEntries,
         },

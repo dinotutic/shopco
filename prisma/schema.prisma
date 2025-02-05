@@ -46,6 +46,7 @@ model Color{
   name        String
   orderItems  OrderItem[]
   stock       Stock[]
+  image       Image[]
 }
 
 model Stock {
@@ -64,6 +65,8 @@ model Image {
   url         String
   product     Product   @relation(fields: [productId], references: [id])
   productId   Int
+  colorId     Int
+  color       Color     @relation(fields: [colorId], references: [id])
 }
 
 

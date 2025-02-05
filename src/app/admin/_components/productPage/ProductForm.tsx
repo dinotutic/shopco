@@ -251,6 +251,7 @@ export default function ProductForm({
           images={images}
           product={product}
           setImages={setImages}
+          // selectedColor={selectedColor}
         />
         {mode === "edit" && product && (
           <div className="mb-4">
