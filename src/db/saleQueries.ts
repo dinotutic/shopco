@@ -9,9 +9,9 @@ export const getAllSales = async () => {
             include: {
               category: true,
               style: true,
-              images: true,
+              images: { include: { color: true } },
               gender: true,
-              stock: true,
+              stock: { include: { color: true } },
             },
           },
           color: true,
