@@ -31,3 +31,8 @@ export default async function AdminDashboard() {
     </div>
   );
 }
+
+// ToDo:
+// Need to click on Add Product a few times for the page to finally open. Button doesnt work sometimes.
+// Ask Zlatko why the fuck did wrapping <Link> with a button cause the button to not work sometimes???
+// Data validation for editing/creating products

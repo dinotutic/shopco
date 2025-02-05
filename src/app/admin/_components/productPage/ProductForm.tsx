@@ -26,7 +26,7 @@ interface ProductDetailProps {
   mode: "create" | "edit";
   genders: Gender[];
 }
-// add required fields to the product object
+
 export default function ProductForm({
   product,
   styles,
