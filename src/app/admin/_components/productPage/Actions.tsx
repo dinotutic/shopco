@@ -7,9 +7,10 @@ import { Product } from "../shared.types";
 export const Actions = ({ product }: { product: Product }) => {
   const handleDelete = async () => {
     await deleteProduct(product.id);
-    window.location.reload(); // Refresh the page for now, later will probably add state and make this fancier
+    window.location.reload();
   };
   const firstColorId = product.stock[0].color.id;
+
   return (
     <div className="flex items-center justify-center max-w-fit">
       <Link
@@ -18,7 +19,9 @@ export const Actions = ({ product }: { product: Product }) => {
       >
         View
       </Link>
+      {/* ONLY FOR DEV MODE */}
       <Button onClick={handleDelete}>Delete</Button>
+      {/* ONLY FOR DEV MODE */}
     </div>
   );
 };

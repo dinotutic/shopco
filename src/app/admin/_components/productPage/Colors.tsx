@@ -2,11 +2,11 @@ import { useRouter } from "next/navigation";
 import { Product, Color } from "../shared.types";
 
 // Edit mode:
-// Clicking on a color that is not selected will add it to availableColors which will later be used to create a new stock object with that color
-// Clicking a color that is selected will remove it from availableColors which will later delete a stock object with that color
+// Clicking on a color that is not available will add it to availableColors which will later be used to create a new stock object with that color
+// Clicking a color that is available will remove it from availableColors which will later delete a stock object with that color
 
 // Create mode:
-// Clicking on a color will set it as the selected color. Multiple colors can be selected in edit mode after the product has been created
+// Clicking on a color will set it as the selected color. To add additional colors to product, new colors can be selected in edit mode after the product has been created
 interface ColorsProps {
   isEditing: boolean;
   product?: Product;
