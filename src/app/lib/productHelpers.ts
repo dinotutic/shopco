@@ -45,3 +45,8 @@ export const removeDuplicatesInArr = (array: any[], key: any) => {
     return !duplicate;
   });
 };
+
+// export const filterImagesByColor = (images: Image[], color: Color) => {
+//   console.log("helper images", images);
+//   return images.filter((image) => image.color && image.color.id === color.id);
+// };

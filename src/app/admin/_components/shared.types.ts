@@ -8,6 +8,8 @@ export interface Image {
   id?: number;
   productId?: number;
   file?: File;
+  color?: Color;
+  colorId?: number;
 }
 
 export interface Style {

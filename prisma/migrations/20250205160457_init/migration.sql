@@ -9,13 +9,20 @@ CREATE TABLE "Product" (
     "updatedAt" DATETIME NOT NULL,
     "categoryId" INTEGER NOT NULL,
     "styleId" INTEGER NOT NULL,
-    "gender" TEXT NOT NULL,
+    "genderId" INTEGER NOT NULL,
     "sale" INTEGER NOT NULL,
     "details" TEXT NOT NULL,
     "newArrival" BOOLEAN NOT NULL DEFAULT false,
     "topSelling" BOOLEAN NOT NULL DEFAULT false,
     CONSTRAINT "Product_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Product_styleId_fkey" FOREIGN KEY ("styleId") REFERENCES "Style" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "Product_styleId_fkey" FOREIGN KEY ("styleId") REFERENCES "Style" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Product_genderId_fkey" FOREIGN KEY ("genderId") REFERENCES "Gender" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Gender" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL
 );
 
 -- CreateTable
@@ -40,7 +47,9 @@ CREATE TABLE "Image" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "url" TEXT NOT NULL,
     "productId" INTEGER NOT NULL,
-    CONSTRAINT "Image_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    "colorId" INTEGER NOT NULL,
+    CONSTRAINT "Image_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Image_colorId_fkey" FOREIGN KEY ("colorId") REFERENCES "Color" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable

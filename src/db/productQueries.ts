@@ -166,7 +166,11 @@ export async function addProduct(data: {
     where: { id: newProductId },
     data: {
       images: {
-        create: imageUrls.map((image) => ({ url: image })),
+        // I can use data.stock[0].color.id because there is always only 1 color when creating a product
+        create: imageUrls.map((image) => ({
+          url: image,
+          color: { connect: { id: data.stock[0].color.id } },
+        })),
       },
     },
   });
@@ -263,7 +267,10 @@ export async function editProduct(
         },
       },
       images: {
-        create: uploadedImages.map((image) => ({ url: image.url })),
+        create: uploadedImages.map((image) => ({
+          url: image.url,
+          color: { connect: { id: selectedColor.id } },
+        })),
       },
       details: data.details,
       sale: data.sale,
@@ -382,12 +389,12 @@ export async function getColorByColorId(colorId: number) {
   const color = await prisma.color.findUnique({ where: { id: colorId } });
   return color;
 }
-
+// Do I need this?
 export async function getProductById(id: number) {
   const product = await prisma.product.findUnique({
     where: { id },
     include: {
-      images: true,
+      images: { include: { color: true } },
       category: true,
       style: true,
       gender: true,
@@ -408,7 +415,7 @@ export async function getProductByIdAndColor(id: number, colorId: number) {
       },
     },
     include: {
-      images: true,
+      images: { where: { colorId: colorId }, include: { color: true } },
       category: true,
       style: true,
       gender: true,

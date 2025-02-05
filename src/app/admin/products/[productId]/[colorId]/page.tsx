@@ -25,7 +25,7 @@ export default async function ProductPage({
   const colors = await getColors();
   const color = await getColorByColorId(Number(colorId));
   const genders = await getGenders();
-
+  console.log("feteching product images", product.images);
   return (
     <div>
       <PageHeader>Product Detail</PageHeader>
