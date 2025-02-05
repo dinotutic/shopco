@@ -1,32 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import OrdersActions from "./OrdersActions";
-
-export type User = {
-  id: number;
-  name: string;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-  password: string | null;
-};
-
-export type OrderItem = {
-  id: number;
-  productId: number;
-  orderId: number;
-  colorId: number;
-  quantity: number;
-  price: number;
-  size: string;
-  product?: {
-    name: string;
-  };
-  color?: {
-    name: string;
-  };
-  createdAt?: Date;
-};
+import TableComponent from "../TableComponent";
+import { formatCurrency } from "@/app/lib/formatters";
+import { OrderItem, User } from "../shared.types";
 
 export type OrderProps = {
   id: number;
@@ -38,6 +15,8 @@ export type OrderProps = {
 };
 
 const OrdersList = ({ orders }: { orders: OrderProps[] }) => {
+  // I dont like the way I filter stuff. Will redo this sometime later
+
   const [search, setSearch] = useState<string>("");
   const [sort, setSort] = useState<string>("");
 
@@ -64,6 +43,30 @@ const OrdersList = ({ orders }: { orders: OrderProps[] }) => {
     return 0;
   });
 
+  const tableHeaders = [
+    { id: "id", label: "ID", render: (row: OrderProps) => row.id },
+    {
+      id: "customer",
+      label: "Customer",
+      render: (row: OrderProps) => row.user.name,
+    },
+    {
+      id: "total",
+      label: "Total",
+      render: (row: OrderProps) => formatCurrency(row.totalInCents),
+    },
+    {
+      id: "date",
+      label: "Date",
+      render: (row: OrderProps) => row.createdAt.toLocaleDateString("de-DE"),
+    },
+    {
+      id: "actions",
+      label: "Actions",
+      render: (row: OrderProps) => <OrdersActions orderId={row.id} />,
+    },
+  ];
+
   return (
     <div className="overflow-x-auto">
       <div className="flex my-8 justify-between items-center">
@@ -89,54 +92,7 @@ const OrdersList = ({ orders }: { orders: OrderProps[] }) => {
           </select>
         </div>
       </div>
-      <table className="w-full border-separate border-spacing-0">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="py-2 px-4 border rounded-tl-lg border-gray-300 text-start">
-              ID
-            </th>
-            <th className="py-2 px-4 border-y border-r border-gray-300 text-start">
-              Customer
-            </th>
-            <th className="py-2 px-4 border-y border-r border-gray-300 text-start">
-              Total
-            </th>
-            <th className="py-2 px-4 border-y border-r border-gray-300 text-start">
-              Date
-            </th>
-            <th className="py-2 px-4 border-y rounded-tr-lg border-gray-300 text-start">
-              Items
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedOrders.map((order, index) => (
-            <tr key={order.id} className="hover:bg-gray-100">
-              <td
-                className={`px-4 border-b border-r border-l ${
-                  index === orders.length - 1 ? "rounded-bl-lg" : ""
-                }`}
-              >
-                {order.id}
-              </td>
-              <td className="py-2 px-4 border-b border-r">{order.user.name}</td>
-              <td className="py-2 px-4 border-b border-r">
-                {(order.totalInCents / 100).toFixed(2)}€
-              </td>
-              <td className="py-2 px-4 border-b border-r">
-                {new Date(order.createdAt).toLocaleDateString()}
-              </td>
-              <td
-                className={`py-2 px-4 border-b border-r w-10 ${
-                  index === orders.length - 1 ? "rounded-br-lg" : ""
-                }`}
-              >
-                <OrdersActions orderId={order.id} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TableComponent data={sortedOrders} headers={tableHeaders} />
     </div>
   );
 };

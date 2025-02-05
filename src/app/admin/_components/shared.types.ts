@@ -1,4 +1,5 @@
 import { Gender } from "@prisma/client";
+import { ReactNode } from "react";
 
 export interface Image {
   url?: string;
@@ -79,4 +80,10 @@ export interface User {
   name: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+export interface TableHeader {
+  id: string;
+  label: string;
+  render: (row: any) => ReactNode;
 }

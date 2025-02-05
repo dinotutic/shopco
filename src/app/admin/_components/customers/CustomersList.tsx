@@ -2,8 +2,11 @@
 import { User } from "@prisma/client";
 import { CustomerActions } from "./CustomerActions";
 import { useState } from "react";
+import TableComponent from "../TableComponent";
 
 const CustomersList = ({ customers }: { customers: User[] }) => {
+  // Will redo sorting and filtering. Dont like it
+
   const [search, setSearch] = useState<string>("");
   const [sort, setSort] = useState<string>("");
 
@@ -23,6 +26,34 @@ const CustomersList = ({ customers }: { customers: User[] }) => {
     }
     return 0;
   });
+
+  const tableHeaders = [
+    {
+      id: "id",
+      label: "ID",
+      render: (row: User) => row.id,
+    },
+    {
+      id: "customer",
+      label: "Customer",
+      render: (row: User) => row.name,
+    },
+    {
+      id: "email",
+      label: "Email",
+      render: (row: User) => row.email,
+    },
+    {
+      id: "memberSince",
+      label: "Member since",
+      render: (row: User) => row.createdAt.toLocaleDateString(),
+    },
+    {
+      id: "actions",
+      label: "Actions",
+      render: (row: User) => <CustomerActions customerId={row.id} />,
+    },
+  ];
   return (
     <div className="overflow-x-auto">
       <div className="flex my-8 justify-between items-center">
@@ -46,52 +77,7 @@ const CustomersList = ({ customers }: { customers: User[] }) => {
           </select>
         </div>
       </div>
-      <table className="w-full border-separate border-spacing-0">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="py-2 px-4 border rounded-tl-lg border-gray-300 text-start">
-              ID
-            </th>
-            <th className="py-2 px-4 border-y border-r border-gray-300 text-start">
-              User
-            </th>
-            <th className="py-2 px-4 border-y border-r border-gray-300 text-start">
-              Email
-            </th>
-            <th className="py-2 px-4 border-y border-r border-gray-300 text-start whitespace-nowrap">
-              Member since
-            </th>
-            <th className="py-2 px-4 border-y rounded-tr-lg border-gray-300 text-start">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {sortedCustomers.map((customer, index) => (
-            <tr key={customer.id} className="hover:bg-gray-100">
-              <td
-                className={`px-4 border-b border-r border-l ${
-                  index === customers.length - 1 ? "rounded-bl-lg" : ""
-                }`}
-              >
-                {customer.id}
-              </td>
-              <td className="py-2 px-4 border-b border-r">{customer.name}</td>
-              <td className="py-2 px-4 border-b border-r">{customer.email}</td>
-              <td className="py-2 px-4 border-b border-r">
-                {customer.createdAt.toLocaleDateString()}
-              </td>
-              <td
-                className={`py-2 px-4 border-b border-r w-10 ${
-                  index === customers.length - 1 ? "rounded-br-lg" : ""
-                }`}
-              >
-                <CustomerActions customerId={customer.id} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TableComponent headers={tableHeaders} data={sortedCustomers} />
     </div>
   );
 };

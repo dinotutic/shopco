@@ -9,9 +9,6 @@ interface OrderDetailProps {
 }
 
 const OrderDetail: FC<OrderDetailProps> = ({ order, totalItems }) => {
-  console.log(
-    order.items.map((item) => item.product.stock.map((stock) => stock.color.id))
-  );
   return (
     <>
       <OrderData order={order} totalItems={totalItems} />
