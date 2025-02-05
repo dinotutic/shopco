@@ -5,7 +5,15 @@ export const getAllSales = async () => {
     include: {
       items: {
         include: {
-          product: true,
+          product: {
+            include: {
+              category: true,
+              style: true,
+              images: true,
+              gender: true,
+              stock: true,
+            },
+          },
           color: true,
         },
       },
