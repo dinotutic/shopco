@@ -10,10 +10,7 @@ import Images from "./Images";
 import Button from "./Button";
 import Timestamp from "./Timestamp";
 import FormButtons from "./FormButtons";
-import {
-  createEmptyStock,
-  removeDuplicatesInArr,
-} from "@/app/lib/productHelpers";
+import { removeDuplicatesInArr } from "@/app/lib/productHelpers";
 import { Gender } from "@prisma/client";
 import { handleSubmitCreate, handleSubmitEdit } from "@/app/lib/submitHelpers";
 
@@ -89,6 +86,7 @@ export default function ProductForm({
   const [isEditing, setIsEditing] = useState<boolean>(
     mode === "create" ? true : false
   );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -102,6 +100,8 @@ export default function ProductForm({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
+
     const data = {
       name,
       description,
@@ -118,14 +118,19 @@ export default function ProductForm({
       images,
       colors: availableColors,
     };
-
-    if (mode === "edit" && product) {
-      handleSubmitEdit(e, data, product.id, availableColors, selectedColor);
-    } else if (mode === "create") {
-      const newProd = await handleSubmitCreate(e, data);
-      if (newProd) {
-        window.location.href = `/admin/products/${newProd.id}/${newProd.stock[0].color.id}`;
+    try {
+      if (mode === "edit" && product) {
+        handleSubmitEdit(e, data, product.id, availableColors, selectedColor);
+      } else if (mode === "create") {
+        const newProd = await handleSubmitCreate(e, data);
+        if (newProd) {
+          window.location.href = `/admin/products/${newProd.id}/${newProd.stock[0].color.id}`;
+        }
       }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -251,7 +256,6 @@ export default function ProductForm({
           images={images}
           product={product}
           setImages={setImages}
-          // selectedColor={selectedColor}
         />
         {mode === "edit" && product && (
           <div className="mb-4">
@@ -265,6 +269,7 @@ export default function ProductForm({
             mode={mode}
             onDiscard={handleDiscard}
             handleEdit={handleEdit}
+            isLoading={isLoading}
           />
         ) : (
           <Button type="submit" onClick={handleEdit}>

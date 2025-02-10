@@ -1,5 +1,5 @@
 import { formatCurrency, formatNumber } from "../lib/formatters";
-import DashboardCard from "./ui/Card";
+import DashboardCard from "./ui/DashboardCard";
 import { getSaleStats } from "@/db/saleQueries";
 import { getProductCount } from "@/db/productQueries";
 import { getAllCustomerStats } from "@/db/userQueries";
@@ -33,9 +33,5 @@ export default async function AdminDashboard() {
 }
 
 // ToDo:
-// Need to click on Add Product a few times for the page to finally open. Button doesnt work sometimes.
-// Ask Zlatko why the fuck did wrapping <Link> with a button cause the button to not work sometimes???
 // Data validation for editing/creating products
 // Data validation for images. Only accept jpg, jpeg and maybe some other
-
-// Issues with AWS when deleting colors. I need to revisit

@@ -1,11 +1,12 @@
 import React from "react";
 import Button from "./Button";
-
+import Loading from "../../ui/Loading";
 interface FormButtonsProps {
   isEditing: boolean;
   mode: "create" | "edit";
   onDiscard: (e: React.MouseEvent<HTMLButtonElement>) => void;
   handleEdit: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  isLoading: boolean;
 }
 
 const FormButtons: React.FC<FormButtonsProps> = ({
@@ -13,14 +14,17 @@ const FormButtons: React.FC<FormButtonsProps> = ({
   mode,
   onDiscard,
   handleEdit,
+  isLoading,
 }) => {
   return (
     <div>
       {isEditing ? (
         <>
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" isLoading={isLoading}>
+            {isLoading && <Loading />}Save Changes
+          </Button>
           {mode === "edit" && (
-            <Button type="button" onClick={onDiscard}>
+            <Button type="button" isLoading={isLoading} onClick={onDiscard}>
               Discard Changes
             </Button>
           )}

@@ -89,3 +89,17 @@ export interface TableHeader {
   label: string;
   render: (row: any) => ReactNode;
 }
+
+export interface CustomerSalesStats {
+  amount: number;
+  numberOfOrders: number;
+}
+
+export interface Review {
+  id: number;
+  userId: number;
+  rating: number;
+  comment: string | null;
+  createdAt: Date;
+  productId: number;
+}

@@ -14,7 +14,7 @@ const CustomerPage = async ({ params }: CustomerPageProps) => {
   const customerIdNum = Number(customerId);
   const customer = await getCustomerById(customerIdNum);
   const purchases = await getPurchasesByUserId(customerIdNum);
-  const orders = await getSaleStatsForUser(customerIdNum);
+  const saleStats = await getSaleStatsForUser(customerIdNum);
   const reviews = await getReviewByUser(customerIdNum);
 
   if (!customer) {
@@ -23,12 +23,12 @@ const CustomerPage = async ({ params }: CustomerPageProps) => {
   return (
     <>
       <div className="flex items-center w-full">
-        <PageHeader>Customer Page</PageHeader>
+        <PageHeader>Customer Detail</PageHeader>
       </div>
       <CustomerDetail
         customer={customer}
         purchases={purchases}
-        orders={orders}
+        saleStats={saleStats}
         reviews={reviews}
       />
     </>
