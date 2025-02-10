@@ -50,9 +50,24 @@ export const getPurchasesByUserId = async (userId: number) => {
   const purchases = await prisma.order.findMany({
     where: { userId },
     include: {
-      items: true,
+      items: {
+        include: {
+          product: {
+            include: {
+              category: true,
+              style: true,
+              images: true,
+              gender: true,
+              stock: { include: { color: true } },
+            },
+          },
+          color: true,
+        },
+      },
+      user: true,
     },
   });
+  console.log("purchases server", purchases);
   return purchases;
 };
 

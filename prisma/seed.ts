@@ -138,11 +138,6 @@ async function main() {
           },
         },
         images: { create: images },
-        // create: [
-        //   { url: faker.image.urlLoremFlickr() },
-        //   { url: faker.image.urlLoremFlickr() },
-        //   { url: faker.image.urlLoremFlickr() },
-        // ],
         stock: {
           create: stockEntries,
         },
@@ -158,6 +153,21 @@ async function main() {
       },
     });
     products.push(product);
+  }
+
+  // Create random reviews for each product
+  for (const product of products) {
+    const reviewCount = faker.number.int({ min: 3, max: 10 });
+    for (let i = 0; i < reviewCount; i++) {
+      await prisma.review.create({
+        data: {
+          user: { connect: { id: faker.helpers.arrayElement(users).id } },
+          product: { connect: { id: product.id } },
+          rating: faker.number.int({ min: 0, max: 5 }),
+          comment: faker.datatype.boolean() ? faker.lorem.sentence() : null,
+        },
+      });
+    }
   }
 
   // Create orders
@@ -199,7 +209,7 @@ async function main() {
   }
 
   console.log(
-    "Seeded database with users, products, categories, styles, and orders"
+    "Seeded database with users, products, categories, styles, orders, and reviews"
   );
 }
 
