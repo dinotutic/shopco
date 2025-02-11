@@ -91,7 +91,6 @@ export const handleSubmitEdit = async (
       .filter((stock) => stock.toDelete)
       .map((stock) => stock.color.name)
   );
-  console.log(colorsToDelete);
 
   // Delete all images of that color from s3
   await Promise.all(
