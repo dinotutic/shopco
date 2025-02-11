@@ -6,8 +6,8 @@ import {
   getColorByColorId,
   getGenders,
 } from "@/db/productQueries";
-import PageHeader from "@/app/admin/_components/PageHeader";
-import ProductForm from "@/app/admin/_components/productPage/ProductForm";
+import PageHeader from "@/app/(admin)/admin/_components/PageHeader";
+import ProductForm from "@/app/(admin)/admin/_components/productPage/ProductForm";
 
 export default async function ProductPage({
   params,

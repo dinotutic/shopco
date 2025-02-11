@@ -1,4 +1,4 @@
-import { formatCurrency, formatNumber } from "../lib/formatters";
+import { formatCurrency, formatNumber } from "../../lib/formatters";
 import DashboardCard from "./ui/DashboardCard";
 import { getSaleStats } from "@/db/saleQueries";
 import { getProductCount } from "@/db/productQueries";
