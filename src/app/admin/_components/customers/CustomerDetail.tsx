@@ -22,14 +22,13 @@ const CustomerDetail = ({
   saleStats,
   reviews,
 }: CustomerDetailProps) => {
-  console.log("purchases client", purchases);
   const [showReviews, setShowReviews] = useState(false);
   const toggleReviews = () => {
     setShowReviews(!showReviews);
   };
 
   return (
-    <div className="p-4">
+    <>
       <CustomerData customer={customer} />
       <SalesStats saleStats={saleStats} />
       <PurchasesSection purchases={purchases} />
@@ -38,7 +37,7 @@ const CustomerDetail = ({
         toggleReviews={toggleReviews}
         showReviews={showReviews}
       />
-    </div>
+    </>
   );
 };
 
