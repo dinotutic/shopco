@@ -1,5 +1,5 @@
 import { Color } from "@prisma/client";
-import { Image, Stock } from "../admin/_components/shared.types";
+import { Image, Stock } from "../(admin)/admin/_components/shared.types";
 
 export const processImagesArray = (
   images: Image[],

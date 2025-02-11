@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "./../globals.css";
+import Header from "./_components/header/Header";
 
 export const metadata: Metadata = {
   title: "ShopCo - Your Fashion Destination",
@@ -14,7 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="w-full">{children}</body>
+      <body className="w-full flex flex-col items-center">
+        <header className="w-full max-w-[1280px] flex items-center justify-center px-4">
+          <Header />
+        </header>
+        {children}
+      </body>
     </html>
   );
 }
