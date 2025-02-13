@@ -5,29 +5,14 @@ import Logo from "./logo";
 import NavBar from "./NavBar";
 import SearchBar from "./SearchBar";
 import UserActions from "./UserActions";
+import useResponsiveMenu from "../../hooks/useResponsiveMenu";
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
-
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsSmallScreen(window.innerWidth < 768);
-      if (window.innerWidth >= 768) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    handleResize();
-
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  // Handles opening and closing the hamburger menu
+  const { isMenuOpen, isSmallScreen, toggleMenu } = useResponsiveMenu();
 
   return (
-    <header className="flex justify-between items-center my-6 gap-10 h-12 border border-green-500 w-full">
+    <header className="flex justify-between items-center my-6 gap-10 h-12 w-full">
       <div className="flex items-center">
         <HamburgerMenu toggleMenu={toggleMenu} />
         <Logo />

@@ -6,7 +6,7 @@ import SearchIcon from "../../../../../public/svg/searchIcon";
 
 const UserActions = () => {
   return (
-    <div className="flex gap-3 border border-purple-500">
+    <div className="flex gap-3">
       <SearchIcon opacity="dark" className="lg:hidden" />
       <Link href="#">
         <Image src={cart} width="24" height="24" alt="Shopping cart icon" />
