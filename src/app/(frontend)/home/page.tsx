@@ -1,5 +1,11 @@
+import Hero from "../_components/hero/Hero";
+
 const HomePage = () => {
-  return <h1>Hello Motherfucker</h1>;
+  return (
+    <div className="max-w-[1440px] border w-full overflow-hidden bg-gray_bg">
+      <Hero />
+    </div>
+  );
 };
 
 export default HomePage;

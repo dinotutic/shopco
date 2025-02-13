@@ -33,3 +33,7 @@ body {
   font-family: "SatoshiRegular";
   src: url("/fonts/Satoshi-Regular.otf");
 }
+@font-face {
+  font-family: "IntegralCf";
+  src: url("/fonts/Integral-CF.otf");
+}
