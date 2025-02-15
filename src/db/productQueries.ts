@@ -420,6 +420,7 @@ export async function getProductByIdAndColor(id: number, colorId: number) {
       category: true,
       style: true,
       gender: true,
+      reviews: true,
       stock: {
         include: {
           color: true,
@@ -454,3 +455,30 @@ export async function deleteColorImages(productId: number, colorName: string) {
     where: { productId, color: { name: colorName } },
   });
 }
+
+export async function getNewArrivals(limit?: number) {
+  const newArrivals = await prisma.product.findMany({
+    where: { newArrival: true },
+    include: {
+      images: true,
+      category: true,
+      style: true,
+      gender: true,
+      reviews: true,
+      stock: {
+        include: { color: true },
+      },
+    },
+    take: limit,
+  });
+  return newArrivals;
+}
+
+// export async function getReviewsForProduct(productId: number) {
+//   const reviews = await prisma.review.findMany({
+//     where: { productId },
+//   });
+//   const averageRating =
+//     reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+//   return { reviews, averageRating };
+// }

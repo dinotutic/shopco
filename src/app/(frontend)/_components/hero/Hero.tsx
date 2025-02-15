@@ -4,20 +4,21 @@ import HeroText from "./HeroText";
 
 const Hero = () => {
   return (
-    <div className="flex flex-col lg:flex-row items-center w-full border border-black">
-      <div className="hero-text w-full lg:w-1/2 p-4 lg:p-14">
+    <section className="flex flex-col lg:flex-row items-center w-full border border-black h-[1280px] md:h-[1280px] lg:h-[660px] bg-gray_bg">
+      <div className="hero-text w-full lg:w-1/2 p-4 md:p-14">
         <HeroText />
       </div>
-      <div className="w-full lg:w-1/2 overflow-hidden relative h-[663px]">
+      <div className="w-full lg:w-1/2 relative h-[1280px] lg:h-[660px]">
         <Image
           src={hero_big.src}
+          quality={100}
           alt="Two models posing in front of a camera"
-          className="object-cover w-full h-full"
           fill
+          sizes="90vw"
           style={{ objectFit: "cover" }}
         />
       </div>
-    </div>
+    </section>
   );
 };
 
