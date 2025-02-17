@@ -5,8 +5,7 @@
 import { Category, Gender, Stock, Style } from "@prisma/client";
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
-import { Color, Image } from "@/app/admin/_components/shared.types";
-import { undefined } from "zod";
+import { Color, Image } from "@/app/(admin)/admin/_components/shared.types";
 
 export async function getAllProducts() {
   const products = await prisma.product.findMany({
