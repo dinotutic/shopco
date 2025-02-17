@@ -1,5 +1,9 @@
 import { Color } from "@prisma/client";
-import { Image, Stock } from "../admin/_components/shared.types";
+import {
+  Image,
+  Review,
+  Stock,
+} from "../(admin)/admin/_components/shared.types";
 
 export const processImagesArray = (
   images: Image[],
@@ -49,16 +53,9 @@ export const removeDuplicatesInArr = (array: any[], key?: any) => {
     return !duplicate;
   });
 };
-// export const removeDuplicatesInArr = (array: any[], key: any) => {
-//   const seen = new Set();
-//   return array.filter((item) => {
-//     const duplicate = seen.has(item[key]);
-//     seen.add(item[key]);
-//     return !duplicate;
-//   });
-// };
 
-// export const filterImagesByColor = (images: Image[], color: Color) => {
-//   console.log("helper images", images);
-//   return images.filter((image) => image.color && image.color.id === color.id);
-// };
+export const averageRating = (reviews: Review[]) => {
+  if (!reviews.length) return 0;
+  const total = reviews.reduce((acc, review) => acc + review.rating, 0);
+  return parseFloat((total / reviews.length).toFixed(1));
+};

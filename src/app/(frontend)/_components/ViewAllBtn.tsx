@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { MouseEventHandler } from "react";
+
 interface ViewAllBtnProps {
   href: string;
 }

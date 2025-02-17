@@ -53,6 +53,7 @@ export interface Product {
   details: string;
   newArrival: boolean;
   topSelling: boolean;
+  reviews: Review[];
 }
 
 export interface OrderItem {

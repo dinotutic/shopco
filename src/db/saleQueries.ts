@@ -58,6 +58,7 @@ export const getPurchasesByUserId = async (userId: number) => {
               style: true,
               images: true,
               gender: true,
+              reviews: true,
               stock: { include: { color: true } },
             },
           },

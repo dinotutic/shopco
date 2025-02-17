@@ -1,8 +1,8 @@
+import { formatCurrency, formatNumber } from "../../lib/formatters";
 import DashboardCard from "./ui/DashboardCard";
 import { getSaleStats } from "@/db/saleQueries";
 import { getProductCount } from "@/db/productQueries";
 import { getAllCustomerStats } from "@/db/userQueries";
-import { formatCurrency, formatNumber } from "@/app/lib/formatters";
 
 export default async function AdminDashboard() {
   const salesData = await getSaleStats();
