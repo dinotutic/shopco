@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DetailParagraph } from "../orders/DetailComponents";
-import { User } from "../shared.types";
+import { User } from "../../../../types/shared.types";
 import { updateCustomer } from "@/db/userQueries";
 
 interface CustomerDataProps {

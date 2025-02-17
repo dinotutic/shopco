@@ -8,7 +8,7 @@ import {
   processImagesArray,
   removeDuplicatesInArr,
 } from "@/app/lib/productHelpers";
-import { Color, Image, Style } from "../(admin)/admin/_components/shared.types";
+import { Color, Image, Style } from "../types/shared.types";
 import { Category, Gender } from "@prisma/client";
 
 export interface ProductHandleSubmitProps {
@@ -100,7 +100,6 @@ export const handleSubmitEdit = async (
   );
   // // Delete images in S3 and DB
   const imagesToDelete = processImagesArray(data.images, "delete") || [];
-  console.log("images teo delete in submitHelpers", imagesToDelete);
   await Promise.all(
     imagesToDelete.map(async (image) => {
       if (image.url) {

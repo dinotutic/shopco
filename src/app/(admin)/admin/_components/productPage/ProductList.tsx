@@ -2,36 +2,34 @@
 
 import { useState } from "react";
 import Actions from "./Actions";
-import { Category, Gender, Style } from "@prisma/client";
 import TableComponent from "../TableComponent";
 import FilterComponent from "../FilterComponent";
-import { Product } from "../shared.types";
+import { FormOptions, Product } from "../../../../types/shared.types";
 import { sortProducts } from "@/app/lib/sortUtils";
 import SortComponent from "../SortComponent";
 import SearchComponent from "../SearchComponent";
 import { filterProducts } from "@/app/lib/filterUtil";
+import useProductFilters from "../../hooks/useProductFilters";
 
 interface ProductListProps {
   products: Product[];
-  categories: Category[];
-  styles: Style[];
-  genders: Gender[];
+  formOptions: FormOptions;
 }
 export default function ProductList({
   products,
-  categories,
-  styles,
-  genders,
+  formOptions,
 }: ProductListProps) {
-  const [search, setSearch] = useState<string>("");
-  const [sort, setSort] = useState<string>("");
-  const [styleFilter, setStyleFilter] = useState<string | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [availabilityFilter, setAvailabilityFilter] = useState<boolean | null>(
-    null
-  );
-  const [genderFilter, setGenderFilter] = useState<string | null>(null);
+  const { filterState, setFilterField } = useProductFilters();
+  const {
+    search,
+    sort,
+    styleFilter,
+    availabilityFilter,
+    categoryFilter,
+    genderFilter,
+  } = filterState;
 
+  const { categories, styles, genders } = formOptions;
   const filteredProducts = filterProducts(
     products,
     search,
@@ -121,37 +119,45 @@ export default function ProductList({
         <div className="flex gap-4">
           <SearchComponent
             value={search}
-            onChange={setSearch}
+            onChange={(e) => setFilterField("search", e.target.value)}
             placeholder="Search by name"
           />
           <SortComponent
             options={sortOptions}
             placeholder="Sort by"
             value={sort}
-            onChange={setSort}
+            onChange={(e) => setFilterField("sort", e.target.value)}
           />
           <FilterComponent
             value={categoryFilter}
-            onChange={(value) => setCategoryFilter(value as string | null)}
+            onChange={(value) =>
+              setFilterField("categoryFilter", value as string | null)
+            }
             options={categoryOptions}
             placeholder="Categories"
           />
           <FilterComponent
             value={styleFilter}
             options={styleOptions}
-            onChange={(value) => setStyleFilter(value as string | null)}
+            onChange={(value) =>
+              setFilterField("styleFilter", value as string | null)
+            }
             placeholder="Styles"
           />
           <FilterComponent
             value={availabilityFilter}
             options={availabilityOptions}
-            onChange={(value) => setAvailabilityFilter(value as boolean | null)}
+            onChange={(value) =>
+              setFilterField("availabilityFilter", value as boolean | null)
+            }
             placeholder="Availability"
           />
           <FilterComponent
             value={genderFilter}
             options={genderOptions}
-            onChange={(value) => setGenderFilter(value as string | null)}
+            onChange={(value) =>
+              setFilterField("genderFilter", value as string | null)
+            }
             placeholder="Gender"
           />
         </div>

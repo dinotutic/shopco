@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Order } from "../shared.types";
+import { Order } from "../../../../types/shared.types";
 import { formatCurrency } from "@/app/lib/formatters";
 import { DetailLink, DetailParagraph } from "./DetailComponents";
 

@@ -1,34 +1,23 @@
 import { useState } from "react";
-import {
-  Product,
-  Style,
-  Color,
-  Category,
-  Stock,
-  Image,
-} from "../_components/shared.types";
-import { Gender } from "@prisma/client";
+import { Product, Color, FormOptions } from "../../../types/shared.types";
 import { removeDuplicatesInArr } from "@/app/lib/productHelpers";
 
-interface UseProductFormProps {
+export interface UseProductFormProps {
   product?: Product;
-  styles: Style[];
-  categories: Category[];
-  colors: Color[];
-  color?: Color;
+  initialSelectedColor: Color;
+  formOptions: FormOptions;
   mode: "create" | "edit";
-  genders: Gender[];
 }
 
 export const useProductForm = ({
   product,
-  styles,
-  categories,
-  colors,
-  color,
+  formOptions,
+  initialSelectedColor,
   mode,
-  genders,
 }: UseProductFormProps) => {
+  const { styles, categories, genders } = formOptions;
+
+  // Extract available colors from product stock and trim array
   const initialAvailableColors = removeDuplicatesInArr(
     (product?.stock || []).map((item) => item.color),
     "id"
@@ -49,20 +38,35 @@ export const useProductForm = ({
     availableForSale: product?.isAvailable || false,
     availableColors: initialAvailableColors,
     stock: product?.stock || [],
-    selectedColor: color || colors[0],
+    selectedColor: initialSelectedColor,
     isEditing: mode === "create" ? true : false,
     isLoading: false,
   });
 
+  const handleEdit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setProductField("isEditing", true);
+  };
+
+  const handleDiscard = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    window.location.reload();
+  };
+
   const setProductField = (field: string, value: any) => {
-    setProductState((prevState) => ({
-      ...prevState,
-      [field]: value,
-    }));
+    setProductState((prevState) => {
+      const newState = {
+        ...prevState,
+        [field]: value,
+      };
+      return newState;
+    });
   };
 
   return {
     productState,
     setProductField,
+    handleEdit,
+    handleDiscard,
   };
 };

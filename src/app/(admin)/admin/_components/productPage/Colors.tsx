@@ -1,5 +1,5 @@
 import { useRouter } from "next/navigation";
-import { Product, Color } from "../shared.types";
+import { Product, Color, FormOptions } from "../../../../types/shared.types";
 
 // Edit mode:
 // Clicking on a color that is not available will add it to availableColors which will later be used to create a new stock object with that color
@@ -8,38 +8,35 @@ import { Product, Color } from "../shared.types";
 // Create mode:
 // Clicking on a color will set it as the selected color. To add additional colors to product, new colors can be selected in edit mode after the product has been created
 interface ColorsProps {
-  isEditing: boolean;
   product?: Product;
-  colors: Color[];
+  allColors: Color[];
+  setProductField: (field: string, value: any) => void;
+  isEditing: boolean;
   availableColors: Color[];
-  setAvailableColors: React.Dispatch<React.SetStateAction<Color[]>>;
   selectedColor: Color;
-  setSelectedColor?: React.Dispatch<React.SetStateAction<Color>>;
-  setColorsToRemove?: React.Dispatch<React.SetStateAction<Color[]>>;
   mode: "create" | "edit";
 }
-
 const Colors: React.FC<ColorsProps> = ({
-  isEditing,
   product,
-  colors,
+  allColors,
+  setProductField,
+  isEditing,
   availableColors,
-  setAvailableColors,
   selectedColor,
-  setSelectedColor,
   mode,
 }) => {
   const router = useRouter();
 
   const handleColorClick = (color: Color) => {
     if (mode === "edit") {
-      setAvailableColors((prev) =>
-        prev.some((c) => c.id === color.id)
-          ? prev.filter((c) => c.id !== color.id)
-          : [...prev, color]
+      setProductField(
+        "availableColors",
+        availableColors.some((c) => c.id === color.id)
+          ? availableColors.filter((c) => c.id !== color.id)
+          : [...availableColors, color]
       );
-    } else if (mode === "create" && setSelectedColor) {
-      setSelectedColor(color);
+    } else if (mode === "create") {
+      setProductField("selectedColor", color);
     }
   };
 
@@ -58,7 +55,6 @@ const Colors: React.FC<ColorsProps> = ({
       </label>
       <div className="inline-block">
         <ColorItem
-          key={selectedColor.id}
           color={selectedColor}
           isEditing={isEditing}
           selectedColor={selectedColor}
@@ -69,7 +65,7 @@ const Colors: React.FC<ColorsProps> = ({
       </div>
       <label className="block text-sm font-medium text-gray-700">Colors</label>
       <div className="flex gap-1">
-        {colors.map((color) => (
+        {allColors.map((color) => (
           <ColorItem
             key={color.id}
             color={color}

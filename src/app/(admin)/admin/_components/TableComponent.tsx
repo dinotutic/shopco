@@ -1,5 +1,5 @@
 import { ReactNode, HTMLAttributes } from "react";
-import { TableHeader } from "./shared.types";
+import { TableHeader } from "../../../types/shared.types";
 
 interface TableCellProps extends HTMLAttributes<HTMLTableCellElement> {
   children: ReactNode;

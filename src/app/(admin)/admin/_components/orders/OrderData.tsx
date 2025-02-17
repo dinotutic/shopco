@@ -1,6 +1,6 @@
 import { formatCurrency } from "@/app/lib/formatters";
 
-import { Order } from "../shared.types";
+import { Order } from "../../../../types/shared.types";
 import { DetailLink, DetailParagraph } from "./DetailComponents";
 
 interface OrderDataProps {

@@ -1,10 +1,7 @@
 import {
-  getCategories,
-  getStyles,
-  getColors,
   getProductByIdAndColor,
   getColorByColorId,
-  getGenders,
+  getFormOptions,
 } from "@/db/productQueries";
 import PageHeader from "@/app/(admin)/admin/_components/PageHeader";
 import ProductForm from "@/app/(admin)/admin/_components/productPage/ProductForm";
@@ -20,11 +17,12 @@ export default async function ProductPage({
     Number(productId),
     Number(colorId)
   );
-  const styles = await getStyles();
-  const categories = await getCategories();
-  const colors = await getColors();
-  const color = await getColorByColorId(Number(colorId));
-  const genders = await getGenders();
+
+  // categories, styles, colors and genders
+  const formOptions = await getFormOptions();
+
+  const placeHolderColor = formOptions.colors[0];
+  const initialSelectedColor = await getColorByColorId(Number(colorId));
 
   return (
     <div>
@@ -32,12 +30,9 @@ export default async function ProductPage({
       <div>
         <ProductForm
           product={product}
-          categories={categories}
-          styles={styles}
-          colors={colors}
-          color={color ?? undefined}
+          initialSelectedColor={initialSelectedColor ?? placeHolderColor}
+          formOptions={formOptions}
           mode={"edit"}
-          genders={genders}
         />
       </div>
     </div>

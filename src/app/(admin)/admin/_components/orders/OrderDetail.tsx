@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Order } from "../shared.types";
+import { Order } from "../../../../types/shared.types";
 import { OrderData } from "./OrderData";
 import { OrderItems } from "./OrderItems";
 

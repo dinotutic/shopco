@@ -4,7 +4,12 @@ import { formatCurrency } from "@/app/lib/formatters";
 import Link from "next/link";
 import { CustomerData } from "./CustomerData";
 import renderStars from "@/app/lib/renderStars";
-import { CustomerSalesStats, Order, Review, User } from "../shared.types";
+import {
+  CustomerSalesStats,
+  Order,
+  Review,
+  User,
+} from "../../../../types/shared.types";
 import SalesStats from "./SalesStats";
 import PurchasesSection from "./PurchasesSection";
 import Reviews from "./Reviews";

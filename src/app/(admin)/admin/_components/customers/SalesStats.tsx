@@ -1,5 +1,5 @@
 import { formatCurrency } from "@/app/lib/formatters";
-import { CustomerSalesStats } from "../shared.types";
+import { CustomerSalesStats } from "../../../../types/shared.types";
 
 interface CustomerSalesStatsProps {
   saleStats: CustomerSalesStats;

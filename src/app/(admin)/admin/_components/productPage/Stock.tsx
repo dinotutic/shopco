@@ -1,5 +1,5 @@
 import { createEmptyStock, updateStockColor } from "@/app/lib/productHelpers";
-import { Color, Stock } from "../shared.types";
+import { Color, Stock } from "../../../../types/shared.types";
 import { useEffect } from "react";
 
 interface StockRenderProps {

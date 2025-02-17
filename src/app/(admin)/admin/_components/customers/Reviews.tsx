@@ -1,5 +1,5 @@
 import renderStars from "@/app/lib/renderStars";
-import { Review } from "../shared.types";
+import { Review } from "../../../../types/shared.types";
 
 interface ReviewProps {
   reviews: Review[];
