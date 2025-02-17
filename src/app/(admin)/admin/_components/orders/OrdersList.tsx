@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import OrdersActions from "./OrdersActions";
 import TableComponent from "../TableComponent";
 import { formatCurrency } from "@/app/lib/formatters";
-import { Order } from "../shared.types";
+import { Order } from "../../../../types/shared.types";
 import { filterOrders } from "@/app/lib/filterUtil";
 import { sortOrders } from "@/app/lib/sortUtils";
 import SortComponent from "../SortComponent";
@@ -59,13 +59,13 @@ const OrdersList = ({ orders }: OrderProps) => {
         <div className="flex gap-4">
           <SearchComponent
             value={search}
-            onChange={setSearch}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name"
           />
           <SortComponent
             options={sortOptions}
             value={sort}
-            onChange={setSort}
+            onChange={(e) => setSort(e.target.value)}
             placeholder="Sort by"
           />
         </div>

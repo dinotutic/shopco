@@ -2,7 +2,7 @@
 import Button from "./Button";
 import { deleteProduct } from "@/db/productQueries";
 import Link from "next/link";
-import { Product } from "../shared.types";
+import { Product } from "../../../../types/shared.types";
 
 export const Actions = ({ product }: { product: Product }) => {
   const handleDelete = async () => {
@@ -25,5 +25,5 @@ export const Actions = ({ product }: { product: Product }) => {
     </div>
   );
 };
-
+// Products should be able to be deleted from the admin panel
 export default Actions;

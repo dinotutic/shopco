@@ -1,4 +1,4 @@
-import { Product } from "@/app/(admin)/admin/_components/shared.types";
+import { Product } from "@/app/types/shared.types";
 import { formatCurrency } from "@/app/lib/formatters";
 import { averageRating } from "@/app/lib/productHelpers";
 import renderStars from "@/app/lib/renderStars";

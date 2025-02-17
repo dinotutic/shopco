@@ -4,13 +4,6 @@ import Title from "@/app/(admin)/admin/ui/Title";
 
 const NewArrivals = async () => {
   const newArrivals = await getNewArrivals(4);
-  console.log(newArrivals);
-  newArrivals.map((prod) =>
-    console.log(
-      prod + " ",
-      prod.images.map((img) => img.url)
-    )
-  );
   return (
     <section className="flex flex-col items-center my-12 gap-12">
       <Title>New Arrivals</Title>

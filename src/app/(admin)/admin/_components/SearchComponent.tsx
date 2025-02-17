@@ -2,7 +2,11 @@ import React from "react";
 
 interface SearchComponentProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => void;
   placeholder: string;
 }
 
@@ -16,7 +20,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
       type="text"
       placeholder={placeholder}
       value={value}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={onChange}
       className="border p-2 rounded-xl"
     />
   );

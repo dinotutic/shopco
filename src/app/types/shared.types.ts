@@ -104,3 +104,10 @@ export interface Review {
   createdAt: Date;
   productId: number;
 }
+
+export interface FormOptions {
+  categories: Category[];
+  styles: Style[];
+  colors: Color[];
+  genders: Gender[];
+}

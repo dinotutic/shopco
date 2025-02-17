@@ -1,5 +1,5 @@
 // import { filterImagesByColor } from "@/app/lib/productHelpers";
-import { Color, Image, Product } from "../shared.types";
+import { Color, Image, Product } from "../../../../types/shared.types";
 
 interface ImagesProps {
   isEditing: boolean;

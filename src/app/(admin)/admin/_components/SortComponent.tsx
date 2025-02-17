@@ -7,7 +7,11 @@ interface SortOption {
 
 interface SortComponentProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => void;
   options: SortOption[];
   placeholder: string;
 }
@@ -19,11 +23,7 @@ const SortComponent: React.FC<SortComponentProps> = ({
   placeholder,
 }) => {
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="border p-2 rounded-xl"
-    >
+    <select value={value} onChange={onChange} className="border p-2 rounded-xl">
       <option value="">{placeholder}</option>
       {options.map((option) => (
         <option key={option.value} value={option.value}>

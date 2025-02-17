@@ -63,12 +63,12 @@ const CustomersList = ({ customers }: CustomerListProps) => {
         <div className="flex gap-4">
           <SearchComponent
             value={search}
-            onChange={setSearch}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name"
           />
           <SortComponent
             value={sort}
-            onChange={setSort}
+            onChange={(e) => setSort(e.target.value)}
             options={sortOptions}
             placeholder="Sort by"
           />
