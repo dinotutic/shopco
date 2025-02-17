@@ -473,12 +473,3 @@ export async function getNewArrivals(limit?: number) {
   });
   return newArrivals;
 }
-
-// export async function getReviewsForProduct(productId: number) {
-//   const reviews = await prisma.review.findMany({
-//     where: { productId },
-//   });
-//   const averageRating =
-//     reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
-//   return { reviews, averageRating };
-// }
