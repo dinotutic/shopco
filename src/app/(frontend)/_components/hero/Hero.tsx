@@ -8,7 +8,7 @@ const Hero = () => {
       <div className="hero-text w-full lg:w-1/2 p-4 md:p-14">
         <HeroText />
       </div>
-      <div className="w-full lg:w-1/2 relative h-[1280px] lg:h-[660px]">
+      <div className="w-full lg:w-1/2 relative h-full">
         <Image
           src={hero_big.src}
           quality={100}
