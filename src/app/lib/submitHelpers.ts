@@ -8,7 +8,7 @@ import {
   processImagesArray,
   removeDuplicatesInArr,
 } from "@/app/lib/productHelpers";
-import { Color, Image, Style } from "../admin/_components/shared.types";
+import { Color, Image, Style } from "../(admin)/admin/_components/shared.types";
 import { Category, Gender } from "@prisma/client";
 
 export interface ProductHandleSubmitProps {

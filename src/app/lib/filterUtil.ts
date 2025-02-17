@@ -1,4 +1,8 @@
-import { Order, Product, User } from "../admin/_components/shared.types";
+import {
+  Order,
+  Product,
+  User,
+} from "../(admin)/admin/_components/shared.types";
 
 export const filterProducts = (
   products: Product[],

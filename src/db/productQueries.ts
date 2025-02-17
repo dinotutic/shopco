@@ -6,6 +6,7 @@ import { Category, Gender, Stock, Style } from "@prisma/client";
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
 import { Color, Image } from "@/app/(admin)/admin/_components/shared.types";
+import { undefined } from "zod";
 
 export async function getAllProducts() {
   const products = await prisma.product.findMany({
@@ -419,6 +420,7 @@ export async function getProductByIdAndColor(id: number, colorId: number) {
       category: true,
       style: true,
       gender: true,
+      reviews: true,
       stock: {
         include: {
           color: true,
@@ -452,4 +454,22 @@ export async function deleteColorImages(productId: number, colorName: string) {
   await prisma.image.deleteMany({
     where: { productId, color: { name: colorName } },
   });
+}
+
+export async function getNewArrivals(limit?: number) {
+  const newArrivals = await prisma.product.findMany({
+    where: { newArrival: true },
+    include: {
+      images: true,
+      category: true,
+      style: true,
+      gender: true,
+      reviews: true,
+      stock: {
+        include: { color: true },
+      },
+    },
+    take: limit,
+  });
+  return newArrivals;
 }
