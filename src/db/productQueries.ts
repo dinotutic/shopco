@@ -377,10 +377,10 @@ export async function editProduct(
 //   return styles;
 // }
 
-// export async function getColors() {
-//   const colors = await prisma.color.findMany();
-//   return colors;
-// }
+export async function getColors() {
+  const colors = await prisma.color.findMany();
+  return colors;
+}
 
 // export async function getGenders() {
 //   const genders = await prisma.gender.findMany();

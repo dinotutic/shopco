@@ -10,3 +10,13 @@ export const getReviewByUser = (userId: number) => {
   });
   return reviews;
 };
+
+export const getAllReviews = () => {
+  return prisma.review.findMany();
+};
+
+export const getHighLightedReviews = () => {
+  return prisma.review.findMany({
+    where: { highlighted: true },
+  });
+};
