@@ -474,6 +474,23 @@ export async function getNewArrivals(limit?: number) {
   });
   return newArrivals;
 }
+export async function getTopSelling(limit?: number) {
+  const topSelling = await prisma.product.findMany({
+    where: { topSelling: true },
+    include: {
+      images: true,
+      category: true,
+      style: true,
+      gender: true,
+      reviews: true,
+      stock: {
+        include: { color: true },
+      },
+    },
+    take: limit,
+  });
+  return topSelling;
+}
 
 export const getFormOptions = async () => {
   const categories = await prisma.category.findMany();
