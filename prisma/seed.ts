@@ -165,6 +165,7 @@ async function main() {
           product: { connect: { id: product.id } },
           rating: faker.number.int({ min: 0, max: 5 }),
           comment: faker.datatype.boolean() ? faker.lorem.sentence() : null,
+          highlighted: false,
         },
       });
     }

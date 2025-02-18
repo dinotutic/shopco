@@ -125,6 +125,7 @@ model Review {
   rating      Int       
   comment     String?
   createdAt   DateTime  @default(now())
+  highlighted Boolean   @default(false)
 }
 
 model Cart {
