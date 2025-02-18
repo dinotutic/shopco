@@ -7,7 +7,16 @@ const nextConfig: NextConfig = {
     },
   },
   images: {
-    domains: ["loremflickr.com", "shopco-project.s3.eu-north-1.amazonaws.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "loremflickr.com",
+      },
+      {
+        protocol: "https",
+        hostname: "shopco-project.s3.eu-north-1.amazonaws.com",
+      },
+    ],
   },
 };
 

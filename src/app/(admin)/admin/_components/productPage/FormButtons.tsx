@@ -1,6 +1,6 @@
 import React from "react";
 import Button from "./Button";
-import Loading from "../../ui/Loading";
+import Loading from "../../../../(frontend)/_components/ui/Loading";
 interface FormButtonsProps {
   isEditing: boolean;
   mode: "create" | "edit";
