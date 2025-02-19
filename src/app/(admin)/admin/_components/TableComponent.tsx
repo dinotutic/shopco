@@ -37,7 +37,7 @@ const TableCell = ({
     <td
       className={`${baseClasses} ${firstColumnClass} ${lastColumnClass} ${lastRowClass}`}
     >
-      {children}
+      <div className="truncate max-w-72">{children}</div>
     </td>
   );
 };
@@ -83,28 +83,30 @@ interface TableComponentProps {
 
 const TableComponent = ({ data, headers }: TableComponentProps) => {
   return (
-    <table className="w-full border-separate border-spacing-0">
-      <thead className="bg-gray-200">
-        <TableHeaders headers={headers} />
-      </thead>
-      <tbody>
-        {data.map((row, rowIndex) => (
-          <TableRow key={row.id}>
-            {headers.map((header, colIndex) => (
-              <TableCell
-                key={header.id}
-                rowIndex={rowIndex}
-                colIndex={colIndex}
-                totalRows={data.length}
-                totalCols={headers.length}
-              >
-                {header.render(row)}
-              </TableCell>
-            ))}
-          </TableRow>
-        ))}
-      </tbody>
-    </table>
+    <div className="overflow-x-auto">
+      <table className="w-full border-separate border-spacing-0">
+        <thead className="bg-gray-200">
+          <TableHeaders headers={headers} />
+        </thead>
+        <tbody>
+          {data.map((row, rowIndex) => (
+            <TableRow key={row.id}>
+              {headers.map((header, colIndex) => (
+                <TableCell
+                  key={header.id}
+                  rowIndex={rowIndex}
+                  colIndex={colIndex}
+                  totalRows={data.length}
+                  totalCols={headers.length}
+                >
+                  {header.render(row)}
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 };
 

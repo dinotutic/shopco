@@ -10,7 +10,7 @@ import SortComponent from "../SortComponent";
 import SearchComponent from "../SearchComponent";
 
 interface OrderProps {
-  orders: Order[];
+  orders: Omit<Order, "product">[];
 }
 const OrdersList = ({ orders }: OrderProps) => {
   const [search, setSearch] = useState<string>("");

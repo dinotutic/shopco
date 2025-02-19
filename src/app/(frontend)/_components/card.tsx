@@ -10,8 +10,6 @@ interface CardProps {
 
 const Card = async ({ product }: CardProps) => {
   const rating = await averageRating(product.reviews);
-  console.log("product: ", product);
-  console.log("images: ", product.images);
   return (
     <div className="w-min flex flex-col items-start justify-start rounded-2xl gap-2">
       <div className="w-48 h-48 md:h-72 md:w-72 rounded-2xl relative overflow-hidden">
