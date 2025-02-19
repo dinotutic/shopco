@@ -12,6 +12,7 @@ export const getAllSales = async () => {
               images: { include: { color: true } },
               gender: true,
               stock: { include: { color: true } },
+              reviews: { include: { user: true } },
             },
           },
           color: true,

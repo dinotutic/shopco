@@ -23,6 +23,7 @@ export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
           <NavLink href="/admin/products">Products</NavLink>
           <NavLink href="/admin/customers">Customers</NavLink>
           <NavLink href="/admin/orders">Orders</NavLink>
+          <NavLink href="/admin/reviews">Reviews</NavLink>
         </Nav>
         <div className="p-6 w-full max-w-[1400px] m-auto overflow-auto">
           {children}

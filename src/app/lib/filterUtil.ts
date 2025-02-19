@@ -1,4 +1,4 @@
-import { Order, Product, User } from "../types/shared.types";
+import { Order, Product, Review, User } from "../types/shared.types";
 
 export const filterProducts = (
   products: Product[],
@@ -46,5 +46,21 @@ export const filterOrders = (orders: Order[], search: string) => {
       .toLowerCase()
       .includes(search.toLowerCase());
     return matchesSearchFilter;
+  });
+};
+
+export const filterReviews = (reviews: Review[], search: string) => {
+  return reviews.filter((review) => {
+    const matchesCommentFilter =
+      review.comment?.toLowerCase().includes(search.toLowerCase()) ?? false;
+    const matchesUsernameFilter = review.user.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesProductFilter = review.product.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    return (
+      matchesCommentFilter || matchesUsernameFilter || matchesProductFilter
+    );
   });
 };

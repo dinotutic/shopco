@@ -465,7 +465,9 @@ export async function getNewArrivals(limit?: number) {
       category: true,
       style: true,
       gender: true,
-      reviews: true,
+      reviews: {
+        include: { user: true },
+      },
       stock: {
         include: { color: true },
       },

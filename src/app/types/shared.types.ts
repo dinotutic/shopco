@@ -98,11 +98,14 @@ export interface CustomerSalesStats {
 
 export interface Review {
   id: number;
+  user: User;
   userId: number;
   rating: number;
   comment: string | null;
   createdAt: Date;
   productId: number;
+  product: Product;
+  highlighted: boolean;
 }
 
 export interface FormOptions {
