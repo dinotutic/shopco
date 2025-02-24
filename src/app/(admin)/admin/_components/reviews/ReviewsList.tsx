@@ -38,7 +38,7 @@ const ReviewsList = ({ reviews }: ReviewsListProps) => {
     <div className="overflow-x-auto">
       <div className="flex my-8 justify-between items-center">
         <h1 className="text-xl text-gray-500">Filters:</h1>
-        <div>
+        <div className="flex gap-4">
           <SearchComponent
             value={search}
             onChange={handleSearchChange}
