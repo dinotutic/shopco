@@ -1,13 +1,14 @@
-import { Product } from "@/app/types/shared.types";
+import { Product, Review } from "@/app/types/shared.types";
 import { formatCurrency } from "@/app/lib/formatters";
 import { averageRating } from "@/app/lib/productHelpers";
 import renderStars from "@/app/lib/renderStars";
 import Image from "next/image";
 
 interface CardProps {
-  product: Product;
+  product: Omit<Product, "reviews" | "user"> & {
+    reviews: Omit<Review, "product" | "user">[];
+  };
 }
-
 const Card = async ({ product }: CardProps) => {
   const rating = await averageRating(product.reviews);
   return (

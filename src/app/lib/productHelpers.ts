@@ -50,7 +50,9 @@ export const removeDuplicatesInArr = (array: any[], key?: any) => {
   });
 };
 
-export const averageRating = (reviews: Review[]) => {
+export const averageRating = (
+  reviews: Omit<Review, "product" | "user">[]
+): number => {
   if (!reviews.length) return 0;
   const total = reviews.reduce((acc, review) => acc + review.rating, 0);
   return parseFloat((total / reviews.length).toFixed(1));
