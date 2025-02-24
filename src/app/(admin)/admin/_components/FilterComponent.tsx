@@ -2,7 +2,7 @@ import React from "react";
 
 interface FilterOption {
   label: string;
-  value: string | boolean;
+  value: string | boolean | number;
 }
 
 interface FilterComponentProps {

@@ -5,7 +5,6 @@ import party from "../../../../../public/img/party.png";
 import gym from "../../../../../public/img/gym.png";
 import Link from "next/link";
 
-//very werid bug at width 1512 on Formal style - left side - vertical line
 const BrowseByStyle = () => {
   return (
     <section className="bg-gray_bg h-auto w-11/12 rounded-2xl flex flex-col items-center justify-center pt-16 pb-10 gap-14">
@@ -48,7 +47,7 @@ const StyleLink: React.FC<StyleLinkProps> = ({
   return (
     <Link href={href} className={className}>
       <div
-        className={`rounded-2xl h-72 bg-cover bg-center`}
+        className={`rounded-2xl h-72 bg-cover bg-center bg-no-repeat`}
         style={{ backgroundImage: `url(${backgroundImage})` }}
       >
         <div className="text-4xl font-satoshiBold pt-8 pl-10">{title}</div>

@@ -49,10 +49,23 @@ export const filterOrders = (orders: Order[], search: string) => {
   });
 };
 
-export const filterReviews = (reviews: Review[], search: string) => {
+export const filterReviews = (
+  reviews: Review[],
+  search: string,
+  commentFilter: boolean | null,
+  ratingFilter: number | null,
+  highlightedFilter: boolean | null
+) => {
   return reviews.filter((review) => {
     const matchesCommentFilter =
       review.comment?.toLowerCase().includes(search.toLowerCase()) ?? false;
+    const matchesCommentIncluded =
+      commentFilter === null || matchesCommentFilter === commentFilter;
+    const matchesHighlighted =
+      highlightedFilter === null || review.highlighted === highlightedFilter;
+    const matchesRatingsFilter =
+      ratingFilter === null || review.rating === Number(ratingFilter);
+
     const matchesUsernameFilter = review.user.name
       .toLowerCase()
       .includes(search.toLowerCase());
@@ -60,7 +73,10 @@ export const filterReviews = (reviews: Review[], search: string) => {
       .toLowerCase()
       .includes(search.toLowerCase());
     return (
-      matchesCommentFilter || matchesUsernameFilter || matchesProductFilter
+      (matchesCommentFilter || matchesUsernameFilter || matchesProductFilter) &&
+      matchesCommentIncluded &&
+      matchesRatingsFilter &&
+      matchesHighlighted
     );
   });
 };

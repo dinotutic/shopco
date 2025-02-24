@@ -1,4 +1,4 @@
-import { Order, Product, User } from "../types/shared.types";
+import { Order, Product, Review, User } from "../types/shared.types";
 
 export const sortProducts = (products: Product[], sortKey: string) => {
   return products.sort((a, b) => {
@@ -43,5 +43,24 @@ export const sortOrders = (orders: Order[], sortKey: string) => {
       return b.createdAt.getTime() - a.createdAt.getTime();
     }
     return 0;
+  });
+};
+
+export const sortReviews = (reviews: Review[], sortKey: string) => {
+  return reviews.sort((a, b) => {
+    if (sortKey === "ratingAsc") {
+      return a.rating - b.rating;
+    }
+    if (sortKey === "ratingDesc") {
+      return b.rating - a.rating;
+    }
+    if (sortKey === "dateAsc") {
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    }
+    if (sortKey === "dateDesc") {
+      return b.createdAt.getTime() - a.createdAt.getTime();
+    } else {
+      return 0;
+    }
   });
 };
