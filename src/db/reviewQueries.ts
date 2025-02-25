@@ -24,6 +24,7 @@ export const getAllReviews = async () => {
 export const getHighLightedReviews = async () => {
   return await prisma.review.findMany({
     where: { highlighted: true },
+    include: { user: true },
   });
 };
 
@@ -44,5 +45,13 @@ export const highlightReview = async (
   return await prisma.review.update({
     where: { id: reviewId },
     data: { highlighted: !highlighted },
+  });
+};
+
+// Used only for development purposes
+export const updateReview = async (reviewId: number, comment: string) => {
+  return await prisma.review.update({
+    where: { id: reviewId },
+    data: { comment: comment },
   });
 };

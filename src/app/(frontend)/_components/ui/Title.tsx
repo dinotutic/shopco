@@ -1,7 +1,17 @@
 import { ReactNode } from "react";
 
-const Title = ({ children }: { children: ReactNode }) => {
-  return <h1 className="text-5xl text-center font-integralCf">{children}</h1>;
+const Title = ({
+  children,
+  className,
+}: {
+  children: ReactNode;
+  className?: string;
+}) => {
+  return (
+    <h1 className={className || `text-5xl text-center font-integralCf`}>
+      {children}
+    </h1>
+  );
 };
 
 export default Title;

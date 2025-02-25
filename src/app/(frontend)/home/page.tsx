@@ -1,5 +1,6 @@
 import Brands from "../_components/brands/brands";
 import BrowseByStyle from "../_components/browse-by-style/BrowseByStyle";
+import HappyCustomers from "../_components/happy-customers/HappyCustomers";
 import Hero from "../_components/hero/Hero";
 import NewArrivals from "../_components/new-arrivals/NewArrivals";
 import TopSelling from "../_components/top-selling/TopSelling";
@@ -12,6 +13,7 @@ const HomePage = () => {
       <NewArrivals />
       <TopSelling />
       <BrowseByStyle />
+      <HappyCustomers />
     </div>
   );
 };
