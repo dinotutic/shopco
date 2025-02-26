@@ -6,7 +6,7 @@ import Title from "@/app/(frontend)/_components/ui/Title";
 const TopSelling = async () => {
   const topSelling = await getTopSelling(4);
   return (
-    <section className="flex flex-col items-center my-12 gap-12">
+    <section className="flex flex-col items-center my-12 gap-12 w-full">
       <Title>Top Selling</Title>
       <div className="flex gap-8">
         {topSelling.map((product) => (
