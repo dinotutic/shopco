@@ -6,7 +6,7 @@ import ViewAllBtn from "../ViewAllBtn";
 const NewArrivals = async () => {
   const newArrivals = await getNewArrivals(4);
   return (
-    <section className="flex flex-col items-center mt-12 gap-12 border-b pb-14">
+    <section className="flex flex-col items-center mt-12 gap-12 border-b pb-14 w-full">
       <Title>New Arrivals</Title>
       <div className="flex gap-8">
         {newArrivals.map((product) => (

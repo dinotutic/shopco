@@ -1,20 +1,20 @@
-export const slideLeft = (elementId: string, amount: number) => {
-  const element = document.getElementById(elementId);
-  if (element) {
-    element.scrollBy({ left: -amount, behavior: "smooth" });
+export const slideLeft = (id: string, amount: number) => {
+  const slider = document.getElementById(id);
+  if (slider) {
+    slider.scrollLeft -= amount;
   }
 };
 
-export const slideRight = (elementId: string, amount: number) => {
-  const element = document.getElementById(elementId);
-  if (element) {
-    element.scrollBy({ left: amount, behavior: "smooth" });
+export const slideRight = (id: string, amount: number) => {
+  const slider = document.getElementById(id);
+  if (slider) {
+    slider.scrollLeft += amount;
   }
 };
 
-export const scrollToMiddle = (elementId: string) => {
-  const element = document.getElementById(elementId);
-  if (element) {
-    element.scrollLeft = (element.scrollWidth - element.clientWidth) / 2;
+export const scrollToMiddle = (id: string) => {
+  const slider = document.getElementById(id);
+  if (slider) {
+    slider.scrollLeft = (slider.scrollWidth - slider.clientWidth) / 2;
   }
 };

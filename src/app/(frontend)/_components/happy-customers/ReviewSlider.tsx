@@ -10,13 +10,19 @@ interface ReviewCardProps {
 
 const ReviewSlider = ({ reviews }: ReviewCardProps) => {
   return (
-    <div
-      id="slider"
-      className="flex gap-5 p-10 w-full h-full scroll-smooth overflow-x-scroll flex-nowrap"
-    >
-      {reviews.map((review) => (
-        <ReviewCard key={review.id} review={review} />
-      ))}
+    <div className="relative w-full h-full my-8">
+      {/* Left Gradient */}
+      <div className="absolute left-0 top-0 bottom-0 w-16 z-20 gradient-left"></div>
+      {/* Right Gradient */}
+      <div className="absolute right-0 top-0 bottom-0 w-12 z-20 gradient-right"></div>
+      <div
+        id="slider"
+        className="flex py-3 gap-5 w-full h-full scroll-smooth overflow-x-hidden overflow-y-hidden flex-nowrap hide-scrollbar relative z-10"
+      >
+        {reviews.map((review) => (
+          <ReviewCard key={review.id} review={review} />
+        ))}
+      </div>
     </div>
   );
 };

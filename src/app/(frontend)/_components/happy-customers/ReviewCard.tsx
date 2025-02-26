@@ -10,7 +10,7 @@ interface ReviewCardProps {
 const ReviewCard = ({ review }: ReviewCardProps) => {
   return (
     <div
-      className="flex flex-col border gap-3 rounded-xl p-7 w-[400px] h-[240px] hover:scale-105 ease-in-out duration-300 shrink-0"
+      className="flex flex-col border gap-3 rounded-xl p-7 w-[360px] h-[216px] md:h-[240px] md:w-[400px] hover:scale-105 ease-in-out duration-300 shrink-0"
       key={review.id}
     >
       <span className="">{renderStars(review.rating)}</span>
