@@ -1,7 +1,7 @@
 import Brands from "../_components/brands/brands";
 import BrowseByStyle from "../_components/browse-by-style/BrowseByStyle";
 import Footer from "../_components/footer/Footer";
-import HappyCustomers from "../_components/happy-customers/HappyCustomers";
+import CustomerReviews from "../_components/customer-reviews/CustomerReviews";
 import Hero from "../_components/hero/Hero";
 import NewArrivals from "../_components/new-arrivals/NewArrivals";
 import Newsletter from "../_components/newsletter/Newsletter";
@@ -15,7 +15,7 @@ const HomePage = () => {
       <NewArrivals />
       <TopSelling />
       <BrowseByStyle />
-      <HappyCustomers />
+      <CustomerReviews />
       <Newsletter />
       <Footer />
     </div>
