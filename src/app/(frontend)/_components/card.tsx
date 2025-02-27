@@ -9,21 +9,23 @@ interface CardProps {
     reviews: Omit<Review, "product" | "user">[];
   };
 }
+
 const Card = async ({ product }: CardProps) => {
   const rating = await averageRating(product.reviews);
   return (
-    <div className="w-min flex flex-col items-start justify-start rounded-2xl gap-2">
-      <div className="w-48 h-48 md:h-72 md:w-72 rounded-2xl relative overflow-hidden">
+    <div className="flex flex-col items-start justify-start rounded-2xl gap-2 min-w-48 max-w-72 w-full">
+      <div className="rounded-2xl relative overflow-hidden w-full h-48 lg:h-60 xl:h-72">
         {product.images[0]?.url && (
           <Image
             src={product.images[0].url}
             alt={product.name}
             fill
-            sizes="20vw"
+            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 60vw, 72vw"
+            className="object-cover"
           />
         )}
       </div>
-      <h2 className="text-base md:text-xl font-satoshiMedium">
+      <h2 className="text-base md:text-xl font-satoshiMedium w-full truncate">
         {product.name}
       </h2>
       <span className="text-xs md:text-md text-gray-500">
