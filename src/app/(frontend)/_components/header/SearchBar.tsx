@@ -8,7 +8,7 @@ const SearchBar = () => {
         <input
           type="text"
           placeholder="Search for products..."
-          className="bg-gray-100 flex-grow w-full"
+          className="bg-gray-100 flex-grow w-full outline-none"
         />
       </div>
     </form>

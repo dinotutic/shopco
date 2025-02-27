@@ -3,12 +3,14 @@ import FooterBranding from "./FooterBranding";
 
 const FooterLinks = () => {
   return (
-    <div className="flex gap-10 justify-between items-center w-full">
+    <div className="flex flex-col md:flex-row gap-10 justify-start items-center w-full">
       <FooterBranding />
-      <FooterColumn columnData={company} />
-      <FooterColumn columnData={help} />
-      <FooterColumn columnData={faq} />
-      <FooterColumn columnData={resources} />
+      <div className="grid grid-cols-2 md:grid-cols-4 w-full md:ml-16 gap-6">
+        <FooterColumn columnData={company} />
+        <FooterColumn columnData={help} />
+        <FooterColumn columnData={faq} />
+        <FooterColumn columnData={resources} />
+      </div>
     </div>
   );
 };
