@@ -17,7 +17,7 @@ const HomePage = () => {
       <BrowseByStyle />
       <CustomerReviews />
       <Newsletter />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
