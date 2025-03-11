@@ -114,3 +114,9 @@ export interface FormOptions {
   colors: Color[];
   genders: Gender[];
 }
+
+export interface ProductFilters {
+  category: string | null;
+  style: string | null;
+  color: string | null;
+}
