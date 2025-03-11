@@ -3,9 +3,9 @@ import Button from "../Button";
 import HeroStats from "./HeroStats";
 
 const HeroText = () => {
-  const onClick = () => {
-    return null;
-  };
+  // const onClick = () => {
+  //   return null;
+  // };
   return (
     <div className="hero-text flex flex-col justify-center items-center lg:items-start">
       <h2 className="text-6xl font-bold font-integralCf text-center lg:text-left">
@@ -17,9 +17,9 @@ const HeroText = () => {
         designed to bring out your individuality and cater to your sense of
         style.
       </p>
-      <Button onClick={onClick} className="mb-12 w-11/12 md:w-1/2 lg:w-auto">
+      {/* <Button onClick={onClick} className="mb-12 w-11/12 md:w-1/2 lg:w-auto">
         Show Now
-      </Button>
+      </Button> */}
       <HeroStats />
     </div>
   );

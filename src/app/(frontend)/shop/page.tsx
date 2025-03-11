@@ -1,9 +1,11 @@
-const Shop = async () => {
+const ShopStartPage = async () => {
   return (
     <section>
-      <h2>Casual</h2>
+      <h2>
+        Shop - front page that I will deal with later. I still need design
+      </h2>
     </section>
   );
 };
 
-export default Shop;
+export default ShopStartPage;

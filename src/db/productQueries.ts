@@ -6,7 +6,6 @@ import { Category, Gender, Stock, Style } from "@prisma/client";
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
 import { Color, Image } from "@/app/types/shared.types";
-import { undefined } from "zod";
 
 export async function getAllProducts() {
   const products = await prisma.product.findMany({
@@ -367,25 +366,10 @@ export async function editProduct(
   return updatedProduct;
 }
 
-// export async function getCategories() {
-//   const categories = await prisma.category.findMany();
-//   return categories;
-// }
-
-// export async function getStyles() {
-//   const styles = await prisma.style.findMany();
-//   return styles;
-// }
-
 export async function getColors() {
   const colors = await prisma.color.findMany();
   return colors;
 }
-
-// export async function getGenders() {
-//   const genders = await prisma.gender.findMany();
-//   return genders;
-// }
 
 export async function getColorByColorId(colorId: number) {
   const color = await prisma.color.findUnique({ where: { id: colorId } });
@@ -501,3 +485,35 @@ export const getFormOptions = async () => {
   const genders = await prisma.gender.findMany();
   return { categories, styles, colors, genders };
 };
+
+export async function fetchProducts(filters: {
+  category?: string;
+  style?: string;
+  color?: string;
+  gender?: string;
+}) {
+  const { category, style, color, gender } = filters;
+  const products = await prisma.product.findMany({
+    where: {
+      category: category ? { name: category } : undefined,
+      style: style ? { name: style } : undefined,
+      stock: {
+        some: {
+          color: color ? { name: color } : undefined,
+        },
+      },
+      gender: gender ? { name: gender } : undefined,
+    },
+    include: {
+      images: true,
+      category: true,
+      style: true,
+      gender: true,
+      reviews: true,
+      stock: {
+        include: { color: true },
+      },
+    },
+  });
+  return products;
+}
