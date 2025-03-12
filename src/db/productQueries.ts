@@ -371,6 +371,11 @@ export async function getColors() {
   return colors;
 }
 
+export async function getCategories() {
+  const categories = await prisma.category.findMany();
+  return categories;
+}
+
 export async function getColorByColorId(colorId: number) {
   const color = await prisma.color.findUnique({ where: { id: colorId } });
   return color;
