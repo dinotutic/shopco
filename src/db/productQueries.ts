@@ -486,13 +486,17 @@ export const getFormOptions = async () => {
   return { categories, styles, colors, genders };
 };
 
-export async function fetchProducts(filters: {
-  category?: string;
-  style?: string;
-  color?: string;
-  gender?: string;
-}) {
-  const { category, style, color, gender } = filters;
+export async function fetchProducts(
+  filters: {
+    category: string | null;
+    style: string | null;
+    color: string | null;
+  },
+  gender: string,
+  take?: number,
+  skip?: number
+) {
+  const { category, style, color } = filters;
   const products = await prisma.product.findMany({
     where: {
       category: category ? { name: category } : undefined,
@@ -514,6 +518,9 @@ export async function fetchProducts(filters: {
         include: { color: true },
       },
     },
+    take,
+    skip,
   });
+  console.log("server", products);
   return products;
 }
