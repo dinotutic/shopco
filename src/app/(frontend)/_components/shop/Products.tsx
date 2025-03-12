@@ -1,17 +1,17 @@
-import { ProductFilters } from "@/app/types/shared.types";
+import { Product, Review } from "@/app/types/shared.types";
+import Card from "../card";
 
 interface ProductProps {
-  gender: string;
-  filters: ProductFilters;
+  products: (Omit<Product, "reviews" | "user"> & {
+    reviews: Omit<Review, "product" | "user">[];
+  })[];
 }
-const Products = ({ gender, filters }: ProductProps) => {
-  const { category, style, color } = filters;
+const Products = async ({ products }: ProductProps) => {
   return (
-    <div>
-      <h1>gender: {gender}</h1>
-      <h1>category: {category}</h1>
-      <h1>style: {style}</h1>
-      <h1>color: {color}</h1>
+    <div className="flex gap-10 flex-wrap">
+      {products.map((product) => (
+        <Card key={product.id} product={product} />
+      ))}
     </div>
   );
 };
