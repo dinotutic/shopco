@@ -36,7 +36,13 @@ const CategoryFilter = () => {
     <div>
       <div className="flex">
         <h3>Filters</h3>
-        <Image src={filter_icon} alt="filter icon" className="hidden" />
+        <Image
+          src={filter_icon}
+          alt="filter icon"
+          className="hidden"
+          width={24}
+          height={24}
+        />
       </div>
       <div>
         {categories.map((category) => (
