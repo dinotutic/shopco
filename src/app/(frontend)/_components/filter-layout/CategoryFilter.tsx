@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import filter_icon from "@/../public/svg/filter_icon.svg";
 import { capitalizeFirstChar } from "@/app/lib/textFormatting";
+import FilterTitle from "./FilterTitle";
 
 const CategoryFilter = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -35,7 +36,7 @@ const CategoryFilter = () => {
   return (
     <div>
       <div className="flex">
-        <h3>Filters</h3>
+        <FilterTitle title="Category" />
         <Image
           src={filter_icon}
           alt="filter icon"
@@ -49,7 +50,7 @@ const CategoryFilter = () => {
           <button
             key={category.id}
             onClick={() => handleCategoryToggle(category)}
-            className={`block w-full text-left p-2 ${
+            className={`block w-full text-left p-2 text-gray-500 ${
               isSelected(category) ? "bg-gray-400 text-white" : ""
             }`}
           >

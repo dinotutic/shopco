@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ReactSlider from "react-slider";
+import FilterTitle from "./FilterTitle";
 
 const PriceFilter = () => {
   const [value, setValue] = useState({ min: 0, max: 100 });
@@ -12,8 +13,8 @@ const PriceFilter = () => {
 
   return (
     <div>
-      <h3 className="mb-2 font-satoshiMedium">Price</h3>
-      <div className="border w-full">
+      <FilterTitle title="Price" />
+      <div className="w-full">
         <ReactSlider
           className="horizontal-slider"
           thumbClassName="slider-thumb"
