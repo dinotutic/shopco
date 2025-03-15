@@ -103,7 +103,7 @@ const ColorItem: React.FC<ColorItemProps> = ({
 
   const colorStyle: React.CSSProperties = {
     background:
-      color.name === "Colorful"
+      color.name === "colorful"
         ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
         : color.name,
     opacity: isAvailable || isSelected ? 1 : 0.5,
