@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { faker } from "@faker-js/faker";
-import { array } from "zod";
 import { getColors } from "@/db/productQueries";
 
 const prisma = new PrismaClient();
@@ -9,7 +8,7 @@ async function main() {
   const availableSizes = ["XS", "S", "M", "L", "XL"];
 
   // Create categories
-  const categoryNames = ["T-shirts", "Shorts", "Shirts", "Hoodies", "Jeans"];
+  const categoryNames = ["t-shirts", "shorts", "shirts", "hoodies", "jeans"];
   const categories = [];
   for (const category of categoryNames) {
     console.log(`Creating category: ${category}`);
@@ -22,7 +21,7 @@ async function main() {
   }
 
   // Create styles
-  const styleNames = ["Casual", "Formal", "Party", "Gym"];
+  const styleNames = ["casual", "formal", "party", "gym"];
   const styles = [];
   for (const style of styleNames) {
     console.log(`Creating style: ${style}`);
@@ -51,17 +50,17 @@ async function main() {
   // Add Colors
   const colors = await prisma.color.createMany({
     data: [
-      { name: "Black" },
-      { name: "White" },
-      { name: "Red" },
-      { name: "Blue" },
-      { name: "Green" },
-      { name: "Yellow" },
-      { name: "Orange" },
+      { name: "black" },
+      { name: "white" },
+      { name: "red" },
+      { name: "blue" },
+      { name: "green" },
+      { name: "yellow" },
+      { name: "orange" },
       { name: "Purple" },
-      { name: "Pink" },
-      { name: "Brown" },
-      { name: "Colorful" },
+      { name: "pink" },
+      { name: "brown" },
+      { name: "colorful" },
     ],
   });
   const colorsList = await getColors();
@@ -81,9 +80,9 @@ async function main() {
 
   // Create a gender list
   const genderList = [
-    { id: 1, name: "Male" },
-    { id: 2, name: "Female" },
-    { id: 3, name: "Unisex" },
+    { id: 1, name: "men" },
+    { id: 2, name: "women" },
+    { id: 3, name: "unisex" },
   ];
   for (const gender of genderList) {
     await prisma.gender.create({
