@@ -17,6 +17,7 @@ const useColorPicker = () => {
   const isColorSelected = (color: Color) => {
     return selectedColor.some((selected) => selected.id === color.id);
   };
+
   return { selectedColor, handleColorClick, isColorSelected };
 };
 

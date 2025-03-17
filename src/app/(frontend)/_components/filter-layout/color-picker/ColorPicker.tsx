@@ -1,6 +1,6 @@
 import { getColors } from "@/db/productQueries";
-import FilterTitle from "../filter-layout/FilterTitle";
 import RenderColors from "./RenderColors";
+import FilterTitle from "../FilterTitle";
 
 const ColorPicker = async () => {
   const availableColors = await getColors();

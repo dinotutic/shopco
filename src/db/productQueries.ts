@@ -376,6 +376,11 @@ export async function getCategories() {
   return categories;
 }
 
+export async function getStyles() {
+  const styles = await prisma.style.findMany();
+  return styles;
+}
+
 export async function getColorByColorId(colorId: number) {
   const color = await prisma.color.findUnique({ where: { id: colorId } });
   return color;
@@ -465,6 +470,7 @@ export async function getNewArrivals(limit?: number) {
   });
   return newArrivals;
 }
+
 export async function getTopSelling(limit?: number) {
   const topSelling = await prisma.product.findMany({
     where: { topSelling: true },
@@ -528,4 +534,12 @@ export async function fetchProducts(
   });
   console.log("server", products);
   return products;
+}
+
+export async function getSizes() {
+  const sizes = await prisma.stock.findMany({
+    distinct: ["size"],
+    select: { size: true },
+  });
+  return sizes;
 }

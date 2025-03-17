@@ -3,7 +3,7 @@
 import { Color } from "@/app/types/shared.types";
 import Image from "next/image";
 import checkmark from "@/../public/svg/color_checkmark.svg";
-import useColorPicker from "../../hooks/useColorPicker";
+import useColorPicker from "@/app/(frontend)/hooks/useColorPicker";
 
 interface RenderColorsProps {
   availableColors: Color[];
@@ -11,7 +11,6 @@ interface RenderColorsProps {
 
 const RenderColors = ({ availableColors }: RenderColorsProps) => {
   const { selectedColor, handleColorClick, isColorSelected } = useColorPicker();
-  console.log(selectedColor);
   return (
     <div className="flex flex-wrap gap-1">
       {availableColors.map((color) => (
@@ -39,9 +38,7 @@ const RenderColor = ({ color, onClick, isColorSelected }: RenderColorProps) => {
       color.name === "colorful"
         ? "linear-gradient(90deg, red, orange, yellow, green, blue, violet)"
         : color.name,
-    // opacity: isAvailable || isSelected ? 1 : 0.5,
     cursor: "pointer",
-    // pointerEvents: isSelected ? "none" : "auto",
   };
   return (
     <div

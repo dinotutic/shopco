@@ -120,3 +120,7 @@ export interface ProductFilters {
   style: string | null;
   color: string | null;
 }
+
+export interface Size {
+  size: string;
+}
