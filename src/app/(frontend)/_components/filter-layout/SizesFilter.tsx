@@ -1,26 +1,19 @@
 "use client";
-import { getSizes } from "@/db/productQueries";
-import { useEffect, useState } from "react";
+
 import FilterTitle from "./FilterTitle";
 import { Size } from "@/app/types/shared.types";
 import useSizesFilter from "../../../hooks/useSizesFilter";
 
-const SizesFilter = () => {
-  const [sizes, setSizes] = useState<Size[]>([]);
+interface SizesFilterProps {
+  sizes: Size[];
+}
+const SizesFilter = ({ sizes }: SizesFilterProps) => {
   const { handleSizeClick, isSizeSelected } = useSizesFilter();
-
-  useEffect(() => {
-    const fetchSizes = async () => {
-      const sizes = await getSizes();
-      setSizes(sizes);
-    };
-    fetchSizes();
-  }, []);
 
   return (
     <>
       <FilterTitle title="Size" />
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         {sizes.map((size) => (
           <SizeRender
             size={size}

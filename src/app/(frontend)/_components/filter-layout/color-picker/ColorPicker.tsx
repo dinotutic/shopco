@@ -1,9 +1,11 @@
-import { getColors } from "@/db/productQueries";
 import RenderColors from "./RenderColors";
 import FilterTitle from "../FilterTitle";
+import { Color } from "@/app/types/shared.types";
 
-const ColorPicker = async () => {
-  const availableColors = await getColors();
+interface ColorPickerProps {
+  availableColors: Color[];
+}
+const ColorPicker = ({ availableColors }: ColorPickerProps) => {
   return (
     <div>
       <FilterTitle title="Color" />

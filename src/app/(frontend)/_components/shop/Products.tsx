@@ -5,6 +5,8 @@ import Card from "../card";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "@/db/productQueries";
 import { RESULTS_PER_PAGE } from "../../(shop)/shop/[gender]/page";
+import Loading from "@/app/(frontend)/_components/ui/Loading";
+import Image from "next/image";
 
 interface ProductProps {
   initialProducts: (Omit<Product, "reviews" | "user"> & {
@@ -26,9 +28,15 @@ const Products = ({ initialProducts, filters }: ProductProps) => {
     queryKey: ["products", { ...filters }],
     queryFn: () => getProducts(filters, RESULTS_PER_PAGE),
     initialData: initialProducts,
+    staleTime: 1000 * 60 * 5,
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
   if (isError) return <div>Error fetching products</div>;
 
   return (
