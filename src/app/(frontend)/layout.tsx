@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./../globals.css";
 import Header from "./_components/header/Header";
 import Footer from "./_components/footer/Footer";
+import QueryProvider from "../_components/providers/QueryProvider";
 
 export const metadata: Metadata = {
   title: "ShopCo - Your Fashion Destination",
@@ -17,11 +18,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="w-full flex flex-col items-center">
-        <header className="w-full max-w-[1440px] flex items-center justify-center px-4">
-          <Header />
-        </header>
-        {children}
-        <Footer />
+        <QueryProvider>
+          <header className="w-full max-w-[1440px] flex items-center justify-center px-4">
+            <Header />
+          </header>
+          {children}
+          <Footer />
+        </QueryProvider>
       </body>
     </html>
   );

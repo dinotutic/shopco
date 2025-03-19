@@ -5,7 +5,7 @@ import Logo from "./logo";
 import NavBar from "./NavBar";
 import SearchBar from "./SearchBar";
 import UserActions from "./UserActions";
-import useResponsiveMenu from "../../hooks/useResponsiveMenu";
+import useResponsiveMenu from "../../../hooks/useResponsiveMenu";
 
 const Header = () => {
   // Handles opening and closing the hamburger menu

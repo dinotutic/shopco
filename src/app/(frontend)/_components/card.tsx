@@ -3,6 +3,7 @@ import { formatCurrency } from "@/app/lib/formatters";
 import { averageRating } from "@/app/lib/productHelpers";
 import renderStars from "@/app/lib/renderStars";
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
 
 interface CardProps {
   product: Omit<Product, "reviews" | "user"> & {
@@ -10,8 +11,16 @@ interface CardProps {
   };
 }
 
-const Card = async ({ product }: CardProps) => {
-  const rating = await averageRating(product.reviews);
+const Card = ({ product }: CardProps) => {
+  const {
+    data: rating,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["rating", product.reviews],
+    queryFn: () => averageRating(product.reviews),
+  });
+
   return (
     <div className="flex flex-col items-start justify-start rounded-2xl gap-2 min-w-48 max-w-72 w-full">
       <div className="rounded-2xl relative overflow-hidden w-full h-48 lg:h-60 xl:h-72">
@@ -29,7 +38,15 @@ const Card = async ({ product }: CardProps) => {
         {product.name}
       </h2>
       <span className="text-xs md:text-md text-gray-500">
-        {renderStars(rating)} {rating}
+        {isLoading ? (
+          <span>Loading...</span>
+        ) : isError ? (
+          <span>Error loading rating</span>
+        ) : (
+          <>
+            {renderStars(rating ?? 0)} {rating ?? 0}
+          </>
+        )}
       </span>
       <span className="text-xl md:text-2xl font-satoshiMedium">
         {formatCurrency(product.priceInCents)}

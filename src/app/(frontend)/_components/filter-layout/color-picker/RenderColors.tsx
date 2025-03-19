@@ -3,7 +3,7 @@
 import { Color } from "@/app/types/shared.types";
 import Image from "next/image";
 import checkmark from "@/../public/svg/color_checkmark.svg";
-import useColorPicker from "@/app/(frontend)/hooks/useColorPicker";
+import useColorPicker from "@/app/hooks/useColorPicker";
 
 interface RenderColorsProps {
   availableColors: Color[];

@@ -1,5 +1,5 @@
 "use client";
-import useStylesFilter from "@/app/(frontend)/hooks/useStylesFilter";
+import useStylesFilter from "@/app/hooks/useStylesFilter";
 import { Style } from "@/app/types/shared.types";
 import { getStyles } from "@/db/productQueries";
 import { useEffect, useState } from "react";
