@@ -4,7 +4,7 @@ import { Category } from "@/app/types/shared.types";
 import { getCategories } from "@/db/productQueries";
 import { useEffect, useState } from "react";
 import CategoriesAndStyles from "./CategoriesAndStyles";
-import useCategoriesFilter from "../../../hooks/useCategoriesFilter";
+import useCategoriesFilter from "../../../../hooks/useCategoriesFilter";
 
 const CategoryFilter = () => {
   const [categories, setCategories] = useState<Category[]>([]);

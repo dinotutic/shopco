@@ -497,17 +497,17 @@ export const getFormOptions = async () => {
   return { categories, styles, colors, genders };
 };
 
-export async function fetchProducts(
+export async function getProducts(
   filters: {
     category: string | null;
     style: string | null;
     color: string | null;
+    gender: string | null;
   },
-  gender: string,
   take?: number,
   skip?: number
 ) {
-  const { category, style, color } = filters;
+  const { category, style, color, gender } = filters;
   const products = await prisma.product.findMany({
     where: {
       category: category ? { name: category } : undefined,
@@ -532,7 +532,7 @@ export async function fetchProducts(
     take,
     skip,
   });
-  console.log("server", products);
+  new Promise((resolve) => setTimeout(resolve, 1000));
   return products;
 }
 

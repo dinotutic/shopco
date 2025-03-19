@@ -3,7 +3,7 @@ import { getSizes } from "@/db/productQueries";
 import { useEffect, useState } from "react";
 import FilterTitle from "./FilterTitle";
 import { Size } from "@/app/types/shared.types";
-import useSizesFilter from "../../hooks/useSizesFilter";
+import useSizesFilter from "../../../hooks/useSizesFilter";
 
 const SizesFilter = () => {
   const [sizes, setSizes] = useState<Size[]>([]);

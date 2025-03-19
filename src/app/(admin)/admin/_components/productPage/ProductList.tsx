@@ -11,6 +11,10 @@ import useProductFilters from "../../hooks/useProductFilters";
 import { tableHaders, sortOptions } from "./productConstants";
 import { filterHandlers } from "./filterHandlers";
 
+// I in some cases (somewhere in the list definitely) I refresh pages to see the changes to products.
+// I now believe that it is the wrong way to do it, since it only works in development mode.
+// I should probably use revalidateTag/revalidatePath to see latest changes. Or maybe ReactQuery? refetchOnWindowFocus:true?
+// Will investigate this in the future
 interface ProductListProps {
   products: Product[];
   formOptions: FormOptions;
