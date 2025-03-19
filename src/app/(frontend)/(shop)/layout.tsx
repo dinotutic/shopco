@@ -14,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex border">
+    <div className="flex gap-4">
       <FilterLayout />
       {children}
     </div>

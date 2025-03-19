@@ -1,9 +1,11 @@
+"use client";
 import { Product, Review } from "@/app/types/shared.types";
 import { formatCurrency } from "@/app/lib/formatters";
 import { averageRating } from "@/app/lib/productHelpers";
 import renderStars from "@/app/lib/renderStars";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
+import Loading from "./ui/Loading";
 
 interface CardProps {
   product: Omit<Product, "reviews" | "user"> & {
@@ -39,7 +41,9 @@ const Card = ({ product }: CardProps) => {
       </h2>
       <span className="text-xs md:text-md text-gray-500">
         {isLoading ? (
-          <span>Loading...</span>
+          <span>
+            <Loading />
+          </span>
         ) : isError ? (
           <span>Error loading rating</span>
         ) : (

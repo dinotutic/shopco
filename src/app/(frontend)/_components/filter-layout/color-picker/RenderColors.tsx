@@ -12,7 +12,7 @@ interface RenderColorsProps {
 const RenderColors = ({ availableColors }: RenderColorsProps) => {
   const { selectedColor, handleColorClick, isColorSelected } = useColorPicker();
   return (
-    <div className="flex flex-wrap gap-1">
+    <div className="flex flex-wrap gap-2">
       {availableColors.map((color) => (
         <RenderColor
           key={color.id}
