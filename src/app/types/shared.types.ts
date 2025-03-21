@@ -22,11 +22,16 @@ export interface Category {
   name: string;
 }
 
+export interface Size {
+  id: number;
+  name: string;
+}
+
 export interface Stock {
   id?: number;
   productId?: number;
-  size: string;
   quantity: number;
+  size: Size;
   color: Color;
   isNew?: boolean;
 }
@@ -53,7 +58,7 @@ export interface Product {
   details: string;
   newArrival: boolean;
   topSelling: boolean;
-  reviews: Review[];
+  reviews: Omit<Review, "product" | "user">[];
 }
 
 export interface OrderItem {
@@ -113,6 +118,7 @@ export interface FormOptions {
   styles: Style[];
   colors: Color[];
   genders: Gender[];
+  sizes: Size[];
 }
 
 export interface ProductFilters {
@@ -121,6 +127,7 @@ export interface ProductFilters {
   color: string | null;
 }
 
-export interface Size {
-  size: string;
-}
+// might need to use this later
+// product: Omit<Product, "reviews" | "user"> & {
+//   reviews: Omit<Review, "product" | "user">[];
+// };

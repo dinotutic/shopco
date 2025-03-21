@@ -8,7 +8,7 @@ import {
   processImagesArray,
   removeDuplicatesInArr,
 } from "@/app/lib/productHelpers";
-import { Color, Image, Style } from "../types/shared.types";
+import { Color, Image, Size, Style } from "../types/shared.types";
 import { Category, Gender } from "@prisma/client";
 
 export interface ProductHandleSubmitProps {
@@ -17,7 +17,7 @@ export interface ProductHandleSubmitProps {
   details: string;
   stock: {
     productId?: number;
-    size: string;
+    size: Size;
     quantity: number;
     color: Color;
     isNew?: boolean;
@@ -55,12 +55,12 @@ export const handleSubmitEdit = async (
   data: ProductHandleSubmitProps,
   id: number,
   availableColors: Color[],
-  selectedColor: Color
+  selectedColor: Color,
+  sizes: Size[]
 ) => {
   e.preventDefault();
 
   // Define sizes
-  const sizes = ["XS", "S", "M", "L", "XL"];
 
   // Finds colors that are new and creates a new empty stock for those colors
   const newColors = availableColors.filter(
@@ -68,7 +68,7 @@ export const handleSubmitEdit = async (
   );
   const newStock = newColors.flatMap((color) =>
     sizes.map((size) => ({
-      size,
+      size: { id: size.id, name: size.name },
       quantity: 0,
       color: color,
       productId: id || 0,

@@ -35,6 +35,7 @@ const Colors: React.FC<ColorsProps> = ({
           ? availableColors.filter((c) => c.id !== color.id)
           : [...availableColors, color]
       );
+      console.log(availableColors);
     } else if (mode === "create") {
       setProductField("selectedColor", color);
     }

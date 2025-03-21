@@ -1,5 +1,5 @@
 import { handleSubmitCreate, handleSubmitEdit } from "@/app/lib/submitHelpers";
-import { Color } from "../../../../types/shared.types";
+import { Color, Size } from "../../../../types/shared.types";
 
 interface handleSubmitProps {
   productId: number | undefined;
@@ -7,6 +7,7 @@ interface handleSubmitProps {
   productState: any;
   mode: string;
   setProductField: (field: string, value: any) => void;
+  sizes: Size[];
 }
 
 const handleSubmit =
@@ -16,6 +17,7 @@ const handleSubmit =
     productState,
     mode,
     setProductField,
+    sizes,
   }: handleSubmitProps) =>
   async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,7 +46,14 @@ const handleSubmit =
 
     try {
       if (mode === "edit" && productId) {
-        handleSubmitEdit(e, data, productId, availableColors, selectedColor);
+        handleSubmitEdit(
+          e,
+          data,
+          productId,
+          availableColors,
+          selectedColor,
+          sizes
+        );
       } else if (mode === "create") {
         const newProd = await handleSubmitCreate(e, data);
         if (newProd) {

@@ -34,12 +34,13 @@ CREATE TABLE "Color" (
 -- CreateTable
 CREATE TABLE "Stock" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "size" TEXT NOT NULL,
     "quantity" INTEGER NOT NULL,
     "productId" INTEGER NOT NULL,
     "colorId" INTEGER NOT NULL,
+    "sizeId" INTEGER NOT NULL,
     CONSTRAINT "Stock_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT "Stock_colorId_fkey" FOREIGN KEY ("colorId") REFERENCES "Color" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT "Stock_colorId_fkey" FOREIGN KEY ("colorId") REFERENCES "Color" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Stock_sizeId_fkey" FOREIGN KEY ("sizeId") REFERENCES "Size" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 -- CreateTable
@@ -98,6 +99,12 @@ CREATE TABLE "Style" (
 );
 
 -- CreateTable
+CREATE TABLE "Size" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL
+);
+
+-- CreateTable
 CREATE TABLE "Review" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "userId" INTEGER NOT NULL,
@@ -129,7 +136,7 @@ CREATE TABLE "CartItem" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Stock_productId_colorId_size_key" ON "Stock"("productId", "colorId", "size");
+CREATE UNIQUE INDEX "Stock_productId_colorId_sizeId_key" ON "Stock"("productId", "colorId", "sizeId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
@@ -139,3 +146,6 @@ CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Style_name_key" ON "Style"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Size_name_key" ON "Size"("name");
