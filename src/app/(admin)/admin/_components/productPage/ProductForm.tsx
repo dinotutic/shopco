@@ -3,7 +3,7 @@
 import { formatCurrency } from "@/app/lib/formatters";
 import Colors from "./Colors";
 import { Product, FormOptions, Color } from "../../../../types/shared.types";
-import StockRender from "./Stock";
+import StockRender from "./StockRender";
 import FormField from "./FormField";
 import Images from "./Images";
 import Button from "./Button";
@@ -33,7 +33,7 @@ export default function ProductForm({
       mode,
     });
   const productId = product?.id;
-  const { categories, styles, colors, genders } = formOptions;
+  const { categories, styles, colors, genders, sizes } = formOptions;
   const {
     name,
     description,
@@ -63,6 +63,7 @@ export default function ProductForm({
           productState,
           mode,
           setProductField,
+          sizes,
         })}
       >
         <FormField
@@ -88,6 +89,7 @@ export default function ProductForm({
         />
         <StockRender
           stock={stock}
+          sizes={sizes}
           setStock={(stock) => setProductField("stock", stock)}
           isEditing={isEditing}
           selectedColor={selectedColor}

@@ -5,6 +5,8 @@ import { getColors } from "@/db/productQueries";
 const prisma = new PrismaClient();
 
 async function main() {
+  const availableSizes = ["XS", "S", "M", "L", "XL"];
+
   // Create categories
   const categoryNames = ["t-shirts", "shorts", "shirts", "hoodies", "jeans"];
   const categories = [];
@@ -29,19 +31,6 @@ async function main() {
       },
     });
     styles.push(createdStyle);
-  }
-
-  // Create sizes
-  const availableSizes = ["XS", "S", "M", "L", "XL"];
-  const sizes = [];
-  for (const size of availableSizes) {
-    console.log(`Creating size: ${size}`);
-    const createdSize = await prisma.size.create({
-      data: {
-        name: size,
-      },
-    });
-    sizes.push(createdSize);
   }
 
   // Create users
@@ -106,11 +95,11 @@ async function main() {
   for (let i = 0; i < 50; i++) {
     const colorIndexes = getColorIndexes();
     const stockEntries = [];
-    const images = [];
+    const images = []; // IMAGES ----------------IMAGES ----------------IMAGES ----------------
     for (const size of availableSizes) {
       for (const colorIndex of colorIndexes) {
         stockEntries.push({
-          size: { connect: { name: size } },
+          size,
           quantity: faker.number.int({ min: 0, max: 30 }),
           color: {
             connect: {

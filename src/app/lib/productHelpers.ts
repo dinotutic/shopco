@@ -1,5 +1,6 @@
 import { Color } from "@prisma/client";
-import { Image, Review, Stock } from "../types/shared.types";
+import { Image, Review, Size, Stock } from "../types/shared.types";
+import { getSizes } from "@/db/productQueries";
 
 export const processImagesArray = (
   images: Image[],
@@ -19,12 +20,14 @@ export const processImagesArray = (
   return [];
 };
 
-export const createEmptyStock = (selectedColor: Color): Stock[] => {
-  const sizes = ["XS", "S", "M", "L", "XL"];
-  const emptyStock: Stock[] = sizes.map((size, index) => ({
+export const createEmptyStock = (
+  selectedColor: Color,
+  sizes: Size[]
+): Stock[] => {
+  const emptyStock = sizes.map((size, index) => ({
     id: index,
     color: { id: selectedColor.id, name: selectedColor.name },
-    size,
+    size: { id: size.id, name: size.name },
     quantity: 0,
   }));
   return emptyStock;

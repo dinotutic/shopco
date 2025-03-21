@@ -23,7 +23,6 @@ export default async function ProductPage({
 
   const placeHolderColor = formOptions.colors[0];
   const initialSelectedColor = await getColorByColorId(Number(colorId));
-
   return (
     <div>
       <PageHeader>Product Detail</PageHeader>

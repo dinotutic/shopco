@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { Product, Color, FormOptions } from "../../../types/shared.types";
+import {
+  Product,
+  Color,
+  FormOptions,
+  Review,
+} from "../../../types/shared.types";
 import { removeDuplicatesInArr } from "@/app/lib/productHelpers";
 
 export interface UseProductFormProps {

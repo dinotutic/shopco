@@ -79,7 +79,7 @@ export async function addProduct(data: {
   description: string;
   details: string;
   stock: {
-    size: string;
+    size: { name: string; id: number };
     quantity: number;
     color: { name: string; id: number };
   }[];
@@ -130,7 +130,7 @@ export async function addProduct(data: {
       },
       stock: {
         create: data.stock.map((item) => ({
-          size: item.size,
+          size: { connect: { id: item.size.id } },
           quantity: item.quantity,
           color: {
             connect: {
@@ -182,7 +182,8 @@ export async function addProduct(data: {
 export async function addStock(data: Stock, colorId: number) {
   const newStock = await prisma.stock.create({
     data: {
-      size: data.size,
+      // size: data.size,
+      size: { connect: { id: data.sizeId } },
       quantity: data.quantity,
       product: {
         connect: {
@@ -207,7 +208,7 @@ export async function editProduct(
     details: string;
     stock: {
       id?: number;
-      size: string;
+      size: { name: string; id: number };
       quantity: number;
       color: { name: string; id: number };
       toDelete?: boolean;
@@ -297,7 +298,7 @@ export async function editProduct(
           where: {
             productId: id,
             colorId: item.color.id,
-            size: item.size,
+            sizeId: item.size.id,
           },
           data: {
             quantity: item.quantity,
@@ -317,7 +318,11 @@ export async function editProduct(
       try {
         await prisma.stock.create({
           data: {
-            size: item.size,
+            size: {
+              connect: {
+                id: item.size.id,
+              },
+            },
             quantity: item.quantity,
             product: {
               connect: {
@@ -419,6 +424,7 @@ export async function getProductByIdAndColor(id: number, colorId: number) {
       stock: {
         include: {
           color: true,
+          size: true,
         },
       },
     },
@@ -494,7 +500,8 @@ export const getFormOptions = async () => {
   const styles = await prisma.style.findMany();
   const colors = await prisma.color.findMany();
   const genders = await prisma.gender.findMany();
-  return { categories, styles, colors, genders };
+  const sizes = await prisma.size.findMany();
+  return { categories, styles, colors, genders, sizes };
 };
 
 export async function getProducts(
@@ -536,10 +543,6 @@ export async function getProducts(
   return products;
 }
 
-export async function getSizes() {
-  const sizes = await prisma.stock.findMany({
-    distinct: ["size"],
-    select: { size: true },
-  });
-  return sizes;
-}
+export const getSizes = async () => {
+  return await prisma.size.findMany();
+};
