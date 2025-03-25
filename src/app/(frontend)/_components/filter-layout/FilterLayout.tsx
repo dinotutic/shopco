@@ -11,8 +11,8 @@ const FilterLayout = async () => {
   const styles = await getStyles();
   const colors = await getColors();
   const sizes = await getSizes();
-
-  const filters = { categories, styles, colors, sizes };
+  const price = { min: 0, max: 1000 };
+  const filters = { categories, styles, colors, sizes, price };
 
   return (
     <>

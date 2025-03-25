@@ -5,13 +5,25 @@ import { Color } from "@/app/types/shared.types";
 import { useState } from "react";
 import Image from "next/image";
 import toggle_filter from "@/../public/svg/toggle_filter.svg";
+import { FilterType } from "@/app/hooks/useFilters";
 interface ColorPickerProps {
   availableColors: Color[];
+  isFilterOpen: (filter: FilterType) => boolean;
+  toggleIsFilterOpen: (filter: FilterType) => void;
+  selectColor: (filter: FilterType, id: number) => void;
+  isColorSelected: (option: FilterType, id: number) => boolean;
 }
-const ColorPicker = ({ availableColors }: ColorPickerProps) => {
-  const [isOpen, setIsOpen] = useState(true);
+const ColorPicker = ({
+  availableColors,
+  isFilterOpen,
+  toggleIsFilterOpen,
+  selectColor,
+  isColorSelected,
+}: ColorPickerProps) => {
+  const isOpen = isFilterOpen("colors");
+
   const handleToggleClick = () => {
-    setIsOpen(!isOpen);
+    toggleIsFilterOpen("colors");
   };
   return (
     <div>
@@ -24,7 +36,13 @@ const ColorPicker = ({ availableColors }: ColorPickerProps) => {
           className={`cursor-pointer ${isOpen ? "rotate-0" : "rotate-180"}`}
         />
       </div>
-      {isOpen && <RenderColors availableColors={availableColors} />}
+      {isOpen && (
+        <RenderColors
+          availableColors={availableColors}
+          selectColor={selectColor}
+          isColorSelected={isColorSelected}
+        />
+      )}
     </div>
   );
 };

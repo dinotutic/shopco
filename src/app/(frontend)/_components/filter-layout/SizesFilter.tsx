@@ -2,18 +2,35 @@
 
 import FilterTitle from "./FilterTitle";
 import { Size } from "@/app/types/shared.types";
-import useSizesFilter from "../../../hooks/useSizesFilter";
-import { useState } from "react";
 import Image from "next/image";
 import toggle_filter from "@/../public/svg/toggle_filter.svg";
+import { FilterType } from "@/app/hooks/useFilters";
 interface SizesFilterProps {
   sizes: Size[];
+  isFilterOpen: (filter: FilterType) => boolean;
+  toggleIsFilterOpen: (filter: FilterType) => void;
+  selectFilter: (filter: FilterType, id: number) => void;
+  isFilterSelected: (option: FilterType, id: number) => boolean;
 }
-const SizesFilter = ({ sizes }: SizesFilterProps) => {
-  const { handleSizeClick, isSizeSelected } = useSizesFilter();
-  const [isOpen, setIsOpen] = useState(true);
+const SizesFilter = ({
+  sizes,
+  isFilterOpen,
+  toggleIsFilterOpen,
+  selectFilter,
+  isFilterSelected,
+}: SizesFilterProps) => {
+  const isOpen = isFilterOpen("sizes");
+
   const handleToggleClick = () => {
-    setIsOpen(!isOpen);
+    toggleIsFilterOpen("sizes");
+  };
+
+  const handleSizeClick = (id: number) => {
+    selectFilter("sizes", id);
+  };
+
+  const handleIsSizeSelected = (id: number) => {
+    return isFilterSelected("sizes", id);
   };
   return (
     <>
@@ -31,9 +48,9 @@ const SizesFilter = ({ sizes }: SizesFilterProps) => {
           {sizes.map((size) => (
             <SizeRender
               size={size}
-              key={size.size}
+              key={size.id}
               onClick={handleSizeClick}
-              isSizeSelected={isSizeSelected}
+              isSizeSelected={handleIsSizeSelected}
             />
           ))}
         </div>
@@ -46,21 +63,21 @@ export default SizesFilter;
 
 interface SizeRenderProps {
   size: Size;
-  onClick: (size: Size) => void;
-  isSizeSelected: (size: Size) => boolean;
+  onClick: (id: number) => void;
+  isSizeSelected: (id: number) => boolean;
 }
 const SizeRender = ({ size, onClick, isSizeSelected }: SizeRenderProps) => {
   return (
     <>
       <button
         className={`px-5 py-2 border rounded-full ${
-          isSizeSelected(size)
+          isSizeSelected(size.id)
             ? "bg-black text-white"
             : "bg-gray-200 text-gray-600"
         }`}
-        onClick={() => onClick(size)}
+        onClick={() => onClick(size.id)}
       >
-        {size.size}
+        {size.name}
       </button>
     </>
   );
