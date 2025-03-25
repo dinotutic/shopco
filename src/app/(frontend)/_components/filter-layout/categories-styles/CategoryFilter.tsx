@@ -1,42 +1,50 @@
 import { Category } from "@/app/types/shared.types";
 import CategoriesAndStyles from "./CategoriesAndStyles";
-import useCategoriesFilter from "../../../../hooks/useCategoriesFilter";
-import { getCategories } from "@/db/productQueries";
 
 interface CategoryFilterProps {
   categories: Category[];
+  toggleFilterIsOpen: (filter: string) => void;
+  selectFilter: (filter: string, id: number) => void;
+  getSelectedFilters: (filter: string) => {
+    selectedCategories: { isSelected: boolean }[];
+    selectedStyles: { isSelected: boolean }[];
+    selectedColors: { isSelected: boolean }[];
+    selectedSizes: { isSelected: boolean }[];
+  };
+  filterIsOpen: (filter: string) => boolean;
+  filterIsSelected: (
+    option: "categories" | "styles" | "colors" | "sizes",
+    id: number
+  ) => boolean;
 }
-const CategoryFilter = async ({ categories }: CategoryFilterProps) => {
+const CategoryFilter = ({
+  categories,
+  toggleFilterIsOpen,
+  selectFilter,
+  getSelectedFilters,
+  filterIsOpen,
+  filterIsSelected,
+}: CategoryFilterProps) => {
+  const handleCategoryClick = (category: Category) => {
+    selectFilter("categories", category.id);
+  };
+
+  const handleToggleClick = () => {
+    toggleFilterIsOpen("categories");
+  };
+
   return (
-    <div></div>
-    // <CategoriesAndStyles
-    //   title="Category"
-    //   options={categories}
-    //   handleOptionToggle={handleCategoryClick}
-    //   isSelected={isCategorySelected}
-    //   isOpen={isOpen}
-    //   handleToggleClick={handleToggleClick}
-    // />
+    <div>
+      <CategoriesAndStyles
+        title="Category"
+        filterType="categories"
+        options={categories}
+        handleOptionToggle={handleCategoryClick}
+        isOpen={filterIsOpen("categories")}
+        isSelected={filterIsSelected}
+        handleToggleClick={handleToggleClick}
+      />
+    </div>
   );
 };
 export default CategoryFilter;
-// "use client";
-
-// import { Category } from "@/app/types/shared.types";
-// import CategoriesAndStyles from "./CategoriesAndStyles";
-// import useCategoriesFilter from "../../../../hooks/useCategoriesFilter";
-
-// interface CategoryFilterProps {
-//   categories: Category[];
-// }
-// const CategoryFilter = ({ categories }: CategoryFilterProps) => {
-//   return (
-//     <CategoriesAndStyles
-//       title="Category"
-//       options={categories}
-//       handleOptionToggle={handleCategoryClick}
-//       isSelected={isCategorySelected}
-//     />
-//   );
-// };
-// export default CategoryFilter;

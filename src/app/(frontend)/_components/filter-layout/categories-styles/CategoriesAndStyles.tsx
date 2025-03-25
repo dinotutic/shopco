@@ -4,29 +4,25 @@ import FilterTitle from "../FilterTitle";
 import { capitalizeFirstChar } from "@/app/lib/textFormatting";
 import checkmark from "@/../public/svg/filters_checkmark.svg";
 import toggle_filter from "@/../public/svg/toggle_filter.svg";
-import { useState } from "react";
 
 interface CategoriesAndStylesProps {
   title: string;
+  filterType: "categories" | "styles";
   options: any[];
   handleOptionToggle: (option: any) => void;
-  isSelected: (option: any) => boolean;
+  isSelected: (filterType: "categories" | "styles", id: number) => boolean;
   isOpen: boolean;
   handleToggleClick: () => void;
 }
 const CategoriesAndStyles = ({
   title,
+  filterType,
   options,
   handleOptionToggle,
   isSelected,
   isOpen,
   handleToggleClick,
 }: CategoriesAndStylesProps) => {
-  // const [isOpen, setIsOpen] = useState(true);
-  // const handleToggleClick = () => {
-  //   setIsOpen(!isOpen);
-  // };
-
   return (
     <div>
       <div className="flex justify-between items-center">
@@ -42,6 +38,7 @@ const CategoriesAndStyles = ({
         <div>
           {options.map((option, index) => (
             <RenderOption
+              filterType={filterType}
               key={index}
               option={option}
               handleOptionToggle={handleOptionToggle}
@@ -57,10 +54,12 @@ export default CategoriesAndStyles;
 
 interface RenderOptionProps {
   option: any;
+  filterType: "categories" | "styles";
   handleOptionToggle: (option: any) => void;
-  isSelected: (option: any) => boolean;
+  isSelected: (filterType: "categories" | "styles", id: number) => boolean;
 }
 const RenderOption = ({
+  filterType,
   option,
   handleOptionToggle,
   isSelected,
@@ -73,11 +72,13 @@ const RenderOption = ({
       className={`flex justify-between w-full text-left p-2 my-1 text-gray-500`}
     >
       {capitalizedOption}
-      {isSelected(option) && (
+      {isSelected(filterType, option.id) && (
         <Image
           src={checkmark}
           alt="checkmark icon"
-          className={`${isSelected(option) ? "filter-white" : "filter-gray"}`}
+          className={`${
+            isSelected(filterType, option.id) ? "filter-white" : "filter-gray"
+          }`}
           height={16}
           width={16}
         />
