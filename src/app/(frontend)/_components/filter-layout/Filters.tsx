@@ -1,6 +1,6 @@
 "use client";
 
-import { Category, Color, Style } from "@/app/types/shared.types";
+import { Category, Color, Style, Size } from "@/app/types/shared.types";
 import FilterTitle from "./FilterTitle";
 import AppleFilterBtn from "./AppleFilterBtn";
 import filter_icon from "@/../public/svg/filter_icon.svg";
@@ -10,51 +10,95 @@ import PriceFilter from "./PriceFilter";
 import ColorPicker from "./color-picker/ColorPicker";
 import SizesFilter from "./SizesFilter";
 import StylesFilter from "./categories-styles/StylesFilter";
-import { Size } from "@prisma/client";
 import useFilter from "@/app/hooks/useFilters";
+import usePriceFilter from "@/app/hooks/usePriceFilter";
+
 interface FiltersProps {
   filters: {
     categories: Category[];
     styles: Style[];
     colors: Color[];
     sizes: Size[];
+    price: { min: number; max: number };
   };
 }
 const Filters = ({ filters }: FiltersProps) => {
   const {
-    toggleFilterIsOpen,
+    toggleIsFilterOpen,
     selectFilter,
     getSelectedFilters,
-    menuIsOpen,
-    filterIsOpen,
-    filterIsSelected,
+    menuToggle,
+    isFilterOpen,
+    isFilterSelected,
   } = useFilter(filters);
+
+  const {
+    handlePriceRangeChange,
+    getPriceRange,
+    isPriceRangeMenuOpen,
+    togglePriceRangeMenu,
+  } = usePriceFilter();
+
+  const handleMenuToggle = () => {
+    menuToggle();
+    togglePriceRangeMenu();
+  };
+
+  // Generate search queries in URL on submit
+  const selectedFilters = getSelectedFilters();
+  const { selectedCategories, selectedStyles, selectedColors, selectedSizes } =
+    selectedFilters;
+  const selectedPrices = getPriceRange();
 
   return (
     <>
       <div className="w-72 h-min p-6 border rounded-3xl flex-wrap flex flex-col gap-4">
         <div className="flex justify-between items-center">
           <FilterTitle title="Filters" />
-          <Image src={filter_icon} alt="filter icon" />
+          <button onClick={handleMenuToggle}>
+            <Image src={filter_icon} alt="filter icon" />
+          </button>
         </div>
         <hr className="w-full" />
         <CategoryFilter
           categories={filters.categories}
-          toggleFilterIsOpen={toggleFilterIsOpen}
+          isFilterOpen={isFilterOpen}
+          toggleIsFilterOpen={toggleIsFilterOpen}
           selectFilter={selectFilter}
-          filterIsSelected={filterIsSelected}
-          getSelectedFilters={getSelectedFilters}
-          filterIsOpen={filterIsOpen}
+          isFilterSelected={isFilterSelected}
         />
-        {/* <hr />
-        <PriceFilter />
         <hr />
-        <ColorPicker />
+        <PriceFilter
+          isFilterOpen={isPriceRangeMenuOpen}
+          toggleIsFilterOpen={togglePriceRangeMenu}
+          handlePriceRangeChange={handlePriceRangeChange}
+          getPriceRange={getPriceRange}
+        />
         <hr />
-        <SizesFilter />
+        <ColorPicker
+          availableColors={filters.colors}
+          isFilterOpen={isFilterOpen}
+          toggleIsFilterOpen={toggleIsFilterOpen}
+          selectColor={selectFilter}
+          isColorSelected={isFilterSelected}
+        />
         <hr />
-        <StylesFilter />
-        <AppleFilterBtn /> */}
+        <SizesFilter
+          sizes={filters.sizes}
+          isFilterOpen={isFilterOpen}
+          toggleIsFilterOpen={toggleIsFilterOpen}
+          selectFilter={selectFilter}
+          isFilterSelected={isFilterSelected}
+        />
+        <hr />
+        <StylesFilter
+          styles={filters.styles}
+          isFilterOpen={isFilterOpen}
+          toggleIsFilterOpen={toggleIsFilterOpen}
+          selectFilter={selectFilter}
+          isFilterSelected={isFilterSelected}
+        />
+        <AppleFilterBtn />
       </div>
     </>
   );

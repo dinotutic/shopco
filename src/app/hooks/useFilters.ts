@@ -1,6 +1,9 @@
 "use client";
 import { useState } from "react";
+
 import { Category, Color, Size, Style } from "../types/shared.types";
+
+export type FilterType = "categories" | "styles" | "colors" | "sizes";
 
 interface FiltersProps {
   categories: Category[];
@@ -9,127 +12,61 @@ interface FiltersProps {
   sizes: Size[];
 }
 
+export type FilterOption = {
+  id: number;
+  name: string;
+  isSelected: boolean;
+};
+
+type Filter = {
+  isOpen: boolean;
+  options: FilterOption[];
+};
+
 const useFilter = (filters: FiltersProps) => {
-  const initializeFilter = (filter: any) => {
-    const filterProperties = filter.map((element: any) => ({
+  const initializeFilter = (filter: { id: number; name: string }[]) => {
+    const filterProperties = filter.map((element) => ({
       ...element,
       isSelected: false,
     }));
     return { isOpen: true, options: filterProperties };
   };
 
-  const [categories, setCategories] = useState(
-    initializeFilter(filters.categories)
-  );
-  const [styles, setStyles] = useState(initializeFilter(filters.styles));
-  const [colors, setColors] = useState(initializeFilter(filters.colors));
-  const [sizes, setSizes] = useState(initializeFilter(filters.sizes));
+  const [filterState, setFilterState] = useState({
+    categories: initializeFilter(filters.categories),
+    styles: initializeFilter(filters.styles),
+    colors: initializeFilter(filters.colors),
+    sizes: initializeFilter(filters.sizes),
+    price: { isOpen: true, options: { min: 0, max: 1000 } },
+  });
+  const { categories, styles, colors, sizes } = filterState;
 
-  const toggleFilterIsOpen = (filterType: string) => {
-    switch (filterType) {
-      case "categories":
-        setCategories((prev) => ({ ...prev, isOpen: !prev.isOpen }));
-        break;
-      case "styles":
-        setStyles((prev) => ({ ...prev, isOpen: !prev.isOpen }));
-        break;
-      case "colors":
-        setColors((prev) => ({ ...prev, isOpen: !prev.isOpen }));
-        break;
-      case "sizes":
-        setSizes((prev) => ({ ...prev, isOpen: !prev.isOpen }));
-        break;
-      default:
-        break;
-    }
-  };
-
-  const selectFilter = (filterType: string, id: number) => {
-    const updateOptions = (options: any[]) =>
-      options.map((option) =>
-        option.id === id
-          ? { ...option, isSelected: !option.isSelected }
-          : option
-      );
-
-    switch (filterType) {
-      case "categories":
-        setCategories((prev) => ({
-          ...prev,
-          options: updateOptions(prev.options),
-        }));
-        break;
-      case "styles":
-        setStyles((prev) => ({
-          ...prev,
-          options: updateOptions(prev.options),
-        }));
-        break;
-      case "colors":
-        setColors((prev) => ({
-          ...prev,
-          options: updateOptions(prev.options),
-        }));
-        break;
-      case "sizes":
-        setSizes((prev) => ({ ...prev, options: updateOptions(prev.options) }));
-        break;
-      default:
-        break;
-    }
-  };
-
-  const filterIsSelected = (
-    option: "categories" | "styles" | "colors" | "sizes",
-    id: number
-  ): boolean => {
-    switch (option) {
-      case "categories":
-        return categories.options.find(
-          (category: Category) => category.id === id
-        )?.isSelected;
-      case "styles":
-        return styles.options.find((style: Style) => style.id === id)
-          ?.isSelected;
-      case "colors":
-        return colors.options.find((color: Color) => color.id === id)
-          ?.isSelected;
-      case "sizes":
-        return sizes.options.find((size: Size) => size.id === id)?.isSelected;
-      default:
-        return false;
-    }
-  };
-
-  const getSelectedFilters = () => {
-    const selectedCategories = categories.options.filter(
-      (option: { isSelected: boolean }) => option.isSelected
-    );
-    const selectedStyles = styles.options.filter(
-      (option: { isSelected: boolean }) => option.isSelected
-    );
-    const selectedColors = colors.options.filter(
-      (option: { isSelected: boolean }) => option.isSelected
-    );
-    const selectedSizes = sizes.options.filter(
-      (option: { isSelected: boolean }) => option.isSelected
-    );
-    return {
-      selectedCategories,
-      selectedStyles,
-      selectedColors,
-      selectedSizes,
+  const toggleIsFilterOpen = (filterType: FilterType) => {
+    const toggleFilter = (filterType: FilterType) => {
+      setFilterState((prev) => ({
+        ...prev,
+        [filterType]: { ...prev[filterType], isOpen: !prev[filterType].isOpen },
+      }));
     };
+    switch (filterType) {
+      case "categories":
+        toggleFilter("categories");
+        break;
+      case "styles":
+        toggleFilter("styles");
+        break;
+      case "colors":
+        toggleFilter("colors");
+        break;
+      case "sizes":
+        toggleFilter("sizes");
+        break;
+      default:
+        break;
+    }
   };
 
-  const menuIsOpen = () => {
-    setCategories((prev) => ({ ...prev, isOpen: !prev.isOpen }));
-    setStyles((prev) => ({ ...prev, isOpen: !prev.isOpen }));
-    setColors((prev) => ({ ...prev, isOpen: !prev.isOpen }));
-    setSizes((prev) => ({ ...prev, isOpen: !prev.isOpen }));
-  };
-
-  const filterIsOpen = (filterType: string) => {
+  const isFilterOpen = (filterType: FilterType): boolean => {
     switch (filterType) {
       case "categories":
         return categories.isOpen;
@@ -144,13 +81,96 @@ const useFilter = (filters: FiltersProps) => {
     }
   };
 
+  const selectFilter = (filterType: FilterType, id: number) => {
+    const updateOptions = (options: FilterOption[]) =>
+      options.map((option) =>
+        option.id === id
+          ? { ...option, isSelected: !option.isSelected }
+          : option
+      );
+
+    const updateState = (filterType: FilterType) => {
+      setFilterState((prev) => ({
+        ...prev,
+        [filterType]: {
+          ...prev[filterType],
+          options: updateOptions(prev[filterType].options),
+        },
+      }));
+    };
+    switch (filterType) {
+      case "categories":
+        updateState("categories");
+        break;
+      case "styles":
+        updateState("styles");
+        break;
+      case "colors":
+        updateState("colors");
+        break;
+      case "sizes":
+        updateState("sizes");
+        break;
+      default:
+        break;
+    }
+  };
+
+  const isFilterSelected = (option: FilterType, id: number): boolean => {
+    const findOption = (filter: Filter) => {
+      return (
+        filter.options.find((option) => option.id === id)?.isSelected ?? false
+      );
+    };
+
+    switch (option) {
+      case "categories":
+        return findOption(categories);
+      case "styles":
+        return findOption(styles);
+      case "colors":
+        return findOption(colors);
+      case "sizes":
+        return findOption(sizes);
+      default:
+        return false;
+    }
+  };
+
+  const getSelectedFilters = () => {
+    const getSelectedFilter = (filter: Filter) => {
+      return filter.options.filter((element) => element.isSelected);
+    };
+    const selectedCategories = getSelectedFilter(categories);
+    const selectedStyles = getSelectedFilter(styles);
+    const selectedColors = getSelectedFilter(colors);
+    const selectedSizes = getSelectedFilter(sizes);
+
+    return {
+      selectedCategories,
+      selectedStyles,
+      selectedColors,
+      selectedSizes,
+    };
+  };
+
+  const menuToggle = () => {
+    setFilterState((prev) => ({
+      ...prev,
+      categories: { ...prev.categories, isOpen: !prev.categories.isOpen },
+      styles: { ...prev.styles, isOpen: !prev.styles.isOpen },
+      colors: { ...prev.colors, isOpen: !prev.colors.isOpen },
+      sizes: { ...prev.sizes, isOpen: !prev.sizes.isOpen },
+    }));
+  };
+
   return {
-    toggleFilterIsOpen,
+    toggleIsFilterOpen,
+    isFilterOpen,
     selectFilter,
+    isFilterSelected,
     getSelectedFilters,
-    menuIsOpen,
-    filterIsOpen,
-    filterIsSelected,
+    menuToggle,
   };
 };
 

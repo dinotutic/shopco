@@ -1,36 +1,27 @@
 import { Category } from "@/app/types/shared.types";
 import CategoriesAndStyles from "./CategoriesAndStyles";
+import { FilterType } from "@/app/hooks/useFilters";
 
 interface CategoryFilterProps {
   categories: Category[];
-  toggleFilterIsOpen: (filter: string) => void;
-  selectFilter: (filter: string, id: number) => void;
-  getSelectedFilters: (filter: string) => {
-    selectedCategories: { isSelected: boolean }[];
-    selectedStyles: { isSelected: boolean }[];
-    selectedColors: { isSelected: boolean }[];
-    selectedSizes: { isSelected: boolean }[];
-  };
-  filterIsOpen: (filter: string) => boolean;
-  filterIsSelected: (
-    option: "categories" | "styles" | "colors" | "sizes",
-    id: number
-  ) => boolean;
+  isFilterOpen: (filter: FilterType) => boolean;
+  toggleIsFilterOpen: (filter: FilterType) => void;
+  selectFilter: (filter: FilterType, id: number) => void;
+  isFilterSelected: (option: FilterType, id: number) => boolean;
 }
 const CategoryFilter = ({
   categories,
-  toggleFilterIsOpen,
+  isFilterOpen,
+  toggleIsFilterOpen,
   selectFilter,
-  getSelectedFilters,
-  filterIsOpen,
-  filterIsSelected,
+  isFilterSelected,
 }: CategoryFilterProps) => {
-  const handleCategoryClick = (category: Category) => {
+  const handleSelect = (category: Category) => {
     selectFilter("categories", category.id);
   };
 
   const handleToggleClick = () => {
-    toggleFilterIsOpen("categories");
+    toggleIsFilterOpen("categories");
   };
 
   return (
@@ -39,9 +30,9 @@ const CategoryFilter = ({
         title="Category"
         filterType="categories"
         options={categories}
-        handleOptionToggle={handleCategoryClick}
-        isOpen={filterIsOpen("categories")}
-        isSelected={filterIsSelected}
+        handleSelect={handleSelect}
+        isOpen={isFilterOpen("categories")}
+        isSelected={isFilterSelected}
         handleToggleClick={handleToggleClick}
       />
     </div>

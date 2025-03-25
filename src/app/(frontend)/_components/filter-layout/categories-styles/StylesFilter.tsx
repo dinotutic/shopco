@@ -1,19 +1,40 @@
 "use client";
-import useStylesFilter from "@/app/hooks/useStylesFilter";
+
 import { Style } from "@/app/types/shared.types";
 import CategoriesAndStyles from "./CategoriesAndStyles";
+import { FilterType } from "@/app/hooks/useFilters";
 
 interface StylesFilterProps {
   styles: Style[];
+  isFilterOpen: (filter: FilterType) => boolean;
+  toggleIsFilterOpen: (filter: FilterType) => void;
+  selectFilter: (filter: FilterType, id: number) => void;
+  isFilterSelected: (option: FilterType, id: number) => boolean;
 }
-const StylesFilter = ({ styles }: StylesFilterProps) => {
-  const { handleStyleClick, isStyleSelected } = useStylesFilter();
+const StylesFilter = ({
+  styles,
+  isFilterOpen,
+  toggleIsFilterOpen,
+  selectFilter,
+  isFilterSelected,
+}: StylesFilterProps) => {
+  const handleSelect = (style: Style) => {
+    selectFilter("styles", style.id);
+  };
+
+  const handleToggleClick = () => {
+    toggleIsFilterOpen("styles");
+  };
+
   return (
     <CategoriesAndStyles
-      title="Styles"
+      title="Style"
+      filterType="styles"
       options={styles}
-      handleOptionToggle={handleStyleClick}
-      isSelected={isStyleSelected}
+      handleSelect={handleSelect}
+      isOpen={isFilterOpen("styles")}
+      isSelected={isFilterSelected}
+      handleToggleClick={handleToggleClick}
     />
   );
 };

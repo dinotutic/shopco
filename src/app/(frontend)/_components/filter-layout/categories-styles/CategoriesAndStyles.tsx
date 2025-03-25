@@ -9,7 +9,7 @@ interface CategoriesAndStylesProps {
   title: string;
   filterType: "categories" | "styles";
   options: any[];
-  handleOptionToggle: (option: any) => void;
+  handleSelect: (option: any) => void;
   isSelected: (filterType: "categories" | "styles", id: number) => boolean;
   isOpen: boolean;
   handleToggleClick: () => void;
@@ -18,7 +18,7 @@ const CategoriesAndStyles = ({
   title,
   filterType,
   options,
-  handleOptionToggle,
+  handleSelect,
   isSelected,
   isOpen,
   handleToggleClick,
@@ -41,7 +41,7 @@ const CategoriesAndStyles = ({
               filterType={filterType}
               key={index}
               option={option}
-              handleOptionToggle={handleOptionToggle}
+              handleSelect={handleSelect}
               isSelected={isSelected}
             />
           ))}
@@ -55,20 +55,20 @@ export default CategoriesAndStyles;
 interface RenderOptionProps {
   option: any;
   filterType: "categories" | "styles";
-  handleOptionToggle: (option: any) => void;
+  handleSelect: (option: any) => void;
   isSelected: (filterType: "categories" | "styles", id: number) => boolean;
 }
 const RenderOption = ({
   filterType,
   option,
-  handleOptionToggle,
+  handleSelect,
   isSelected,
 }: RenderOptionProps) => {
   const capitalizedOption = capitalizeFirstChar(option.name);
   return (
     <button
       key={option.key}
-      onClick={() => handleOptionToggle(option)}
+      onClick={() => handleSelect(option)}
       className={`flex justify-between w-full text-left p-2 my-1 text-gray-500`}
     >
       {capitalizedOption}
