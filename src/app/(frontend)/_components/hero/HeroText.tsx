@@ -1,11 +1,8 @@
 "use client";
-import Button from "../Button";
+import Link from "next/link";
 import HeroStats from "./HeroStats";
 
 const HeroText = () => {
-  // const onClick = () => {
-  //   return null;
-  // };
   return (
     <div className="hero-text flex flex-col justify-center items-center lg:items-start">
       <h2 className="text-6xl font-bold font-integralCf text-center lg:text-left">
@@ -17,9 +14,12 @@ const HeroText = () => {
         designed to bring out your individuality and cater to your sense of
         style.
       </p>
-      {/* <Button onClick={onClick} className="mb-12 w-11/12 md:w-1/2 lg:w-auto">
-        Show Now
-      </Button> */}
+      <Link
+        href="/shop"
+        className="px-12 py-3 bg-secondaryBackground text-white rounded-full mb-12 w-11/12 md:w-1/2 lg:w-auto"
+      >
+        Shop Now
+      </Link>
       <HeroStats />
     </div>
   );
