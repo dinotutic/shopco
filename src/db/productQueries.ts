@@ -510,11 +510,13 @@ export async function getProducts(
     style: string | null;
     color: string | null;
     gender: string | null;
+    minPrice: number | null;
+    maxPrice: number | null;
   },
   take?: number,
   skip?: number
 ) {
-  const { category, style, color, gender } = filters;
+  const { category, style, color, gender, minPrice, maxPrice } = filters;
   const products = await prisma.product.findMany({
     where: {
       category: category ? { name: category } : undefined,
@@ -525,6 +527,10 @@ export async function getProducts(
         },
       },
       gender: gender ? { name: gender } : undefined,
+      priceInCents: {
+        gte: minPrice ? minPrice * 100 : undefined, // Convert to cents
+        lte: maxPrice ? maxPrice * 100 : undefined, // Convert to cents
+      },
     },
     include: {
       images: true,
@@ -533,7 +539,7 @@ export async function getProducts(
       gender: true,
       reviews: true,
       stock: {
-        include: { color: true },
+        include: { color: true, size: true },
       },
     },
     take,

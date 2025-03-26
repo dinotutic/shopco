@@ -16,6 +16,8 @@ interface ProductProps {
     category: string | null;
     style: string | null;
     color: string | null;
+    minPrice: number | null;
+    maxPrice: number | null;
     gender: "men" | "women" | "unisex";
   };
 }
@@ -40,7 +42,7 @@ const Products = ({ initialProducts, filters }: ProductProps) => {
   if (isError) return <div>Error fetching products</div>;
 
   return (
-    <div className="flex gap-10 flex-wrap">
+    <div className="flex gap-10 flex-wrap items-center justify-center">
       {products?.map((product) => (
         <Card key={product.id} product={product} />
       ))}
