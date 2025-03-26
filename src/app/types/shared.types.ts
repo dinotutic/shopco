@@ -125,6 +125,8 @@ export interface ProductFilters {
   category: string | null;
   style: string | null;
   color: string | null;
+  minPrice: number | null;
+  maxPrice: number | null;
 }
 
 // might need to use this later

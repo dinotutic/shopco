@@ -12,6 +12,7 @@ import SizesFilter from "./SizesFilter";
 import StylesFilter from "./categories-styles/StylesFilter";
 import useFilter from "@/app/hooks/useFilters";
 import usePriceFilter from "@/app/hooks/usePriceFilter";
+import generateUrl from "@/app/lib/generateFilterUrl";
 
 interface FiltersProps {
   filters: {
@@ -49,58 +50,57 @@ const Filters = ({ filters }: FiltersProps) => {
   const { selectedCategories, selectedStyles, selectedColors, selectedSizes } =
     selectedFilters;
   const selectedPrices = getPriceRange();
+  const filterParams = generateUrl({ selectedFilters, selectedPrices });
 
   return (
-    <>
-      <div className="w-72 h-min p-6 border rounded-3xl flex-wrap flex flex-col gap-4">
-        <div className="flex justify-between items-center">
-          <FilterTitle title="Filters" />
-          <button onClick={handleMenuToggle}>
-            <Image src={filter_icon} alt="filter icon" />
-          </button>
-        </div>
-        <hr className="w-full" />
-        <CategoryFilter
-          categories={filters.categories}
-          isFilterOpen={isFilterOpen}
-          toggleIsFilterOpen={toggleIsFilterOpen}
-          selectFilter={selectFilter}
-          isFilterSelected={isFilterSelected}
-        />
-        <hr />
-        <PriceFilter
-          isFilterOpen={isPriceRangeMenuOpen}
-          toggleIsFilterOpen={togglePriceRangeMenu}
-          handlePriceRangeChange={handlePriceRangeChange}
-          getPriceRange={getPriceRange}
-        />
-        <hr />
-        <ColorPicker
-          availableColors={filters.colors}
-          isFilterOpen={isFilterOpen}
-          toggleIsFilterOpen={toggleIsFilterOpen}
-          selectColor={selectFilter}
-          isColorSelected={isFilterSelected}
-        />
-        <hr />
-        <SizesFilter
-          sizes={filters.sizes}
-          isFilterOpen={isFilterOpen}
-          toggleIsFilterOpen={toggleIsFilterOpen}
-          selectFilter={selectFilter}
-          isFilterSelected={isFilterSelected}
-        />
-        <hr />
-        <StylesFilter
-          styles={filters.styles}
-          isFilterOpen={isFilterOpen}
-          toggleIsFilterOpen={toggleIsFilterOpen}
-          selectFilter={selectFilter}
-          isFilterSelected={isFilterSelected}
-        />
-        <AppleFilterBtn />
+    <div className="w-96 h-min p-6 border rounded-3xl flex-wrap flex flex-col gap-4">
+      <div className="flex justify-between items-center w-full">
+        <FilterTitle title="Filters" />
+        <button onClick={handleMenuToggle}>
+          <Image src={filter_icon} alt="filter icon" />
+        </button>
       </div>
-    </>
+      <hr className="w-full" />
+      <CategoryFilter
+        categories={filters.categories}
+        isFilterOpen={isFilterOpen}
+        toggleIsFilterOpen={toggleIsFilterOpen}
+        selectFilter={selectFilter}
+        isFilterSelected={isFilterSelected}
+      />
+      <hr />
+      <PriceFilter
+        isFilterOpen={isPriceRangeMenuOpen}
+        toggleIsFilterOpen={togglePriceRangeMenu}
+        handlePriceRangeChange={handlePriceRangeChange}
+        getPriceRange={getPriceRange}
+      />
+      <hr />
+      <ColorPicker
+        availableColors={filters.colors}
+        isFilterOpen={isFilterOpen}
+        toggleIsFilterOpen={toggleIsFilterOpen}
+        selectColor={selectFilter}
+        isColorSelected={isFilterSelected}
+      />
+      <hr />
+      <SizesFilter
+        sizes={filters.sizes}
+        isFilterOpen={isFilterOpen}
+        toggleIsFilterOpen={toggleIsFilterOpen}
+        selectFilter={selectFilter}
+        isFilterSelected={isFilterSelected}
+      />
+      <hr />
+      <StylesFilter
+        styles={filters.styles}
+        isFilterOpen={isFilterOpen}
+        toggleIsFilterOpen={toggleIsFilterOpen}
+        selectFilter={selectFilter}
+        isFilterSelected={isFilterSelected}
+      />
+      <AppleFilterBtn filterParams={filterParams} />
+    </div>
   );
 };
 

@@ -12,8 +12,8 @@ interface ShopProps {
 }
 const Shop = async ({ params, searchParams }: ShopProps) => {
   const { gender } = await params;
-  const { category, style, color } = await searchParams;
-  const filters = { category, style, color, gender };
+  const { category, style, color, minPrice, maxPrice } = await searchParams;
+  const filters = { category, style, color, gender, minPrice, maxPrice };
 
   const title = createTitle([gender, category, style]);
   const initialProducts = await getProducts(filters, RESULTS_PER_PAGE);
