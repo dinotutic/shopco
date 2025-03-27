@@ -1,6 +1,7 @@
 import {
   getCategories,
   getColors,
+  getGenders,
   getSizes,
   getStyles,
 } from "@/db/productQueries";

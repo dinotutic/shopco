@@ -1,4 +1,3 @@
-import { Gender } from "@prisma/client";
 import { ReactNode } from "react";
 
 export interface Image {
@@ -23,6 +22,11 @@ export interface Category {
 }
 
 export interface Size {
+  id: number;
+  name: string;
+}
+
+export interface Gender {
   id: number;
   name: string;
 }

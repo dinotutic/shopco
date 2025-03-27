@@ -10,8 +10,6 @@ const useReviewFilters = () => {
   });
 
   const setFilterField = (field: string, value: any) => {
-    console.log("setFilterField field", field);
-    console.log("setFilterField value", value);
     setFilterState((prevState) => {
       const newState = {
         ...prevState,

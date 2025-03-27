@@ -1,9 +1,9 @@
-const ShopStartPage = async () => {
+import Shop, { ShopProps } from "./[gender]/page";
+
+const ShopStartPage = async ({ params, searchParams }: ShopProps) => {
   return (
     <section>
-      <h2>
-        Shop - front page that I will deal with later. I still need design
-      </h2>
+      <Shop params={params} searchParams={searchParams} />
     </section>
   );
 };

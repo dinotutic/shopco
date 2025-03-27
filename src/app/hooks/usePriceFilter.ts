@@ -6,7 +6,7 @@ import { useState } from "react";
 const usePriceFilter = () => {
   const [price, setPrice] = useState({
     isOpen: true,
-    options: { min: 100, max: 300 },
+    options: { min: 1, max: 500 },
   });
 
   const handlePriceRangeChange = (values: number[]) => {

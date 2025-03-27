@@ -6,7 +6,7 @@ import ProductsHeader from "../../../_components/shop/ProductsHeader";
 
 export const RESULTS_PER_PAGE = 9;
 
-interface ShopProps {
+export interface ShopProps {
   params: { gender: "men" | "women" | "unisex" };
   searchParams: ProductFilters;
 }
@@ -19,7 +19,7 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
   const initialProducts = await getProducts(filters, RESULTS_PER_PAGE);
 
   return (
-    <section className="max-w-[1440px] w-full flex flex-col items-center justify-center overflow-hidden ">
+    <section className="max-w-[1440px] w-full flex flex-col items-center justify-start overflow-hidden ">
       <ProductsHeader title={title} />
       <Products initialProducts={initialProducts} filters={filters} />
     </section>

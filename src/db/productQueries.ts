@@ -376,6 +376,10 @@ export async function getColors() {
   return colors;
 }
 
+export async function getGenders() {
+  const genders = await prisma.gender.findMany();
+  return genders;
+}
 export async function getCategories() {
   const categories = await prisma.category.findMany();
   return categories;
