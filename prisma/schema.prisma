@@ -35,11 +35,7 @@ model Product {
   topSelling   Boolean @default(false)
 }
 
-model Gender {
-  id    Int    @id @default(autoincrement())
-  name  String
-  products Product[]
-}
+
 
 model Color{
   id          Int       @id @default(autoincrement())
@@ -115,6 +111,12 @@ model Style {
   id          Int        @id @default(autoincrement())
   name        String     @unique
   products    Product[]
+}
+
+model Gender {
+  id    Int    @id @default(autoincrement())
+  name  String
+  products Product[]
 }
 
 model Size {

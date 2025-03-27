@@ -4,7 +4,6 @@ import ReactSlider from "react-slider";
 import FilterTitle from "./FilterTitle";
 import Image from "next/image";
 import toggle_filter from "@/../public/svg/toggle_filter.svg";
-import { useEffect } from "react";
 
 interface PriceFilterProps {
   isFilterOpen: () => boolean;

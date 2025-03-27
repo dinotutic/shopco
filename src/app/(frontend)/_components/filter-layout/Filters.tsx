@@ -2,7 +2,7 @@
 
 import { Category, Color, Style, Size } from "@/app/types/shared.types";
 import FilterTitle from "./FilterTitle";
-import AppleFilterBtn from "./AppleFilterBtn";
+import ApplyFilterBtn from "./ApplyFilterBtn";
 import filter_icon from "@/../public/svg/filter_icon.svg";
 import Image from "next/image";
 import CategoryFilter from "./categories-styles/CategoryFilter";
@@ -52,6 +52,8 @@ const Filters = ({ filters }: FiltersProps) => {
   const selectedPrices = getPriceRange();
   const filterParams = generateUrl({ selectedFilters, selectedPrices });
 
+  // const isGenderSelected = usePathname() === "/shop" ? false : true;
+
   return (
     <div className="w-96 h-min p-6 border rounded-3xl flex-wrap flex flex-col gap-4">
       <div className="flex justify-between items-center w-full">
@@ -99,7 +101,7 @@ const Filters = ({ filters }: FiltersProps) => {
         selectFilter={selectFilter}
         isFilterSelected={isFilterSelected}
       />
-      <AppleFilterBtn filterParams={filterParams} />
+      <ApplyFilterBtn filterParams={filterParams} />
     </div>
   );
 };

@@ -83,11 +83,21 @@ const useFilter = (filters: FiltersProps) => {
 
   const selectFilter = (filterType: FilterType, id: number) => {
     const updateOptions = (options: FilterOption[]) =>
-      options.map((option) =>
-        option.id === id
-          ? { ...option, isSelected: !option.isSelected }
-          : option
-      );
+      options.map((option) => {
+        if (filterType === "categories" || filterType === "styles") {
+          return {
+            ...option,
+            isSelected: option.id === id ? !option.isSelected : false,
+          };
+        }
+        if (filterType === "sizes" || filterType === "colors") {
+          return {
+            ...option,
+            isSelected:
+              option.id === id ? !option.isSelected : option.isSelected,
+          };
+        }
+      });
 
     const updateState = (filterType: FilterType) => {
       setFilterState((prev) => ({
