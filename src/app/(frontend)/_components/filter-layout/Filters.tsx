@@ -13,6 +13,7 @@ import StylesFilter from "./categories-styles/StylesFilter";
 import useFilter from "@/app/hooks/useFilters";
 import usePriceFilter from "@/app/hooks/usePriceFilter";
 import generateUrl from "@/app/lib/generateFilterUrl";
+import { useFilterContext } from "./FilterContext";
 
 interface FiltersProps {
   filters: {
@@ -47,20 +48,23 @@ const Filters = ({ filters }: FiltersProps) => {
 
   // Generate search queries in URL on submit
   const selectedFilters = getSelectedFilters();
-  const { selectedCategories, selectedStyles, selectedColors, selectedSizes } =
-    selectedFilters;
+  // const { selectedCategories, selectedStyles, selectedColors, selectedSizes } =
+  //   selectedFilters;
   const selectedPrices = getPriceRange();
   const filterParams = generateUrl({ selectedFilters, selectedPrices });
 
   // const isGenderSelected = usePathname() === "/shop" ? false : true;
 
-  return (
-    <div className="w-96 h-min p-6 border rounded-3xl flex-wrap flex flex-col gap-4">
+  const { isFilterShown, toggleFilter } = useFilterContext();
+
+  return isFilterShown ? (
+    <div className="flex flex-col gap-4">
       <div className="flex justify-between items-center w-full">
         <FilterTitle title="Filters" />
-        <button onClick={handleMenuToggle}>
-          <Image src={filter_icon} alt="filter icon" />
-        </button>
+        <FilterToggleButton
+          handleMenuToggle={handleMenuToggle}
+          toggleFilter={toggleFilter}
+        />
       </div>
       <hr className="w-full" />
       <CategoryFilter
@@ -103,7 +107,30 @@ const Filters = ({ filters }: FiltersProps) => {
       />
       <ApplyFilterBtn filterParams={filterParams} />
     </div>
-  );
+  ) : null;
 };
 
 export default Filters;
+
+export const FilterToggleButton = ({
+  handleMenuToggle,
+  toggleFilter,
+}: {
+  handleMenuToggle: () => void;
+  toggleFilter: () => void;
+}) => {
+  return (
+    <>
+      <button onClick={handleMenuToggle}>
+        <Image
+          src={filter_icon}
+          alt="filter icon"
+          className="hidden md:block"
+        />
+      </button>
+      <button onClick={toggleFilter} className="md:hidden">
+        X
+      </button>
+    </>
+  );
+};

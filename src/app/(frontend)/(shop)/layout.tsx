@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "../../globals.css";
 import FilterLayout from "../_components/filter-layout/FilterLayout";
+import { FilterProvider } from "../_components/filter-layout/FilterContext";
+import { getFilters } from "@/db/productQueries";
 
 export const metadata: Metadata = {
   title: "ShopCo - Your Fashion Destination",
@@ -8,15 +10,19 @@ export const metadata: Metadata = {
     "Discover the latest trends in fashion and shop a wide range of clothing, accessories, and more at ShopCo.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const filters = await getFilters();
+
   return (
-    <div className="flex gap-4 max-w-[1440px] mx-auto w-full">
-      <FilterLayout />
-      {children}
-    </div>
+    <FilterProvider>
+      <div className="flex flex-col md:flex-row gap-10 max-w-[1440px] mx-auto w-full relative">
+        <FilterLayout filters={filters} />
+        {children}
+      </div>
+    </FilterProvider>
   );
 }

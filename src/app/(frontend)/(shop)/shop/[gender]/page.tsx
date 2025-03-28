@@ -14,12 +14,11 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
   const { gender } = await params;
   const { category, style, color, minPrice, maxPrice } = await searchParams;
   const filters = { category, style, color, gender, minPrice, maxPrice };
-
   const title = createTitle([gender, category, style]);
   const initialProducts = await getProducts(filters, RESULTS_PER_PAGE);
 
   return (
-    <section className="max-w-[1440px] w-full flex flex-col items-center justify-start overflow-hidden ">
+    <section className="max-w-[1440px] w-full flex flex-col items-start justify-start overflow-hidden ">
       <ProductsHeader title={title} />
       <Products initialProducts={initialProducts} filters={filters} />
     </section>

@@ -449,7 +449,7 @@ export async function deleteSingleImage(productId: number, key: string) {
     }
     await prisma.image.deleteMany({ where: { productId, url: key } });
   } catch (error) {
-    throw new Error("Error deleting image");
+    throw new Error(`Error deleting image: ${error}`);
   }
 }
 
@@ -555,4 +555,13 @@ export async function getProducts(
 
 export const getSizes = async () => {
   return await prisma.size.findMany();
+};
+
+export const getFilters = async () => {
+  const categories = await getCategories();
+  const styles = await getStyles();
+  const colors = await getColors();
+  const sizes = await getSizes();
+  const price = { min: 0, max: 1000 };
+  return { categories, styles, colors, sizes, price };
 };

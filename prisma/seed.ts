@@ -59,7 +59,7 @@ async function main() {
   }
 
   // Add Colors
-  const colors = await prisma.color.createMany({
+await prisma.color.createMany({
     data: [
       { name: "black" },
       { name: "white" },

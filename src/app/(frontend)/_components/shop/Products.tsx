@@ -1,12 +1,11 @@
 "use client";
-
+// FIX SIZING FOR PRODUCTS. NEED TO BE DYNAMIC
 import { Product, Review } from "@/app/types/shared.types";
 import Card from "../card";
 import { useQuery } from "@tanstack/react-query";
 import { getProducts } from "@/db/productQueries";
 import { RESULTS_PER_PAGE } from "../../(shop)/shop/[gender]/page";
 import Loading from "@/app/(frontend)/_components/ui/Loading";
-import Image from "next/image";
 
 interface ProductProps {
   initialProducts: (Omit<Product, "reviews" | "user"> & {
@@ -42,7 +41,7 @@ const Products = ({ initialProducts, filters }: ProductProps) => {
   if (isError) return <div>Error fetching products</div>;
 
   return (
-    <div className="flex gap-10 flex-wrap items-center justify-center">
+    <div className="flex gap-10 flex-wrap items-center justify-start z-[-1]">
       {products?.map((product) => (
         <Card key={product.id} product={product} />
       ))}
