@@ -24,14 +24,14 @@ const Card = ({ product }: CardProps) => {
   });
 
   return (
-    <div className="flex flex-col items-start justify-start rounded-2xl gap-2 min-w-48 max-w-72 w-full">
-      <div className="rounded-2xl relative overflow-hidden w-full h-48 lg:h-60 xl:h-72">
+    <div className="flex flex-col items-start justify-start rounded-2xl gap-2 w-full h-full">
+      <div className="rounded-2xl relative overflow-hidden w-full h-0 pb-[100%]">
         {product.images[0]?.url && (
           <Image
             src={product.images[0].url}
             alt={product.name}
             fill
-            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 60vw, 72vw"
+            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover"
           />
         )}

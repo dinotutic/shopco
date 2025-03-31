@@ -16,7 +16,6 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
   const filters = { category, style, color, gender, minPrice, maxPrice };
   const title = createTitle([gender, category, style]);
   const initialProducts = await getProducts(filters, RESULTS_PER_PAGE);
-
   return (
     <section className="max-w-[1440px] w-full flex flex-col items-start justify-start overflow-hidden ">
       <ProductsHeader title={title} />

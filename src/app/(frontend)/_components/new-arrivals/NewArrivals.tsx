@@ -2,14 +2,14 @@ import { getNewArrivals } from "@/db/productQueries";
 import Card from "../card";
 import Title from "@/app/(frontend)/_components/ui/Title";
 import ViewAllBtn from "../ViewAllBtn";
+const NR_OF_PRODUCTS = 4;
 
-// Cards are horizontally scrollable on smaller screens
 const NewArrivals = async () => {
-  const newArrivals = await getNewArrivals(4);
+  const newArrivals = await getNewArrivals(NR_OF_PRODUCTS);
   return (
-    <section className="flex flex-col items-center mt-12 gap-12 border-b pb-14 w-full">
+    <section className="flex flex-col items-center mt-12 gap-12 px-4 pb-14 w-full">
       <Title>New Arrivals</Title>
-      <div className="flex gap-8 flex-nowrap w-full overflow-x-auto items-center justify-start md:justify-center hide-scrollbar px-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full">
         {newArrivals.map((product) => (
           <Card key={product.id} product={product} />
         ))}

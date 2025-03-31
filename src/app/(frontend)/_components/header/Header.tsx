@@ -1,5 +1,4 @@
 "use client";
-import { useState, useEffect } from "react";
 import HamburgerMenu from "./HamburgerMenu";
 import Logo from "./logo";
 import NavBar from "./NavBar";
@@ -8,7 +7,6 @@ import UserActions from "./UserActions";
 import useResponsiveMenu from "../../../hooks/useResponsiveMenu";
 
 const Header = () => {
-  // Handles opening and closing the hamburger menu
   const { isMenuOpen, isSmallScreen, toggleMenu } = useResponsiveMenu();
 
   return (
@@ -17,7 +15,9 @@ const Header = () => {
         <HamburgerMenu toggleMenu={toggleMenu} />
         <Logo />
       </div>
-      {isMenuOpen && isSmallScreen && <NavBar screenSize="small" />}
+      {isMenuOpen && isSmallScreen && (
+        <NavBar screenSize="small" toggleMenu={toggleMenu} />
+      )}
       <NavBar screenSize="medium" />
       <div className="hidden lg:flex flex-1 mx-4">
         <SearchBar />

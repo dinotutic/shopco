@@ -473,7 +473,7 @@ export async function getNewArrivals(limit?: number) {
         include: { user: true },
       },
       stock: {
-        include: { color: true },
+        include: { color: true, size: true },
       },
     },
     take: limit,
@@ -491,7 +491,7 @@ export async function getTopSelling(limit?: number) {
       gender: true,
       reviews: true,
       stock: {
-        include: { color: true },
+        include: { color: true, size: true },
       },
     },
     take: limit,

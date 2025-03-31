@@ -10,5 +10,5 @@ export const createTitle = ([gender, category, style]: [
   const title = [gender, category, style].filter(Boolean) as string[];
   const capitalizedTitle = title.map((string) => capitalizeFirstChar(string));
   const joinedTitle = capitalizedTitle.join(" - ");
-  return joinedTitle;
+  return title.length === 0 ? "All Products" : joinedTitle;
 };

@@ -41,7 +41,10 @@ const Products = ({ initialProducts, filters }: ProductProps) => {
   if (isError) return <div>Error fetching products</div>;
 
   return (
-    <div className="flex gap-10 flex-wrap items-center justify-start z-[-1]">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full">
+      {products.length === 0 && (
+        <p className="text-md p-10">No products found :(</p>
+      )}
       {products?.map((product) => (
         <Card key={product.id} product={product} />
       ))}

@@ -1,6 +1,5 @@
 import Brands from "../_components/brands/brands";
 import BrowseByStyle from "../_components/browse-by-style/BrowseByStyle";
-import Footer from "../_components/footer/Footer";
 import CustomerReviews from "../_components/customer-reviews/CustomerReviews";
 import Hero from "../_components/hero/Hero";
 import NewArrivals from "../_components/new-arrivals/NewArrivals";
@@ -13,6 +12,7 @@ const HomePage = () => {
       <Hero />
       <Brands />
       <NewArrivals />
+      <hr className="w-11/12 border-t border-gray-100" />
       <TopSelling />
       <BrowseByStyle />
       <CustomerReviews />
