@@ -1,7 +1,7 @@
 "use server";
 
 // Will definitely have to add some error handling here
-
+// At some places I am fetching products which are not available. These should only be shown in admin panel and not in store
 import { Category, Gender, Stock, Style } from "@prisma/client";
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
@@ -29,20 +29,17 @@ export async function getAllProducts() {
   return products;
 }
 
-export async function getProductCount() {
-  const [productCount, availableProducts] = await Promise.all([
-    prisma.product.count(),
-    prisma.product.count({ where: { isAvailable: true } }),
-  ]);
+export async function getProductCount(gender: string, resultsPerPage: number) {
+  const productCount = await prisma.product.count({
+    where: { isAvailable: true, gender: { name: gender } },
+  });
+
   return {
     productCount,
-    availableProducts,
-    totalPages: Math.ceil(productCount / 50), // 50 items per page
+    totalPages: Math.ceil(productCount / resultsPerPage), // 50 items per page
   };
 }
-////
-// IF I ADD IMAGES TO COLORS LATER, THERE COULD BE ISSUES WHEN DELETING
-////
+
 // I should probably only delete image from s3 if DB delete was successful and vice versa. Will look into it sometime in the future
 export async function deleteProduct(id: number) {
   const product = await prisma.product.findUnique({
@@ -520,6 +517,7 @@ export async function getProducts(
   take?: number,
   skip?: number
 ) {
+  console.log("skipping on server", skip);
   const { category, style, color, gender, minPrice, maxPrice } = filters;
   const products = await prisma.product.findMany({
     where: {

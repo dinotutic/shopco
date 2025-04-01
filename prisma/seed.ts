@@ -59,7 +59,7 @@ async function main() {
   }
 
   // Add Colors
-await prisma.color.createMany({
+  await prisma.color.createMany({
     data: [
       { name: "black" },
       { name: "white" },
@@ -103,7 +103,7 @@ await prisma.color.createMany({
 
   // Create products
   const products = [];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 200; i++) {
     const colorIndexes = getColorIndexes();
     const stockEntries = [];
     const images = [];

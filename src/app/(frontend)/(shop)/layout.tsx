@@ -19,7 +19,7 @@ export default async function RootLayout({
 
   return (
     <FilterProvider>
-      <div className="flex flex-col md:flex-row gap-10 max-w-[1440px] mx-auto w-full relative">
+      <div className="flex flex-col md:flex-row max-w-[1440px] mx-auto w-full relative">
         <FilterLayout filters={filters} />
         {children}
       </div>

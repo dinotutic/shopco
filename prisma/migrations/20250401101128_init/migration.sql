@@ -20,12 +20,6 @@ CREATE TABLE "Product" (
 );
 
 -- CreateTable
-CREATE TABLE "Gender" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT NOT NULL
-);
-
--- CreateTable
 CREATE TABLE "Color" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL
@@ -94,6 +88,12 @@ CREATE TABLE "Category" (
 
 -- CreateTable
 CREATE TABLE "Style" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Gender" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL
 );

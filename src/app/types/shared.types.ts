@@ -131,6 +131,8 @@ export interface ProductFilters {
   color: string | null;
   minPrice: number | null;
   maxPrice: number | null;
+  page: number | null;
+  perPage: number | null;
 }
 
 // might need to use this later
