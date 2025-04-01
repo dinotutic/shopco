@@ -5,7 +5,7 @@ import { createTitle } from "@/app/lib/textFormatting";
 import ProductsHeader from "../../../_components/shop/ProductsHeader";
 import Pagination from "@/app/(frontend)/_components/pagination/Pagination";
 import getPaginationValues from "@/app/lib/paginationUtil";
-// product fetching not working correctly, as well as calculating max products/pages when filtering
+
 export const RESULTS_PER_PAGE = 9;
 
 export interface ShopProps {
@@ -15,17 +15,23 @@ export interface ShopProps {
 const Shop = async ({ params, searchParams }: ShopProps) => {
   const { gender } = await params;
   // use this filters in Pagination to not loose filters when changing pages
-  const { category, style, color, minPrice, maxPrice, page, perPage } =
-    await searchParams;
-  const filters = {
+  const {
     category,
     style,
     color,
-    gender,
     minPrice,
     maxPrice,
     page,
-    perPage,
+  } = // destructure perPage if needed later
+    await searchParams;
+
+  const filters = {
+    category: category || null,
+    style: style || null,
+    color: color || null,
+    gender: gender || null,
+    minPrice: minPrice ? minPrice : null,
+    maxPrice: maxPrice ? maxPrice : null,
   };
   const title = createTitle([gender, category, style]);
 
@@ -34,7 +40,7 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
     selectedPage,
     skip,
     productCount,
-    totalPages,
+    // totalPages,
     hasNextPage,
     hasPrevPage,
     nextPageLink,
@@ -48,9 +54,12 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
   const initialProducts = await getProducts(filters, RESULTS_PER_PAGE, skip);
 
   return (
-    <section className="w-full flex flex-col items-start justify-start overflow-hidden mx-6">
-      <ProductsHeader title={title} />
-      <Products initialProducts={initialProducts} filters={filters} />
+    <section className="w-full">
+      <div className="w-full flex flex-col items-start justify-start overflow-hidden mx-6">
+        <ProductsHeader title={title} />
+        <Products initialProducts={initialProducts} filters={filters} />
+      </div>
+      <hr className="border-t border-gray-100 my-4" />
       <Pagination
         hasPrevPage={hasPrevPage}
         prevPageLink={prevPageLink ?? undefined}

@@ -11,8 +11,6 @@ interface getPaginationValuesProps {
     gender: "men" | "women" | "unisex";
     minPrice: number | null;
     maxPrice: number | null;
-    page: number | null;
-    perPage: number | null;
   };
 }
 
@@ -50,9 +48,11 @@ const getPaginationValues = async ({
   const selectedPage = Number(page ?? "1");
   const skip = (selectedPage - 1) * resultsPerPage;
 
+  // NEED TO ADD FILERS HERE
   const { productCount, totalPages } = await getProductCount(
     gender,
-    resultsPerPage
+    resultsPerPage,
+    filters
   );
   const hasNextPage = selectedPage < totalPages;
   const hasPrevPage = selectedPage > 1;

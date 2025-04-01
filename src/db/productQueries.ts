@@ -5,7 +5,7 @@
 import { Category, Gender, Stock, Style } from "@prisma/client";
 import prisma from "./prisma";
 import { deleteFile, uploadFile } from "@/app/lib/s3";
-import { Color, Image } from "@/app/types/shared.types";
+import { Color, Image, ProductFilters } from "@/app/types/shared.types";
 
 export async function getAllProducts() {
   const products = await prisma.product.findMany({
@@ -29,14 +29,35 @@ export async function getAllProducts() {
   return products;
 }
 
-export async function getProductCount(gender: string, resultsPerPage: number) {
+export async function getProductCount(
+  gender?: string,
+  resultsPerPage?: number,
+  filters?: Omit<ProductFilters, "gender" | "perPage" | "page">
+) {
+  const { category, style, color, minPrice, maxPrice } = filters || {};
   const productCount = await prisma.product.count({
-    where: { isAvailable: true, gender: { name: gender } },
+    where: {
+      isAvailable: true,
+      gender: gender ? { name: gender } : undefined,
+      category: category ? { name: category } : undefined,
+      style: style ? { name: style } : undefined,
+      stock: color
+        ? {
+            some: {
+              color: { name: color },
+            },
+          }
+        : undefined,
+      priceInCents: {
+        gte: minPrice ? minPrice * 100 : undefined,
+        lte: maxPrice ? maxPrice * 100 : undefined,
+      },
+    },
   });
 
   return {
     productCount,
-    totalPages: Math.ceil(productCount / resultsPerPage), // 50 items per page
+    totalPages: Math.ceil(productCount / (resultsPerPage || 1)),
   };
 }
 
@@ -517,17 +538,19 @@ export async function getProducts(
   take?: number,
   skip?: number
 ) {
-  console.log("skipping on server", skip);
   const { category, style, color, gender, minPrice, maxPrice } = filters;
   const products = await prisma.product.findMany({
     where: {
+      isAvailable: true,
       category: category ? { name: category } : undefined,
       style: style ? { name: style } : undefined,
-      stock: {
-        some: {
-          color: color ? { name: color } : undefined,
-        },
-      },
+      stock: color
+        ? {
+            some: {
+              color: { name: color },
+            },
+          }
+        : undefined,
       gender: gender ? { name: gender } : undefined,
       priceInCents: {
         gte: minPrice ? minPrice * 100 : undefined, // Convert to cents
@@ -547,7 +570,6 @@ export async function getProducts(
     take,
     skip,
   });
-  // await new Promise((resolve) => setTimeout(resolve, 1000));
   return products;
 }
 

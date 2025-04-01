@@ -135,7 +135,9 @@ async function main() {
       data: {
         name: faker.commerce.productName(),
         description: faker.commerce.productDescription(),
-        priceInCents: parseInt(faker.commerce.price()) * 100,
+        priceInCents: Math.round(
+          parseFloat(faker.commerce.price({ min: 1, max: 500 })) * 100
+        ),
         isAvailable: faker.datatype.boolean(),
         category: {
           connect: {
@@ -259,4 +261,5 @@ main()
 
 // ran the migration steps.
 
+// TO CREATE THE DATABASE:
 // npx prisma migrate dev --name init
