@@ -54,12 +54,12 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
   const initialProducts = await getProducts(filters, RESULTS_PER_PAGE, skip);
 
   return (
-    <section className="w-full">
-      <div className="w-full flex flex-col items-start justify-start overflow-hidden mx-6">
+    <section className="max-w-[1440px] w-full border">
+      <div className="w-full flex flex-col items-start justify-start overflow-hidden">
         <ProductsHeader title={title} />
         <Products initialProducts={initialProducts} filters={filters} />
       </div>
-      <hr className="border-t border-gray-100 my-4" />
+      <hr className="border-t border-gray-100 my-6" />
       <Pagination
         hasPrevPage={hasPrevPage}
         prevPageLink={prevPageLink ?? undefined}

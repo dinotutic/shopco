@@ -27,7 +27,7 @@ const Pagination: FC<PaginationProps> = ({
   const pageNumbers = getPageNumbers(page, totalPages);
   const { handlePrevious, handleNext, handlePageClick } = useHandleNavigation();
   return (
-    <div className="flex justify-between items-center gap-2 my-4">
+    <div className="flex justify-between items-center gap-2 my-6 w-full">
       <button
         className="bg-blue-500 text-white p-1"
         disabled={!hasPrevPage || !prevPageLink}
@@ -37,10 +37,10 @@ const Pagination: FC<PaginationProps> = ({
       </button>
 
       <div className="flex items-center gap-1">
-        {pageNumbers.map((pageNum) =>
+        {pageNumbers.map((pageNum, index) =>
           typeof pageNum === "number" ? (
             <button
-              key={pageNum}
+              key={index}
               className={`p-1 ${
                 pageNum === page ? "bg-blue-700 text-white" : "bg-gray-200"
               }`}
@@ -49,7 +49,7 @@ const Pagination: FC<PaginationProps> = ({
               {pageNum}
             </button>
           ) : (
-            <span key={pageNum} className="p-1">
+            <span key={`${pageNum}-${index}`} className="p-1">
               {pageNum}
             </span>
           )

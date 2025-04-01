@@ -1,6 +1,5 @@
 import { Color } from "@prisma/client";
 import { Image, Review, Size, Stock } from "../types/shared.types";
-import { getSizes } from "@/db/productQueries";
 
 export const processImagesArray = (
   images: Image[],

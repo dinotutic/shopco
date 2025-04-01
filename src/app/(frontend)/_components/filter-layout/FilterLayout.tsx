@@ -28,7 +28,7 @@ const FilterLayout = ({ filters }: FilterLayoutProps) => {
       <div
         className={`
           ${isFilterShown ? "block" : "hidden"} 
-          md:block w-full md:w-96 h-min p-6 border rounded-3xl absolute md:static z-20 bg-white`}
+          md:block w-full md:w-96 h-min p-6 border rounded-3xl absolute md:static z-20 bg-white mr-6`}
       >
         <Filters filters={filters} />
       </div>

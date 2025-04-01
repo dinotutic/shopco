@@ -1,11 +1,7 @@
 "use client";
-// FIX SIZING FOR PRODUCTS. NEED TO BE DYNAMIC
+
 import { Product, Review } from "@/app/types/shared.types";
 import Card from "../card";
-import { useQuery } from "@tanstack/react-query";
-import { getProducts } from "@/db/productQueries";
-import { RESULTS_PER_PAGE } from "../../(shop)/shop/[gender]/page";
-import Loading from "@/app/(frontend)/_components/ui/Loading";
 
 interface ProductProps {
   initialProducts: (Omit<Product, "reviews" | "user"> & {
@@ -20,32 +16,13 @@ interface ProductProps {
     gender: "men" | "women" | "unisex";
   };
 }
-const Products = ({ initialProducts, filters }: ProductProps) => {
-  const {
-    data: products,
-    isError,
-    isLoading,
-  } = useQuery({
-    queryKey: ["products", { ...filters }],
-    queryFn: () => getProducts(filters, RESULTS_PER_PAGE),
-    initialData: initialProducts,
-    staleTime: 1000 * 60 * 5,
-  });
-
-  if (isLoading)
-    return (
-      <div>
-        <Loading />
-      </div>
-    );
-  if (isError) return <div>Error fetching products</div>;
-
+const Products = ({ initialProducts }: ProductProps) => {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-6 w-full">
-      {products.length === 0 && (
+      {initialProducts.length === 0 && (
         <p className="text-md p-10">No products found :(</p>
       )}
-      {products?.map((product) => (
+      {initialProducts?.map((product) => (
         <Card key={product.id} product={product} />
       ))}
     </div>
