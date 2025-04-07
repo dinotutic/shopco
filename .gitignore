@@ -38,3 +38,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database files
+*.db
+*.sqlite
+*.sqlite3
+*.sql
+prisma/backup/
+prisma/dev.db
