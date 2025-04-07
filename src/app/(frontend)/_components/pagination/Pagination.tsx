@@ -12,6 +12,7 @@ interface PaginationProps {
   perPage: number;
   nextPageLink?: string;
   prevPageLink?: string;
+  pageLinks: string[]; // Array of precomputed page URLs
 }
 
 const Pagination: FC<PaginationProps> = ({
@@ -22,29 +23,33 @@ const Pagination: FC<PaginationProps> = ({
   productCount,
   page,
   perPage,
+  pageLinks,
 }) => {
   const totalPages = Math.ceil(Number(productCount) / Number(perPage));
   const pageNumbers = getPageNumbers(page, totalPages);
   const { handlePrevious, handleNext, handlePageClick } = useHandleNavigation();
+
   return (
     <div className="flex justify-between items-center gap-2 my-6 w-full">
-      <button
-        className="bg-blue-500 text-white p-1"
-        disabled={!hasPrevPage || !prevPageLink}
+      <PaginationButton
+        label="← Previous"
         onClick={() => handlePrevious(prevPageLink)}
-      >
-        ← Previous
-      </button>
+        disabled={!hasPrevPage || !prevPageLink}
+      />
 
       <div className="flex items-center gap-1">
         {pageNumbers.map((pageNum, index) =>
           typeof pageNum === "number" ? (
             <button
               key={index}
-              className={`p-1 ${
-                pageNum === page ? "bg-blue-700 text-white" : "bg-gray-200"
+              className={`px-4 py-2 rounded-xl text-gray-600 ${
+                pageNum === page
+                  ? "bg-gray-100 text-black"
+                  : "hover:bg-gray-100"
               }`}
-              onClick={() => handlePageClick(pageNum)}
+              onClick={() =>
+                handlePageClick(pageNum, () => pageLinks[pageNum - 1])
+              }
             >
               {pageNum}
             </button>
@@ -55,16 +60,35 @@ const Pagination: FC<PaginationProps> = ({
           )
         )}
       </div>
-
-      <button
-        className="bg-blue-500 text-white p-1"
-        disabled={!hasNextPage || !nextPageLink}
+      <PaginationButton
+        label="Next →"
         onClick={() => handleNext(nextPageLink)}
-      >
-        Next →
-      </button>
+        disabled={!hasNextPage || !nextPageLink}
+      />
     </div>
   );
 };
 
 export default Pagination;
+
+interface PaginationButtonProps {
+  label: string;
+  onClick: () => void;
+  disabled: boolean;
+}
+
+const PaginationButton: FC<PaginationButtonProps> = ({
+  label,
+  onClick,
+  disabled,
+}) => {
+  return (
+    <button
+      className="border rounded-lg px-4 py-2 hover:bg-gray-100"
+      disabled={disabled}
+      onClick={onClick}
+    >
+      {label}
+    </button>
+  );
+};

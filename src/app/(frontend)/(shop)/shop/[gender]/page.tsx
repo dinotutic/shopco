@@ -40,11 +40,12 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
     selectedPage,
     skip,
     productCount,
-    // totalPages,
+    totalPages,
     hasNextPage,
     hasPrevPage,
     nextPageLink,
     prevPageLink,
+    pageLink,
   } = await getPaginationValues({
     page,
     gender,
@@ -53,8 +54,12 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
   });
   const initialProducts = await getProducts(filters, RESULTS_PER_PAGE, skip);
 
+  const pageLinks = Array.from({ length: totalPages }, (_, i) =>
+    pageLink(i + 1)
+  );
+
   return (
-    <section className="max-w-[1440px] w-full border">
+    <section className="max-w-[1440px] w-full">
       <div className="w-full flex flex-col items-start justify-start overflow-hidden">
         <ProductsHeader title={title} />
         <Products initialProducts={initialProducts} filters={filters} />
@@ -68,6 +73,7 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
         productCount={productCount}
         page={selectedPage}
         perPage={RESULTS_PER_PAGE}
+        pageLinks={pageLinks} // Pass precomputed page links
       />
     </section>
   );

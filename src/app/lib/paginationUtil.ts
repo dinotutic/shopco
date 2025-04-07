@@ -48,7 +48,6 @@ const getPaginationValues = async ({
   const selectedPage = Number(page ?? "1");
   const skip = (selectedPage - 1) * resultsPerPage;
 
-  // NEED TO ADD FILERS HERE
   const { productCount, totalPages } = await getProductCount(
     gender,
     resultsPerPage,
@@ -65,6 +64,9 @@ const getPaginationValues = async ({
     ? buildUrl(gender, filters, selectedPage - 1, resultsPerPage)
     : null;
 
+  const pageLink = (pageNum: number) =>
+    buildUrl(gender, filters, pageNum, resultsPerPage);
+
   return {
     selectedPage,
     skip,
@@ -74,6 +76,7 @@ const getPaginationValues = async ({
     hasPrevPage,
     nextPageLink,
     prevPageLink,
+    pageLink,
   };
 };
 

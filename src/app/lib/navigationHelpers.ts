@@ -17,8 +17,12 @@ const useHandleNavigation = () => {
     }
   };
 
-  const handlePageClick = (pageNum: number) => {
-    router.push(`?page=${pageNum}`);
+  const handlePageClick = (
+    pageNum: number,
+    pageLink: (pageNum: number) => string
+  ) => {
+    const url = pageLink(pageNum);
+    router.push(url);
   };
 
   return { handlePrevious, handleNext, handlePageClick };
