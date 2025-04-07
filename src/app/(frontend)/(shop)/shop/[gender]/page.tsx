@@ -73,7 +73,7 @@ const Shop = async ({ params, searchParams }: ShopProps) => {
         productCount={productCount}
         page={selectedPage}
         perPage={RESULTS_PER_PAGE}
-        pageLinks={pageLinks} // Pass precomputed page links
+        pageLinks={pageLinks}
       />
     </section>
   );
